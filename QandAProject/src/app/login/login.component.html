@@ -1,0 +1,27 @@
+<form class="login-form" #myForm="ngForm" novalidate>
+  <h1>Login</h1>
+  <input
+    class="inputs"
+    [(ngModel)]="login"
+    type="text"
+    name="login"
+    placeholder="login"
+    autocomplete="username"
+    required
+    email
+    autofocus
+  >
+  <input
+    class="inputs"
+    [(ngModel)]="password"
+    type="password"
+    name="password"
+    placeholder="password"
+    autocomplete="current-password"
+    required
+  >
+  <button 
+    (click)="Login()"
+    [disabled]="myForm.invalid"
+  >login</button>
+</form>

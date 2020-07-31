@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using WebApiQandA.Models.Interfaces;
 using WebApiQandA.Models.Repositorys;
 
@@ -24,9 +26,12 @@ namespace Server2
 			services.AddControllersWithViews();
 		}
 
-		public void Configure(IApplicationBuilder app)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			app.UseDeveloperExceptionPage();
+			if(env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
 
 			app.UseHttpsRedirection();
 
