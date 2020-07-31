@@ -7,6 +7,7 @@ Questions and Answers - this is a survey creation application written in angular
 - .Net Core 3 
 - Angular 
 - html & css
+
 Не используем: 
 - CSS Frameworks (Bootstrap etc) 
 - UI Components Libraries (element-ui, vuetify, vue-bootstrap etc) 
