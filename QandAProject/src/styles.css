@@ -1,1 +1,19 @@
 /* You can add global styles to this file, and also import other style files */
+* {
+  font-weight: 600;
+  font-size: 14px;
+  font-family: Open Sans;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+}
+
+h1 {
+  font-size: 30px;
+  line-height: 40px;
+}
+

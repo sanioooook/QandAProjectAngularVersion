@@ -1,0 +1,12 @@
+.Header {
+  background-color: chocolate;
+  display: flex;
+  justify-content: space-around;
+}
+
+a, .authorize-links  {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+  

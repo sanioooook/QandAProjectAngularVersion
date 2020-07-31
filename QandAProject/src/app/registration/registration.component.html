@@ -1,0 +1,37 @@
+<form class="registration-form" #myForm="ngForm" novalidate>
+  <h1>Registration</h1>
+  <input
+    class="inputs"
+    [(ngModel)]="login"
+    type="text"
+    name="login"
+    placeholder="login"
+    autocomplete="username"
+    required email
+  >
+  <input
+    class="inputs"
+    [(ngModel)]="password"
+    type="password"
+    name="password"
+    placeholder="password"
+    autocomplete="new-password"
+    required
+    pattern="((.+){8,})"
+    (change)="onChange()"
+  >
+  <input
+    class="inputs"
+    [(ngModel)]="secondPassword"
+    type="password"
+    name="secondPassword"
+    placeholder="repeat password"
+    autocomplete="new-password"
+    required
+    [pattern]="pattern"
+  >
+  <button 
+    (click)="Registration()"
+    [disabled]="myForm.invalid"
+  >Registration</button>
+</form>
