@@ -4,9 +4,11 @@
   justify-content: space-around;
 }
 
-a, .authorize-links  {
-  color: white;
+.authorize-links {
   text-decoration: none;
   cursor: pointer;
 }
   
+a, .authorize-links {
+  color: white;
+}
