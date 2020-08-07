@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Server2.Models;
+using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
 namespace Server2.Controllers
@@ -9,31 +11,63 @@ namespace Server2.Controllers
     [ApiController]
     public class AnswerController : ControllerBase
     {
-        public AnswerController(IAnswerRepository answerRepository) => AnswerRepository = answerRepository;
+        public AnswerController(IAnswerRepository answerRepository, IUserRepository userRepository)
+        {
+            _answerRepository = answerRepository;
+            _userRepository = userRepository;
+        }
 
-        public IAnswerRepository AnswerRepository { get; private set; }
+        private IAnswerRepository _answerRepository;
+
+        private IUserRepository _userRepository;
+
         // GET: api/Answer
-        [HttpGet]
-        public IEnumerable<Answer> Get() => AnswerRepository.GetAnswers(Request.Headers["Authorization"]);
+/*        [HttpGet]
+        public IActionResult Get()
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return Ok(_answerRepository.GetAllAnswers());
+        }
 
         // GET: api/Answer/5
         [HttpGet("{id}")]
-        public Answer Get(int id) => AnswerRepository.Get(Request.Headers["Authorization"], id);
+        public IActionResult Get(int id)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return Ok(_answerRepository.GetAnswerById(id));
+        }*/
 
         // POST: api/Answer
         [HttpPost]
-        public string Post([FromBody] Answer answer) => AnswerRepository.Create(Request.Headers["Authorization"], answer);
-
-        // PUT: api/Answer/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        // DELETE: api/ApiWithActions/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        public IActionResult Post([FromBody] AnswerDTO answer)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            _answerRepository.Create(answer);
+            return Ok();
+        }
     }
 }

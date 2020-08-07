@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Server2.Models;
 using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
@@ -23,21 +24,12 @@ namespace Server2.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var users = _userRepository.GetUsers();
-            List<string> usersForReturn = new List<string>();
-            foreach(var user in users)
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
             {
-                usersForReturn.Add(user.Login);
+                return BadRequest("Token is empty. Please, try again.");
             }
-            return Ok(usersForReturn);
-        }
-
-        // GET: api/User/5
-        [HttpGet]
-        public IActionResult Get([FromQuery] int id)
-        {
-            var user = _userRepository.Get(id);
-            return user != null ? Ok(user.Login) : (IActionResult)BadRequest(new HttpError { Error = "Id is incorrect. Please, try again" });
+            return Ok(new UserForPublic { Login = _userRepository.GetUserByToken(token).Login });
         }
 
         // POST: api/User/register
@@ -52,38 +44,27 @@ namespace Server2.Controllers
                     return Ok(_userRepository.Login(user));
                 }
             }
-            return BadRequest(new HttpError {Error="Registration is failed. Please, try again" });
+            return BadRequest("Registration is failed. Please, try again");
         }
 
         // POST: api/User/login
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public IActionResult Login([FromBody] UserForLoginOrRegistrationDTO user)
         {
             var userDTO = _userRepository.Login(user);
-            return userDTO is null ? BadRequest(new HttpError { Error = "Login or Password wrong. Please, try again" }) : (IActionResult)Ok(userDTO);
+            return userDTO is null ? BadRequest("Login or Password wrong. Please, try again") : (IActionResult)Ok(userDTO);
         }
 
-        [HttpGet("logout")]
+        [HttpGet("Logout")]
         public IActionResult Logout()
         {
             Request.Headers.TryGetValue("AuthorizationToken", out var token);
-            if(token == "")
+            if(StringValues.IsNullOrEmpty(token))
             {
-                return BadRequest(new HttpError { Error = "Token is empty. Please, try again." });
+                return BadRequest("Token is empty. Please, try again.");
             }
             _userRepository.Logout(token);
             return Ok();
         }
-        //// PUT: api/User/5
-        //[HttpPut("{id}")]//update
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE: api/ApiWithActions/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

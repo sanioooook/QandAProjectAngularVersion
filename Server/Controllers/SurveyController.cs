@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Server2.Models;
+using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
 namespace Server2.Controllers
@@ -9,42 +11,82 @@ namespace Server2.Controllers
     [ApiController]
     public class SurveyController : ControllerBase
     {
-        public SurveyController(ISurveyRepository surveyRepository) => SurveyRepository = surveyRepository;
 
-        public ISurveyRepository SurveyRepository { get; private set; }
+        public SurveyController(ISurveyRepository surveyRepository, IUserRepository userRepository)
+        {
+            _surveyRepository = surveyRepository;
+            _userRepository = userRepository;
+        }
+
+        private IUserRepository _userRepository;
+
+        private ISurveyRepository _surveyRepository;
+
         // GET: api/Survey
         [HttpGet]
-        public IEnumerable<Survey> Get()
+        public IActionResult Get()
         {
-            return SurveyRepository.GetSurveys(Request.Headers["Authorization"]);
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return Ok(_surveyRepository.GetAllSurveys());
         }
 
         // GET: api/Survey/5
         [HttpGet("{id}")]
-        public Survey Get(int id) => SurveyRepository.Get(Request.Headers["Authorization"], id);
+        public IActionResult Get(int id)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return Ok(_surveyRepository.GetSurveyBySurveyId(id));
+        }
 
-        // GET: api/Survey/Question/{Question}
-        //[HttpGet("Question/{Question}")]
-        public IEnumerable<Survey> Get(string Question) => SurveyRepository.Get(Request.Headers["Authorization"], Question);
+        // POST: api/Survey/Create
+        [HttpPost("Create")]
+        public IActionResult Post([FromBody] SurveyDTO surveyDTO)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            var user = _userRepository.GetUserByToken(token);
+            if(user == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return _surveyRepository.Create(user, surveyDTO) ? Ok() : (IActionResult)BadRequest("Error create survey, please, try again");
+        }
 
-        // POST: api/Survey
-        [HttpPost]
-        public string Post([FromBody] Survey survey) => SurveyRepository.Create(Request.Headers["Authorization"], survey);
 
-
-        // POST: api/Survey
-        [HttpPost("User")]
-        public IEnumerable<Survey> Post([FromBody] User user) => SurveyRepository.Get(Request.Headers["Authorization"], user);
-        // PUT: api/Survey/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        // DELETE: api/ApiWithActions/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        // POST: api/Survey/UserSurveys
+        [HttpPost("UserSurveys")]
+        public IActionResult Post()
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            var user = _userRepository.GetUserByToken(token);
+            if(user == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return Ok(_surveyRepository.GetSurveysByUser(user));
+        }
     }
 }

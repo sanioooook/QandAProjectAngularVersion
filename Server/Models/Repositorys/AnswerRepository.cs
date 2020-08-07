@@ -3,80 +3,138 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using Server2.Models;
+using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
 namespace WebApiQandA.Models.Repositorys
 {
-	public class AnswerRepository : IAnswerRepository
-	{
-		string connectionString = null;
-		public AnswerRepository(string connectionString) => this.connectionString = connectionString;
+    public class AnswerRepository : IAnswerRepository
+    {
+        private string _connectionString = null;
 
-		public string Create(string token, Answer answer)
-		{
-			if(answer.TextAnswer.Length <= 100 && answer.Survey != null)
-			{
-				IDbConnection db = new SqlConnection(connectionString);
-				if(answer.Survey.Id == 0 && answer.Survey.Question != null)
-				{
-					SurveyRepository surveyRepository = new SurveyRepository(connectionString);
-					answer.Survey = surveyRepository.Get(token, answer.Survey.Question).FirstOrDefault();
-				}
-				else if(answer.Survey.Id == 0 && answer.Survey.Question == null)
-					return "Fail";
-				db.Execute("INSERT INTO Answer (TextAnswer, IdSurvey) VALUES(@TextAnswer, @Id)", new { answer.TextAnswer, answer.Survey.Id });
-				return "Success";
-			}
-			return "Fail";
-		}
+        public AnswerRepository(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
 
-		public Answer Get(string token, int id)
-		{
-			IDbConnection db = new SqlConnection(connectionString);
-			//SurveyRepository surveyRepository = new SurveyRepository(connectionString);
-			var answer = db.Query<Answer>("SELECT * FROM Answer WHERE Answer.Id = @id", new { id }).FirstOrDefault();
-			//answer.Survey = surveyRepository.Get(answer.IdSurvey);
-			return answer;
-		}
+        private void Create(Answer answer)
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            db.Execute("INSERT INTO Answer (TextAnswer, IdSurvey) VALUES(@TextAnswer, @IdSurvey)", new { answer.TextAnswer, answer.IdSurvey });
+        }
 
-		public List<Answer> Get(string token, Survey survey)
-		{
-			IDbConnection db = new SqlConnection(connectionString);
-			if(survey != null)
-			{
-				SurveyRepository surveyRepository = new SurveyRepository(connectionString);
-				if(survey.Id == 0 && survey.Question != null)
-					survey = surveyRepository.Get(token, survey.Question).FirstOrDefault();
-				else if(survey.Id == 0 && survey.Question == null)
-					return null;
-				var answers = db.Query<Answer>("SELECT * FROM Answer WHERE IdSurvey = @Id", new { survey.Id }).ToList();
-				//foreach(var answer in answers)
-				//	answer.Survey = survey;
-				return answers;
-			}
-			else
-				return null;
-		}
+        public void Create(AnswerDTO answerDTO)
+        {
+            Create(ConvertAnswerDTOToAnswer(answerDTO, false));
+        }
 
-		public List<Answer> Get(string token, string answer)
-		{
-			IDbConnection db = new SqlConnection(connectionString);
-			SurveyRepository surveyRepository = new SurveyRepository(connectionString);
-			var answers = db.Query<Answer>("SELECT * FROM Answer  WHERE TextAnswer = @answer", new { answer }).ToList();
-			foreach(var Answer in answers)
-				Answer.Survey = surveyRepository.Get(token, Answer.IdSurvey);
-			return answers;
-		}
+        public AnswerDTO GetAnswerById(int id)
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            var answer = db.Query<Answer>("SELECT * FROM Answer WHERE Answer.Id = @id", new { id }).FirstOrDefault();
+            return ConvertAnswerToAnswerDTO(answer);
+        }
 
-		public List<Answer> GetAnswers(string token)
-		{
-			IDbConnection db = new SqlConnection(connectionString);
-			SurveyRepository surveyRepository = new SurveyRepository(connectionString);
-			var answers = db.Query<Answer>("SELECT * FROM Answer ").ToList();
-			foreach(var answer in answers)
-				answer.Survey = surveyRepository.Get(token, answer.IdSurvey);
-			return answers;
-		}
-	}
+        public List<AnswerDTO> GetAnswersBySurvey(Survey survey)
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            var answers = db.Query<Answer>("SELECT * FROM Answer WHERE IdSurvey = @Id", new { survey.Id }).ToList();
+
+            var answersDTO = new List<AnswerDTO>();
+            foreach(var answer in answers)
+            {
+                answersDTO.Add(ConvertAnswerToAnswerDTO(answer));
+            }
+            return answersDTO;
+        }
+
+        public List<AnswerDTO> GetAnswersBySurveyId(int surveyId)
+        {
+            SurveyRepository surveyRepository = new SurveyRepository(_connectionString);
+            return GetAnswersBySurvey(surveyRepository.ConvertSurveyDTOToSurvey(surveyRepository.GetSurveyBySurveyId(surveyId)));
+        }
+
+        /// <summary>
+        /// Возвращает все ответы, которые ставил юзер в конкретном опросе(по тексту опроса)
+        /// </summary>
+        /// <param name="answer">The answer.</param>
+        /// <returns></returns>
+        public List<AnswerDTO> GetAllAnswersByAnswer(string answer)
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            SurveyRepository surveyRepository = new SurveyRepository(_connectionString);
+            var answers = db.Query<Answer>("SELECT * FROM Answer  WHERE TextAnswer = @answer", new { answer }).ToList();
+            foreach(var Answer in answers)
+            {
+                Answer.Survey = surveyRepository.ConvertSurveyDTOToSurvey(surveyRepository.GetSurveyBySurveyId(Answer.IdSurvey));
+            }
+            var answersDTO = new List<AnswerDTO>();
+            foreach(var answerInAnswers in answers)
+            {
+                answersDTO.Add(ConvertAnswerToAnswerDTO(answerInAnswers));
+            }
+            return answersDTO;
+        }
+
+        public List<AnswerDTO> GetAllAnswers()
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            SurveyRepository surveyRepository = new SurveyRepository(_connectionString);
+            var answers = db.Query<Answer>("SELECT * FROM Answer").ToList();
+            foreach(var answer in answers)
+            {
+                answer.Survey = surveyRepository.ConvertSurveyDTOToSurvey(surveyRepository.GetSurveyBySurveyId(answer.IdSurvey));
+            }
+            var answersDTO = new List<AnswerDTO>();
+            foreach(var answer in answers)
+            {
+                answersDTO.Add(ConvertAnswerToAnswerDTO(answer));
+            }
+            return answersDTO;
+        }
+
+        public Answer ConvertAnswerDTOToAnswer(AnswerDTO answerDTO, bool convertSurvey = true)
+        {
+            SurveyRepository surveyRepository = new SurveyRepository(_connectionString);
+            VoteRepository voteRepository = new VoteRepository(_connectionString);
+            var votes = new List<Vote>();
+            if(answerDTO.Votes != null)
+            {
+                foreach(var voteDTO in answerDTO.Votes)
+                {
+                    votes.Add(voteRepository.ConvertVoteDTOToVote(voteDTO));
+                }
+            }
+            return new Answer
+            {
+                Id = (int)answerDTO.Id,
+                IdSurvey = (int)answerDTO.IdSurvey,
+                Survey = convertSurvey ? surveyRepository.ConvertSurveyDTOToSurvey(surveyRepository.GetSurveyBySurveyId((int)answerDTO.IdSurvey)) : null,
+                TextAnswer = answerDTO.TextAnswer,
+                Votes = votes.ToArray()
+            };
+        }
+
+        public AnswerDTO ConvertAnswerToAnswerDTO(Answer answer)
+        {
+            VoteRepository voteRepository = new VoteRepository(_connectionString);
+            var votesDTO = new List<VoteDTO>();
+            if(answer.Votes != null)
+            {
+                foreach(var vote in answer.Votes)
+                {
+                    votesDTO.Add(voteRepository.ConvertVoteToVoteDTO(vote));
+                }
+            }
+            return new AnswerDTO
+            {
+                Id = answer.Id,
+                IdSurvey = answer.IdSurvey,
+                TextAnswer = answer.TextAnswer,
+                Votes = votesDTO.ToArray(),
+            };
+        }
+    }
 }
