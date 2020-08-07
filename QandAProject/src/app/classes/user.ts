@@ -1,3 +1,3 @@
 export class User {
-    public authorizationToken:string 
+    public authorizationToken: string;
 }

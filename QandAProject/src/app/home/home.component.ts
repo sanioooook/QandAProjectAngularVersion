@@ -8,7 +8,7 @@ import { UserService } from '../services/user-service.service';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(public userService:UserService) { }
+  constructor(public userService: UserService) { }
 
   linksNotAuthorizedUser = [
     {title: 'Login', link: '/login'},

@@ -10,26 +10,26 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class RegistrationComponent implements OnInit {
 
-  login:string = '';
-  password:string = '';
-  secondPassword:string = '';
-  pattern:string = ''
-  constructor(private _router: Router, private userService: UserService) { }
+  login = '';
+  password = '';
+  secondPassword = '';
+  pattern = '';
+  constructor(private router: Router, private userService: UserService) { }
 
   ngOnInit(): void {
   }
 
-  Registration():void{
+  Registration(): void{
     this.userService.registration(this.login, this.password).then(() => {
-      this._router.navigate(['home']);
+      this.router.navigate(['home']);
     },
-    (Error: HttpErrorResponse)=>
-      window.alert(Error.error.error)
+    (Error: HttpErrorResponse) =>
+      window.alert(Error.error)
     );
-    
+
   }
 
-  onChange():void{
-    this.pattern=this.password;
+  onChange(): void{
+    this.pattern = this.password;
   }
 }
