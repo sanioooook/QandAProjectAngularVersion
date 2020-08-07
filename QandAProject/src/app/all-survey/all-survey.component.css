@@ -1,0 +1,33 @@
+.survey {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+.surveys {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.survey-answers {
+  margin: 5px 0;
+}
+
+.survey-add-response {
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.survey-creator { 
+  align-items: flex-end;
+  display: flex;
+  flex: auto;
+  justify-content: center;
+}

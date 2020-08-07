@@ -1,7 +1,7 @@
-import { Injectable } from "@angular/core";
-import { CanDeactivate, CanActivate } from "@angular/router";
+import { Injectable } from '@angular/core';
+import { CanDeactivate, CanActivate } from '@angular/router';
 import { UserService } from '../services/user-service.service';
-import { Observable } from "rxjs";
+import { Observable } from 'rxjs';
 
 export interface CanComponentDeactivate {
   canDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
@@ -15,12 +15,12 @@ export class NotAuthorized implements CanDeactivate<CanComponentDeactivate>, Can
 
   constructor(private userService: UserService) { }
 
-  canActivate():boolean {
+  canActivate(): boolean {
     return !this.userService.IsUserLogged();
   }
 
-  canDeactivate():boolean {
+  canDeactivate(): boolean {
     return this.userService.IsUserLogged();
   }
-  
+
 }

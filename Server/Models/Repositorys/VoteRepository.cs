@@ -5,139 +5,125 @@ using System.Data.SqlClient;
 using System.Linq;
 using Dapper;
 using Server2.Models;
+using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
 namespace WebApiQandA.Models.Repositorys
 {
-	public class VoteRepository : IVoteRepository
-	{
-		string connectionString = null;
-		public VoteRepository(string connectionString) => this.connectionString = connectionString;
-		public string Create(string token, Vote vote)
-		{
-			try
-			{
-				UserRepository userRepository = new UserRepository(connectionString);
-				if(userRepository.GetAuthorization(token))
-				{
-					SurveyRepository surveyRepository = new SurveyRepository(connectionString);
-					IDbConnection db = new SqlConnection(connectionString);
-					Answer answer = db.Query<Answer>("SELECT * FROM Answer WHERE Answer.Id = @IdAnswer", new { vote.IdAnswer }).FirstOrDefault();
-					Survey survey = surveyRepository.Get(token, answer.IdSurvey);
-					if(survey.SeveralAnswer || !surveyRepository.VoteUser(token, survey, userRepository.Get(vote.Voter.Login)))
-					{
-						vote.IdCustomer = userRepository.Get(vote.Voter.Login).Id;
-						db = new SqlConnection(connectionString);
-						var date = DateTime.Now;
-						string DateVote = $"{date.Year}{(date.Month < 9 ? "0" + date.Month.ToString() : date.Month.ToString())}{date.Day} {date.Hour}:{date.Minute}:{date.Second}";
-						db.Execute("INSERT INTO Vote (IdAnswer, IdCustomer, DateVote) VALUES(@IdAnswer, @IdCustomer, @DateVote)",
-							new { vote.IdAnswer, vote.IdCustomer, DateVote });
-						return "Success";
-					}
-					else
-						throw new Exception("Нет разрешения на голосование дважды");
-				}
-				else
-					throw new Exception("неверный токен");
-			}
-			catch
-			{
-				return "Fail";
-			}
-		}
+    public class VoteRepository : IVoteRepository
+    {
+        private string _connectionString;
 
-		public Vote Get(string token, int id)
-		{
-			UserRepository userRepository = new UserRepository(connectionString);
-			if(userRepository.GetAuthorization(token))
-			{
-				IDbConnection db = new SqlConnection(connectionString);
-				var vote = db.Query<Vote>("SELECT * FROM Vote WHERE Id = @id", new { id }).FirstOrDefault();
-				AnswerRepository answerRepository = new AnswerRepository(connectionString);
-				vote.Answer = answerRepository.Get(token, vote.IdAnswer);
-				vote.Voter = userRepository.Get(vote.IdCustomer);
-				return vote;
-			}
-			return null;
-		}
+        public VoteRepository(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
 
-		public List<Vote> GetVotes(string token)
-		{
-			UserRepository userRepository = new UserRepository(connectionString);
-			if(userRepository.GetAuthorization(token))
-			{
-				IDbConnection db = new SqlConnection(connectionString);
-				var votes = db.Query<Vote>("SELECT * FROM Vote").ToList();
-				AnswerRepository answerRepository = new AnswerRepository(connectionString);
-				foreach(var vote in votes)
-				{
-					vote.Answer = answerRepository.Get(token, vote.IdAnswer);
-					vote.Voter = userRepository.Get(vote.IdCustomer);
-				}
-				return votes;
-			}
-			return null;
-		}
+        private bool Create(Vote vote)
+        {
+            try
+            {
+                var surveyRepository = new SurveyRepository(_connectionString);
+                var answerRepository = new AnswerRepository(_connectionString);
+                var userRepository = new UserRepository(_connectionString);
+                IDbConnection db = new SqlConnection(_connectionString);
+                var surveyDTO = surveyRepository.GetSurveyBySurveyId((int)answerRepository.GetAnswerById(vote.IdAnswer).IdSurvey);
+                if(surveyDTO.SeveralAnswer || !surveyRepository.VoteUser(userRepository.Get(vote.IdCustomer), surveyDTO))
+                {
+                    var date = DateTime.Now;
+                    db.Execute("INSERT INTO Vote (IdAnswer, IdCustomer, DateVote) VALUES(@IdAnswer, @IdCustomer, @date)",
+                        new { vote.IdAnswer, vote.IdCustomer, date });
+                    return true;
+                }
+                else
+                    throw new Exception("Нет разрешения на голосование дважды");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+        }
 
-		public List<Vote> GetUser(string token, int userId)
-		{
-			UserRepository userRepository = new UserRepository(connectionString);
-			if(userId != 0 && userRepository.GetAuthorization(token))
-			{
-				User user = userRepository.Get(userId);
-				if(user != null)
-				{
-					AnswerRepository answerRepository = new AnswerRepository(connectionString);
-					IDbConnection db = new SqlConnection(connectionString);
-					var votes = db.Query<Vote>("SELECT * FROM Vote WHERE IdCustomer = @Id", new { user.Id }).ToList();
-					foreach(var vote in votes)
-					{
-						vote.Answer = answerRepository.Get(token, vote.IdAnswer);
-						vote.Voter = user;
-					}
-					return votes;
-				}
-			}
-			return null;
-		}
-		public List<Vote> Get(string token, User user)
-		{
-			UserRepository userRepository = new UserRepository(connectionString);
-			if(user != null && user.Login != null && userRepository.GetAuthorization(token))
-			{
-				AnswerRepository answerRepository = new AnswerRepository(connectionString);
-				IDbConnection db = new SqlConnection(connectionString);
-				user = userRepository.Get(user.Login);
-				if(user != null)
-				{
-					var votes = db.Query<Vote>("SELECT * FROM Vote WHERE IdCustomer = @Id", new { user.Id }).ToList();
-					foreach(var vote in votes)
-					{
-						vote.Answer = answerRepository.Get(token, vote.IdAnswer);
-						vote.Voter = user;
-					}
-					return votes;
-				}
-			}
-			return null;
-		}
+        public bool Create(VoteDTO vote)
+        {
+            return Create(ConvertVoteDTOToVote(vote));
+        }
 
-		public List<Answer> Get(string token, Answer[] answers)
-		{
-			UserRepository userRepository = new UserRepository(connectionString);
-			if(answers != null && answers.Length >= 1 && userRepository.GetAuthorization(token))
-			{
-				IDbConnection db = new SqlConnection(connectionString);
-				foreach(var answer in answers)
-				{
-					var votes = db.Query<Vote>("SELECT * FROM Vote WHERE IdAnswer = @Id", new { answer.Id }).ToList();
-					foreach(var vote in votes)
-						vote.Voter = userRepository.Get(vote.IdCustomer);
-					answer.Votes = votes.ToArray();
-				}
-				return answers.ToList();
-			}
-			return null;
-		}
-	}
+        public VoteDTO GetVoteById(int id)
+        {
+            UserRepository userRepository = new UserRepository(_connectionString);
+            IDbConnection db = new SqlConnection(_connectionString);
+            var vote = db.Query<Vote>("SELECT * FROM Vote WHERE Id = @id", new { id }).FirstOrDefault();
+            return ConvertVoteToVoteDTO(vote);
+        }
+
+        public List<VoteDTO> GetAllVotes()
+        {
+            UserRepository userRepository = new UserRepository(_connectionString);
+            IDbConnection db = new SqlConnection(_connectionString);
+            var votes = db.Query<Vote>("SELECT * FROM Vote").ToList();
+            var voteDTOs = new List<VoteDTO>();
+            foreach(var vote in votes)
+            {
+                voteDTOs.Add(ConvertVoteToVoteDTO(vote));
+            }
+            return voteDTOs;
+        }
+
+        public List<VoteDTO> GetVotesByUser(User user)
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            var votes = db.Query<Vote>("SELECT * FROM Vote WHERE IdCustomer = @Id", new { user.Id }).ToList();
+            var voteDTOs = new List<VoteDTO>();
+            foreach(var vote in votes)
+            {
+                voteDTOs.Add(ConvertVoteToVoteDTO(vote));
+            }
+            return voteDTOs;
+        }
+
+        public List<VoteDTO> GetVotesByUserId(int userId)
+        {
+            UserRepository userRepository = new UserRepository(_connectionString);
+            var user = userRepository.Get(userId);
+            return user != null ? GetVotesByUser(user) : null;
+        }
+
+        public List<Answer> FillVotesInAnswers(Answer[] answers)
+        {
+            UserRepository userRepository = new UserRepository(_connectionString);
+            IDbConnection db = new SqlConnection(_connectionString);
+            foreach(var answer in answers)
+            {
+                var votes = db.Query<Vote>("SELECT * FROM Vote WHERE IdAnswer = @Id", new { answer.Id }).ToList();
+                answer.Votes = votes.ToArray();
+            }
+            return answers.ToList();
+        }
+
+        public Vote ConvertVoteDTOToVote(VoteDTO voteDTO)
+        {
+            var userRepository = new UserRepository(_connectionString);
+            return new Vote
+            {
+                Id = (int)voteDTO.Id,
+                IdAnswer = (int)voteDTO.IdAnswer,
+                DateVote = voteDTO.DateVote,
+                IdCustomer = userRepository.Get(voteDTO.Voter).Id
+            };
+        }
+
+        public VoteDTO ConvertVoteToVoteDTO(Vote vote)
+        {
+            var userRepository = new UserRepository(_connectionString);
+            return new VoteDTO
+            {
+                Id = vote.Id,
+                IdAnswer = vote.IdAnswer,
+                DateVote = vote.DateVote,
+                Voter = userRepository.Get(vote.IdCustomer).Login
+            };
+        }
+    }
 }

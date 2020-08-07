@@ -1,43 +1,87 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
-using Server2.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
 namespace Server2.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class VoteController : ControllerBase
     {
-        public VoteController(IVoteRepository voteRepository) => VoteRepository = voteRepository;
 
-        public IVoteRepository VoteRepository { private set; get; }
+        public VoteController(IVoteRepository voteRepository, IUserRepository userRepository)
+        {
+            _voteRepository = voteRepository;
+            _userRepository = userRepository;
+        }
+
+        private IUserRepository _userRepository;
+
+        private IVoteRepository _voteRepository;
+
         // GET: api/Vote
         [HttpGet]
-        public IEnumerable<Vote> Get() => VoteRepository.GetVotes(Request.Headers["Authorization"]);
+        public IActionResult Get()
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return Ok(_voteRepository.GetAllVotes());
+        }
 
         // GET: api/Vote/5
         [HttpGet("{id}")]
-        public Vote Get(int id) => VoteRepository.Get(Request.Headers["Authorization"], id);
-
-        // GET: api/Vote/getvote
-        [HttpPost("getvote")]
-        public IEnumerable<Answer> Post([FromBody] Answer[] answer) => VoteRepository.Get(Request.Headers["Authorization"], answer);
+        public IActionResult Get(int id)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return Ok(_voteRepository.GetVoteById(id));
+        }
+        /*
+                // GET: api/Vote/getvote
+                [HttpPost("getvote")]
+                public IActionResult Post([FromBody] AnswerDTO[] answer)
+                {
+                    Request.Headers.TryGetValue("AuthorizationToken", out var token);
+                    if(StringValues.IsNullOrEmpty(token))
+                    {
+                        return BadRequest("Token is empty. Please, try again.");
+                    }
+                    if(_userRepository.GetUserByToken(token) == null)
+                    {
+                        return BadRequest("Token is incorrect. Please, logout, login and try again");
+                    }
+                    return Ok(_voteRepository.FillVotesInAnswers(answer));
+                }*/
 
         // POST: api/Vote
         [HttpPost]
-        public string Post([FromBody] Vote vote) => VoteRepository.Create(Request.Headers["Authorization"], vote);
-
-        // PUT: api/Vote/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        // DELETE: api/ApiWithActions/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        public IActionResult Post([FromBody] VoteDTO vote)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            if(_userRepository.GetUserByToken(token) == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            return _voteRepository.Create(vote) ? Ok() : (IActionResult)BadRequest("Error on create, please, try again");
+        }
     }
 }

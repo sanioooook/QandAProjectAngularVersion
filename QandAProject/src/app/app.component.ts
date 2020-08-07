@@ -9,7 +9,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(public userService: UserService,private _router: Router){
+  constructor(public userService: UserService, private router: Router){
 
   }
   title = 'QandAProject';
@@ -18,13 +18,13 @@ export class AppComponent {
     {title: 'Registration', link: 'registration'}
   ];
 
-  navigateHome():void{
-    this._router.navigate(['home']);
+  navigateHome(): void{
+    this.router.navigate(['home']);
   }
-  
+
   logOut(): void {
     this.userService.logOut().then(
-      _ => this._router.navigate(['home']),
+      _ => this.router.navigate(['home']),
       (Error: HttpErrorResponse) =>
         window.alert(Error.error.error)
     );

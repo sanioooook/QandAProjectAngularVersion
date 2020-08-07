@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { User } from 'src/app/classes/user'
-import { serverAddress } from '../consts/server-address'
+import { User } from 'src/app/classes/user';
+import { serverAddress } from '../consts/server-address';
 import { Observable, Observer, Subscription } from 'rxjs';
 
 
@@ -10,10 +10,10 @@ import { Observable, Observer, Subscription } from 'rxjs';
 })
 export class UserService {
   constructor(private http: HttpClient) {
-    this.user = new User;
-    this.user.authorizationToken = localStorage.getItem("user") ?? '';
+    this.user = new User();
+    this.user.authorizationToken = localStorage.getItem('user') ?? '';
   }
-  
+
   private user: User;
 
   public getUser(): User {
@@ -38,31 +38,28 @@ export class UserService {
         login: email,
         password
       }
-    )
-      .toPromise();
+    ).toPromise();
     return this.setAuthorizationToken(data.authorizeToken);
   }
 
-  public IsUserLogged():boolean{
-    return this.user.authorizationToken != '';
+  public IsUserLogged(): boolean{
+    return this.user.authorizationToken !== '';
   }
 
-  public setAuthorizationToken(authorizeToken:string):void {
+  public setAuthorizationToken(authorizeToken: string): void {
     this.user.authorizationToken = authorizeToken;
-    localStorage.setItem("user", authorizeToken);
+    localStorage.setItem('user', authorizeToken);
   }
 
-  public logOut(): Promise<any> {
-    return this.http.get<any>(
+  public async logOut(): Promise<any> {
+    await this.http.get<any>(
       serverAddress + 'user/logout',
       {
         headers: {
-          'AuthorizationToken': this.user.authorizationToken
+          AuthorizationToken: this.user.authorizationToken
         }
-      }).toPromise()
-      .then(() => {
-        this.user.authorizationToken = '';
-        localStorage.removeItem("user");
-      });
+      }).toPromise();
+    this.user.authorizationToken = '';
+    localStorage.removeItem('user');
   }
 }

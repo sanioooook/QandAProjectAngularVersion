@@ -1,1 +1,1 @@
-export const serverAddress:string = 'https://localhost:5001/api/';
+export const serverAddress = 'https://localhost:5001/api/';

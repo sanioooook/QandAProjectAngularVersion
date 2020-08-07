@@ -1,14 +1,21 @@
 ﻿using System.Collections.Generic;
 using Server2.Models;
+using WebApiQandA.DTO;
 
 namespace WebApiQandA.Models.Interfaces
 {
 	public interface IVoteRepository
 	{
-		string Create(string token, Vote vote);
-		Vote Get(string token, int id);
-		List<Vote> GetVotes(string token);
-		List<Vote> Get(string token, User user);
-		List<Answer> Get(string token, Answer[] answer);
+		bool Create(VoteDTO vote);
+
+		VoteDTO GetVoteById(int id);
+
+		List<VoteDTO> GetAllVotes();
+
+		List<VoteDTO> GetVotesByUser(User user);
+
+		List<VoteDTO> GetVotesByUserId(int userId);
+
+		List<Answer> FillVotesInAnswers(Answer[] answers);
 	}
 }
