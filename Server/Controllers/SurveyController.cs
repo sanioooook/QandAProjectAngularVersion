@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using Server2.Models;
 using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
-namespace Server2.Controllers
+namespace WebApiQandA.Controllers
 {
 	[Route("api/[controller]")]
     [ApiController]
@@ -18,13 +16,13 @@ namespace Server2.Controllers
             _userRepository = userRepository;
         }
 
-        private IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        private ISurveyRepository _surveyRepository;
+        private readonly ISurveyRepository _surveyRepository;
 
         // GET: api/Survey
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult GetAllSurveys()
         {
             Request.Headers.TryGetValue("AuthorizationToken", out var token);
             if(StringValues.IsNullOrEmpty(token))
@@ -40,7 +38,7 @@ namespace Server2.Controllers
 
         // GET: api/Survey/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult GetById(int id)
         {
             Request.Headers.TryGetValue("AuthorizationToken", out var token);
             if(StringValues.IsNullOrEmpty(token))
@@ -56,7 +54,7 @@ namespace Server2.Controllers
 
         // POST: api/Survey/Create
         [HttpPost("Create")]
-        public IActionResult Post([FromBody] SurveyDTO surveyDTO)
+        public IActionResult CreateSurvey([FromBody] SurveyDTO surveyDto)
         {
             Request.Headers.TryGetValue("AuthorizationToken", out var token);
             if(StringValues.IsNullOrEmpty(token))
@@ -68,13 +66,13 @@ namespace Server2.Controllers
             {
                 return BadRequest("Token is incorrect. Please, logout, login and try again");
             }
-            return _surveyRepository.Create(user, surveyDTO) ? Ok() : (IActionResult)BadRequest("Error create survey, please, try again");
+            return _surveyRepository.Create(user, surveyDto) ? Ok() : (IActionResult)BadRequest("Error create survey, please, try again");
         }
 
 
         // POST: api/Survey/UserSurveys
-        [HttpPost("UserSurveys")]
-        public IActionResult Post()
+        [HttpGet("UserSurveys")]
+        public IActionResult GetUserSurveys()
         {
             Request.Headers.TryGetValue("AuthorizationToken", out var token);
             if(StringValues.IsNullOrEmpty(token))

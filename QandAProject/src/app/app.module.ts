@@ -9,6 +9,7 @@ import { LoginComponent } from './login/login.component';
 import { RegistrationComponent } from './registration/registration.component';
 import { HomeComponent } from './home/home.component';
 import { AllSurveyComponent } from './all-survey/all-survey.component';
+import { UserSurveysComponent } from './user-surveys/user-surveys.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { AllSurveyComponent } from './all-survey/all-survey.component';
     LoginComponent,
     RegistrationComponent,
     HomeComponent,
-    AllSurveyComponent
+    AllSurveyComponent,
+    UserSurveysComponent
   ],
   imports: [
     BrowserModule,
