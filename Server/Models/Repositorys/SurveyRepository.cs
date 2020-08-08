@@ -203,6 +203,7 @@ namespace WebApiQandA.Models.Repositorys
 
         public SurveyDTO ConvertSurveyToSurveyDTO(Survey survey)
         {
+            UserRepository userRepository = new UserRepository(_connectionString);
             AnswerRepository answerRepository = new AnswerRepository(_connectionString);
             var answersDTO = new List<AnswerDTO>();
             foreach(var answer in survey.Answers)
@@ -216,7 +217,7 @@ namespace WebApiQandA.Models.Repositorys
                 Answers = answersDTO.ToArray(),
                 Question = survey.Question,
                 SeveralAnswer = survey.SeveralAnswer,
-                User = new UserForPublic { Login = survey.God.Login }
+                User = new UserForPublic { Login = userRepository.Get(survey.IdCreator).Login }
             };
         }
     }

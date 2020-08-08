@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using Server2.Models;
 using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
-namespace Server2.Controllers
+namespace WebApiQandA.Controllers
 {
 	[Route("api/[controller]")]
     [ApiController]
@@ -17,9 +15,9 @@ namespace Server2.Controllers
             _userRepository = userRepository;
         }
 
-        private IAnswerRepository _answerRepository;
+        private readonly IAnswerRepository _answerRepository;
 
-        private IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
         // GET: api/Answer
 /*        [HttpGet]

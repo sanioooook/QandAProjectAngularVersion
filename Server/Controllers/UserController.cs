@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Server2.Models;
 using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
-namespace Server2.Controllers
+namespace WebApiQandA.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,7 +15,7 @@ namespace Server2.Controllers
             _userRepository = userRepository;
         }
 
-        public IUserRepository _userRepository { get; private set; }
+        private readonly IUserRepository _userRepository;
 
         // GET: api/User
         [HttpGet]
@@ -33,12 +30,12 @@ namespace Server2.Controllers
         }
 
         // POST: api/User/register
-        [HttpPost("Regisration")]
-        public IActionResult Post([FromBody] UserForLoginOrRegistrationDTO userDTO)
+        [HttpPost("Registration")]
+        public IActionResult Post([FromBody] UserForLoginOrRegistrationDTO userDto)
         {
-            if(_userRepository.Get(userDTO.Login) == null)
+            if(_userRepository.Get(userDto.Login) == null)
             {
-                var user = new User() { Login = userDTO.Login, Password = userDTO.Password };
+                var user = new User() { Login = userDto.Login, Password = userDto.Password };
                 if(_userRepository.Create(user))
                 {
                     return Ok(_userRepository.Login(user));
@@ -51,8 +48,8 @@ namespace Server2.Controllers
         [HttpPost("Login")]
         public IActionResult Login([FromBody] UserForLoginOrRegistrationDTO user)
         {
-            var userDTO = _userRepository.Login(user);
-            return userDTO is null ? BadRequest("Login or Password wrong. Please, try again") : (IActionResult)Ok(userDTO);
+            var userDto = _userRepository.Login(user);
+            return userDto is null ? BadRequest("Login or Password wrong. Please, try again") : (IActionResult)Ok(userDto);
         }
 
         [HttpGet("Logout")]

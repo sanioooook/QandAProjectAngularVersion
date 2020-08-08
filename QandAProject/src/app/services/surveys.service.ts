@@ -23,4 +23,8 @@ export class SurveysService {
     return this.interceptor.post('answer', answer).toPromise();
   }
 
+  GetUserSurveys(): Promise<Survey[]> {
+    return this.interceptor.get('survey/userSurveys').toPromise();
+  }
+
 }

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Primitives;
 using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
-namespace Server2.Controllers
+namespace WebApiQandA.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -16,9 +16,9 @@ namespace Server2.Controllers
             _userRepository = userRepository;
         }
 
-        private IUserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        private IVoteRepository _voteRepository;
+        private readonly IVoteRepository _voteRepository;
 
         // GET: api/Vote
         [HttpGet]
