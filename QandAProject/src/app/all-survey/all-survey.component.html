@@ -1,31 +1,13 @@
 <div class="surveys" *ngIf="surveys; else elseTemplate">
-  <div class="survey" *ngFor="let survey of surveys">
-    <div class="survey-question">
-      {{survey.question}}
-    </div>
-    <div class="survey-answers">
-      <div class="answer" *ngFor="let answer of survey.answers">
-        <input 
-          type="checkbox"
-          name="answer"
-          [(ngModel)]="answer.isUserVote"
-          [disabled]="!survey.severalAnswer && isVote(survey)"
-          (click)="vote(answer.id)"
-        >
-        {{answer.textAnswer}}
-      </div>
-    </div>
-    <div class="survey-add-response">
-      <div *ngIf="survey.addResponse">
-        <input type="text" #newAnswer (keyup)="0" (input)="mapNewAnswersInSurveys.set(survey.id, newAnswer.value)">
-        <input type="button" value="Add" (click)="addAnswer(survey.id).then(newAnswer.value = '')">
-      </div>
-    </div>
-    <div class="survey-creator">
-      careator: {{survey.user.login}}
-    </div>
-  </div>
+  <a
+    class="survey"
+    *ngFor="let survey of surveys"
+    [routerLink]="['/survey', survey.id]"
+  >
+    <div class="survey-question">{{survey.question}}</div>
+    <div class="number-answers">number answers: {{survey.answers.length}}</div>
+    <div>time create survey: {{survey.timeCreate|date}}</div>
+    <div>votes: {{getNumberVotes(survey)}}</div>
+  </a>
 </div>
-<ng-template #elseTemplate>
-  download
-</ng-template>
+<ng-template #elseTemplate>download</ng-template>

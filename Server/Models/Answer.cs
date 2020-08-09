@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WebApiQandA.Models;
 
 namespace Server2.Models
 {

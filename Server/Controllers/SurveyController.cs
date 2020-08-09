@@ -49,7 +49,12 @@ namespace WebApiQandA.Controllers
             {
                 return BadRequest("Token is incorrect. Please, logout, login and try again");
             }
-            return Ok(_surveyRepository.GetSurveyBySurveyId(id));
+            var survey = _surveyRepository.GetSurveyBySurveyId(id);
+            if (survey == null)
+            {
+                return NotFound("Not found");
+            }
+            return Ok(survey);
         }
 
         // POST: api/Survey/Create

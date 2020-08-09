@@ -1,38 +1,21 @@
 .survey {
-  display: flex;
-  flex-direction: column;
-  width: 220px;
+  display: grid;
+  grid-template-columns: 40% 20% 20% 20%;
+  grid-template-rows: 100%;
+  width: 100%;
   padding: 10px;
   border: 1px solid black;
-  border-radius: 10px;
+}
+
+.survey:nth-last-child(1) {
+  border-radius: 0 0 10px 10px;
 }
 
 .surveys {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
 }
 
-.survey-answers {
-  margin: 5px 0;
-}
-
-.survey-add-response {
-  height: 25px;
-  /* display: flex;
-  justify-content: center;
-  align-items: center;
-  white-space: nowrap; */
-}
-
-/* .survey-creator { 
-  align-items: flex-end;
-  display: flex;
-  flex: auto;
-  justify-content: center;
-} */
-
-.survey-creator-and-add-response {
-  display: flex;
-  flex-direction: column;
+a {
+  color: black;
 }

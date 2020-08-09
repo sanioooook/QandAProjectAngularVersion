@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApiQandA.DTO
 {
@@ -20,5 +21,7 @@ namespace WebApiQandA.DTO
 
         [Required]
         public bool AddResponse { get; set; }//можно ли добавлять ответы посторонним личностям
+
+        public DateTime TimeCreate { get; set; }//время создания, сервер сам заполняет
     }
 }
