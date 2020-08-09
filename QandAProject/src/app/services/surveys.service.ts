@@ -27,4 +27,7 @@ export class SurveysService {
     return this.interceptor.get('survey/userSurveys').toPromise();
   }
 
+  GetSurveyById(id: number): Promise<Survey> {
+    return this.interceptor.get(`survey/${id}`).toPromise();
+  }
 }

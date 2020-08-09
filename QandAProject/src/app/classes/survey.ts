@@ -14,4 +14,6 @@ export class Survey {
   public severalAnswer: boolean;
 
   public user: UserForPublic;
+
+  public timeCreate: string;
 }

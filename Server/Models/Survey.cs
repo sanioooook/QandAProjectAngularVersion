@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
+using Server2.Models;
 
-namespace Server2.Models
+namespace WebApiQandA.Models
 {
 	public class Survey//опрос
 	{
@@ -9,9 +11,6 @@ namespace Server2.Models
 		public string Question { set; get; }//текст вопроса для опроса
 		
 		public int IdCreator { get; set; }//ид создавшего опрос
-
-		[ForeignKey("IdCreator")]
-		public User God { get; set; }//создавший этот опрос
 		
 		public Answer[] Answers { get; set; }//пулл ответов
 
@@ -19,5 +18,6 @@ namespace Server2.Models
 
 		public bool AddResponse { get; set; }//можно ли добавлять ответы посторонним личностям
 
+        public DateTime TimeCreate { get; set; }//время создания, сервер сам заполняет
 	}
 }
