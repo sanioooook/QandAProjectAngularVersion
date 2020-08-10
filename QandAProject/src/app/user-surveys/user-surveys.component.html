@@ -8,6 +8,7 @@
     <div class="number-answers">number answers: {{survey.answers.length}}</div>
     <div>time create survey: {{survey.timeCreate|date}}</div>
     <div>votes: {{getNumberVotes(survey)}}</div>
+    <a class="fa fa-pencil" aria-hidden="true" [routerLink]="['/edit-survey', survey.id]"></a>
   </a>
 </div>
 <ng-template #elseTemplate>download</ng-template>
