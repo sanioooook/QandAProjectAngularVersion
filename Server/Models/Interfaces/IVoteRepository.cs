@@ -17,5 +17,7 @@ namespace WebApiQandA.Models.Interfaces
 		List<VoteDTO> GetVotesByUserId(int userId);
 
 		List<Answer> FillVotesInAnswers(Answer[] answers);
-	}
+
+        void DeleteVotesByAnswerId(int answerId);
+    }
 }

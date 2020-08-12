@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApiQandA.Models.Interfaces;
-using WebApiQandA.Models.Repositorys;
+using WebApiQandA.Models.Repositoryes;
 
 namespace Server2
 {
@@ -20,7 +20,10 @@ namespace Server2
 			services.AddCors(options =>
 			{
 				options.AddPolicy(name: AngularCorsPolicy, builder =>
-				{ builder.WithOrigins("http://localhost:4200").AllowAnyHeader(); });
+				{ builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin(); });
 			});
 
 			services.AddControllersWithViews();

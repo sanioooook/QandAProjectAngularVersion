@@ -6,7 +6,7 @@ namespace WebApiQandA.Models.Interfaces
 {
 	public interface IAnswerRepository
 	{
-		void Create(AnswerDTO answer);
+		int Create(AnswerDTO answer);
 
 		AnswerDTO GetAnswerById(int id);
 
@@ -14,9 +14,15 @@ namespace WebApiQandA.Models.Interfaces
 
 		List<AnswerDTO> GetAnswersBySurveyId(int surveyId);
 
-		List<AnswerDTO> GetAllAnswersByAnswer(string answer);
+		List<AnswerDTO> GetAllAnswersByTextAnswer(string answer);
 
 		List<AnswerDTO> GetAllAnswers();
 
-	}
+        void DeleteAnswerByAnswerId(User user, int answerId);
+
+        void EditAnswer(User user, AnswerDTO answerDto);
+
+        void DeleteAnswersBySurveyId(int surveyId);
+
+    }
 }
