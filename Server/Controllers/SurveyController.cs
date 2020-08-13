@@ -106,7 +106,7 @@ namespace WebApiQandA.Controllers
                 return BadRequest("Token is incorrect. Please, logout, login and try again");
             }
 
-            if (_surveyRepository.GetSurveyBySurveyId((int) surveyDto.Id) != surveyDto)
+            if (_surveyRepository.GetSurveyBySurveyId((int) surveyDto.Id).Equals(surveyDto))
             {
                 return Ok("The passed object does not differ from the original one");
             }
