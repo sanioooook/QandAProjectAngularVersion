@@ -1,0 +1,48 @@
+<div class="component">
+  <div class="survey" *ngIf="survey; else notSetSurveyTemplate">
+    <div *ngIf="!editQuestionMode; else editQuestionTemplate" class="survey-question">
+      {{survey.question}}
+      <div
+        class="fa fa-pencil"
+        (click)="editQuestionMode=true"
+      ></div>
+      <div
+        class="fa fa-trash"
+        (click)="deleteSurvey()"
+      ></div>
+    </div>
+    <ng-template #editQuestionTemplate>
+      <div class="edit-question-inputs">
+        <input type="text" [(ngModel)]="survey.question">
+        <input type="button" value="Edit" (click)="editQuestionMode=false">
+      </div>
+    </ng-template>
+    <div class="survey-answers">
+      <div class="answer" *ngFor="let answer of survey.answers; index as i">
+        {{answer.textAnswer}}
+        <div
+          class="fa fa-trash"
+          aria-hidden="true"
+          (click)="deleteAnswer(answer).then(survey.answers.splice(i, 1))"
+        ></div>
+        <div
+          class="fa fa-pencil"
+          aria-hidden="true"
+          (click)="showEditAnswerWindow(answer)"
+        ></div>
+      </div>
+    </div>
+    <div class="survey-add-response">
+      <div>
+        <input type="text" [(ngModel)]="newAnswer" (keyup.enter)="addAnswer()">
+        <input type="button" value="Add" (click)="addAnswer()">
+      </div>
+    </div>
+    <div><input type="checkbox" [(ngModel)]="survey.addResponse">can user add answer?</div>
+    <div><input type="checkbox" [(ngModel)]="survey.severalAnswer">multivote?</div>
+    <input type="button" value="Aply" (click)="saveSurvey()">
+  </div>
+  <ng-template #notSetSurveyTemplate>
+    download
+  </ng-template>
+</div>

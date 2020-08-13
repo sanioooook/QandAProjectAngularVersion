@@ -74,7 +74,6 @@ namespace WebApiQandA.Controllers
             return _surveyRepository.Create(user, surveyDto) ? Ok() : (IActionResult)BadRequest("Error create survey, please, try again");
         }
 
-
         // POST: api/Survey/UserSurveys
         [HttpGet("UserSurveys")]
         public IActionResult GetUserSurveys()
@@ -90,6 +89,52 @@ namespace WebApiQandA.Controllers
                 return BadRequest("Token is incorrect. Please, logout, login and try again");
             }
             return Ok(_surveyRepository.GetSurveysByUser(user));
+        }
+
+        // POST: api/Survey/Edit
+        [HttpPost("Edit")]
+        public IActionResult EditSurvey([FromBody] SurveyDTO surveyDto)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            var user = _userRepository.GetUserByToken(token);
+            if(user == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+
+            if (_surveyRepository.GetSurveyBySurveyId((int) surveyDto.Id).Equals(surveyDto))
+            {
+                return Ok("The passed object does not differ from the original one");
+            }
+
+            if (_surveyRepository.GetSurveyBySurveyId((int) surveyDto.Id).User.Login != user.Login)
+            {
+                return BadRequest("You don't have permissive to edit this survey");
+            }
+
+            _surveyRepository.EditSurvey(surveyDto);
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteSurveyBySurveyId([FromRoute] int id)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            var user = _userRepository.GetUserByToken(token);
+            if(user == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            _surveyRepository.DeleteSurveyBySurveyId(user, id);
+            return Ok();
         }
     }
 }

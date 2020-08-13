@@ -19,41 +19,9 @@ namespace WebApiQandA.Controllers
 
         private readonly IUserRepository _userRepository;
 
-        // GET: api/Answer
-/*        [HttpGet]
-        public IActionResult Get()
-        {
-            Request.Headers.TryGetValue("AuthorizationToken", out var token);
-            if(StringValues.IsNullOrEmpty(token))
-            {
-                return BadRequest("Token is empty. Please, try again.");
-            }
-            if(_userRepository.GetUserByToken(token) == null)
-            {
-                return BadRequest("Token is incorrect. Please, logout, login and try again");
-            }
-            return Ok(_answerRepository.GetAllAnswers());
-        }
-
-        // GET: api/Answer/5
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
-            Request.Headers.TryGetValue("AuthorizationToken", out var token);
-            if(StringValues.IsNullOrEmpty(token))
-            {
-                return BadRequest("Token is empty. Please, try again.");
-            }
-            if(_userRepository.GetUserByToken(token) == null)
-            {
-                return BadRequest("Token is incorrect. Please, logout, login and try again");
-            }
-            return Ok(_answerRepository.GetAnswerById(id));
-        }*/
-
         // POST: api/Answer
         [HttpPost]
-        public IActionResult Post([FromBody] AnswerDTO answer)
+        public IActionResult AddNewAnswer([FromBody] AnswerDTO answer)
         {
             Request.Headers.TryGetValue("AuthorizationToken", out var token);
             if(StringValues.IsNullOrEmpty(token))
@@ -64,7 +32,47 @@ namespace WebApiQandA.Controllers
             {
                 return BadRequest("Token is incorrect. Please, logout, login and try again");
             }
-            _answerRepository.Create(answer);
+            return Ok(_answerRepository.Create(answer));
+        }
+
+        // DELETE: api/Answer/5
+        [HttpDelete("{id}")]
+        public IActionResult DeleteAnswer([FromRoute]int id)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            var user = _userRepository.GetUserByToken(token);
+            if(user == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            _answerRepository.DeleteAnswerByAnswerId(user, id);
+            return Ok();
+        }
+
+        // POST: api/Answer/EditAnswer
+        [HttpPost("EditAnswer")]
+        public IActionResult EditAnswer([FromBody] AnswerDTO answerDto)
+        {
+            Request.Headers.TryGetValue("AuthorizationToken", out var token);
+            if(StringValues.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token is empty. Please, try again.");
+            }
+            var user = _userRepository.GetUserByToken(token);
+            if(user == null)
+            {
+                return BadRequest("Token is incorrect. Please, logout, login and try again");
+            }
+            if (_answerRepository.GetAnswerById((int)answerDto.Id).TextAnswer == answerDto.TextAnswer)
+            {
+                return Ok("Don't need edit");
+            }
+            _answerRepository.EditAnswer(user, answerDto);
+
             return Ok();
         }
     }

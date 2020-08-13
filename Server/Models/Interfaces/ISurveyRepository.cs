@@ -19,5 +19,9 @@ namespace WebApiQandA.Models.Interfaces
         bool VoteUser(User user, SurveyDTO survey);
 
         Survey ConvertSurveyDTOToSurvey(SurveyDTO surveyDTO);
+
+        void EditSurvey(SurveyDTO surveyDto);
+
+        void DeleteSurveyBySurveyId(User deleter, int surveyId);
     }
 }

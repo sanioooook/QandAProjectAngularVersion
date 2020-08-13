@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace WebApiQandA.DTO
 {
@@ -23,5 +24,25 @@ namespace WebApiQandA.DTO
         public bool AddResponse { get; set; }//можно ли добавлять ответы посторонним личностям
 
         public DateTime TimeCreate { get; set; }//время создания, сервер сам заполняет
+
+        public override bool Equals(object obj)
+        {
+            var temp = obj as SurveyDTO;
+            if (temp != null && temp.Answers.Where((answerDto, i) => !answerDto.Equals(Answers[i])).Any())
+            {
+                return false;
+            }
+
+            return temp != null && (temp.TimeCreate == TimeCreate
+                                    && temp.User.Equals(User)
+                                    && temp.AddResponse == AddResponse
+                                    && temp.SeveralAnswer == SeveralAnswer
+                                    && temp.Question == Question);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Question, Answers, User, SeveralAnswer, AddResponse, TimeCreate);
+        }
     }
 }

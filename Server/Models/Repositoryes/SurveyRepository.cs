@@ -8,7 +8,7 @@ using Server2.Models;
 using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
-namespace WebApiQandA.Models.Repositorys
+namespace WebApiQandA.Models.Repositoryes
 {
     public class SurveyRepository : ISurveyRepository
     {
@@ -51,11 +51,11 @@ namespace WebApiQandA.Models.Repositorys
             return Create(user, ConvertSurveyDTOToSurvey(survey));
         }
 
-        public SurveyDTO GetSurveyBySurveyId(int id)
+        public SurveyDTO GetSurveyBySurveyId(int surveyId)
         {
             var answerRepository = new AnswerRepository(_connectionString);
             IDbConnection db = new SqlConnection(_connectionString);
-            var survey = db.Query<Survey>("SELECT * FROM Survey WHERE Id = @id", new { id }).FirstOrDefault();
+            var survey = db.Query<Survey>("SELECT * FROM Survey WHERE Id = @surveyId", new { surveyId }).FirstOrDefault();
             if (survey == null)
             {
                 return null;
@@ -69,7 +69,7 @@ namespace WebApiQandA.Models.Repositorys
             survey.Answers = answers.ToArray();
             var voteRepository = new VoteRepository(_connectionString);
             survey.Answers = voteRepository.FillVotesInAnswers(survey.Answers).ToArray();
-            return ConvertSurveyToSurveyDTO(survey);
+            return ConvertSurveyToSurveyDto(survey);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace WebApiQandA.Models.Repositorys
             var surveysDTO = new List<SurveyDTO>();
             foreach(var survey in surveys)
             {
-                surveysDTO.Add(ConvertSurveyToSurveyDTO(survey));
+                surveysDTO.Add(ConvertSurveyToSurveyDto(survey));
             }
             return surveysDTO;
         }
@@ -127,7 +127,7 @@ namespace WebApiQandA.Models.Repositorys
             var surveysDTO = new List<SurveyDTO>();
             foreach(var survey in surveys)
             {
-                surveysDTO.Add(ConvertSurveyToSurveyDTO(survey));
+                surveysDTO.Add(ConvertSurveyToSurveyDto(survey));
             }
             return surveysDTO;
         }
@@ -158,22 +158,20 @@ namespace WebApiQandA.Models.Repositorys
             var surveysDTO = new List<SurveyDTO>();
             foreach(var survey in surveys)
             {
-                surveysDTO.Add(ConvertSurveyToSurveyDTO(survey));
+                surveysDTO.Add(ConvertSurveyToSurveyDto(survey));
             }
 
             return surveysDTO;
         }
 
-        /// <summary>
-        /// голосовал ли юзер в опросе
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <param name="survey">The survey.</param>
-        /// <returns></returns>
-        public bool VoteUser(User user, SurveyDTO survey)
+        public bool VoteUser(User user, SurveyDTO surveyDto)
         {
             var surveys = GetAllSurveys();
-            return (from Survey in surveys where Survey.Id == survey.Id from answer in Survey.Answers from _ in from vote in answer.Votes where vote.Voter == user.Login select new { } select _).Any();
+            return (from survey in surveys
+                where survey.Id == surveyDto.Id
+                from answer in survey.Answers
+                from _ in from vote in answer.Votes where vote.Voter == user.Login select new { }
+                select _).Any();
         }
 
         public Survey ConvertSurveyDTOToSurvey(SurveyDTO surveyDTO)
@@ -196,7 +194,7 @@ namespace WebApiQandA.Models.Repositorys
             };
         }
 
-        private SurveyDTO ConvertSurveyToSurveyDTO(Survey survey)
+        private SurveyDTO ConvertSurveyToSurveyDto(Survey survey)
         {
             var userRepository = new UserRepository(_connectionString);
             var answerRepository = new AnswerRepository(_connectionString);
@@ -215,6 +213,23 @@ namespace WebApiQandA.Models.Repositorys
                 User = new UserForPublic { Login = userRepository.Get(survey.IdCreator).Login },
                 TimeCreate = survey.TimeCreate
             };
+        }
+
+        public void EditSurvey(SurveyDTO surveyDto)
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            db.Execute("UPDATE Survey SET Question = @Question, AddResponse = @AddResponse, SeveralAnswer = @SeveralAnswer WHERE Id = @Id", surveyDto);
+        }
+
+        public void DeleteSurveyBySurveyId(User deleter, int surveyId)
+        {
+            if (GetSurveyBySurveyId(surveyId).User.Login == deleter.Login)
+            {
+                var answerRepository = new AnswerRepository(_connectionString);
+                answerRepository.DeleteAnswersBySurveyId(surveyId);
+                IDbConnection db = new SqlConnection(_connectionString);
+                db.Execute("DELETE Survey WHERE Id = @surveyId", new { surveyId });
+            }
         }
     }
 }

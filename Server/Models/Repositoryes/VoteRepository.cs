@@ -8,7 +8,7 @@ using Server2.Models;
 using WebApiQandA.DTO;
 using WebApiQandA.Models.Interfaces;
 
-namespace WebApiQandA.Models.Repositorys
+namespace WebApiQandA.Models.Repositoryes
 {
     public class VoteRepository : IVoteRepository
     {
@@ -47,7 +47,7 @@ namespace WebApiQandA.Models.Repositorys
 
         public bool Create(VoteDTO vote)
         {
-            return Create(ConvertVoteDTOToVote(vote));
+            return Create(ConvertVoteDtoToVote(vote));
         }
 
         public VoteDTO GetVoteById(int id)
@@ -55,7 +55,7 @@ namespace WebApiQandA.Models.Repositorys
             UserRepository userRepository = new UserRepository(_connectionString);
             IDbConnection db = new SqlConnection(_connectionString);
             var vote = db.Query<Vote>("SELECT * FROM Vote WHERE Id = @id", new { id }).FirstOrDefault();
-            return ConvertVoteToVoteDTO(vote);
+            return ConvertVoteToVoteDto(vote);
         }
 
         public List<VoteDTO> GetAllVotes()
@@ -66,7 +66,7 @@ namespace WebApiQandA.Models.Repositorys
             var voteDTOs = new List<VoteDTO>();
             foreach(var vote in votes)
             {
-                voteDTOs.Add(ConvertVoteToVoteDTO(vote));
+                voteDTOs.Add(ConvertVoteToVoteDto(vote));
             }
             return voteDTOs;
         }
@@ -78,7 +78,7 @@ namespace WebApiQandA.Models.Repositorys
             var voteDTOs = new List<VoteDTO>();
             foreach(var vote in votes)
             {
-                voteDTOs.Add(ConvertVoteToVoteDTO(vote));
+                voteDTOs.Add(ConvertVoteToVoteDto(vote));
             }
             return voteDTOs;
         }
@@ -88,6 +88,12 @@ namespace WebApiQandA.Models.Repositorys
             UserRepository userRepository = new UserRepository(_connectionString);
             var user = userRepository.Get(userId);
             return user != null ? GetVotesByUser(user) : null;
+        }
+
+        public void DeleteVotesByAnswerId(int answerId)
+        {
+            IDbConnection db = new SqlConnection(_connectionString);
+            db.Execute("DELETE Vote WHERE IdAnswer = @answerId", new { answerId });
         }
 
         public List<Answer> FillVotesInAnswers(Answer[] answers)
@@ -102,7 +108,7 @@ namespace WebApiQandA.Models.Repositorys
             return answers.ToList();
         }
 
-        public Vote ConvertVoteDTOToVote(VoteDTO voteDTO)
+        public Vote ConvertVoteDtoToVote(VoteDTO voteDTO)
         {
             var userRepository = new UserRepository(_connectionString);
             return new Vote
@@ -114,7 +120,7 @@ namespace WebApiQandA.Models.Repositorys
             };
         }
 
-        public VoteDTO ConvertVoteToVoteDTO(Vote vote)
+        public VoteDTO ConvertVoteToVoteDto(Vote vote)
         {
             var userRepository = new UserRepository(_connectionString);
             return new VoteDTO

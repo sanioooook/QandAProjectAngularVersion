@@ -8,6 +8,7 @@ import { Authorized } from './classes/authorized';
 import { AllSurveyComponent } from './all-survey/all-survey.component';
 import { UserSurveysComponent } from './user-surveys/user-surveys.component';
 import { SurveyComponent } from './survey/survey.component';
+import { EditSurveyComponent } from './edit-survey/edit-survey.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [NotAuthorized] },
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'all-surveys', component: AllSurveyComponent, canActivate: [Authorized] },
   { path: 'your-surveys', component: UserSurveysComponent, canActivate: [Authorized] },
   { path: 'survey/:id', component: SurveyComponent, canActivate: [Authorized] },
+  { path: 'edit-survey/:id', component: EditSurveyComponent, canActivate: [Authorized]},
   { path: '**', redirectTo: 'home' },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];

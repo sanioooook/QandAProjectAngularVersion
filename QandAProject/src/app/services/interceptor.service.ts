@@ -36,4 +36,14 @@ export class InterceptorService {
       });
   }
 
+  public delete(url: string): Observable<any> {
+    const token = this.userService.getUser()?.authorizationToken;
+    return this.http.delete<any>(
+      serverAddress + url,
+      {
+        headers: {
+          AuthorizationToken: token ?? ''
+        }
+      });
+  }
 }

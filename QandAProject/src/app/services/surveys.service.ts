@@ -23,11 +23,27 @@ export class SurveysService {
     return this.interceptor.post('answer', answer).toPromise();
   }
 
+  EditAnswer(answer: Answer): Promise<any> {
+    return this.interceptor.post('answer/editAnswer', answer).toPromise();
+  }
+
+  DeleteAnswer(id: number): Promise<any> {
+    return this.interceptor.delete(`answer/${id}`).toPromise();
+  }
+
   GetUserSurveys(): Promise<Survey[]> {
     return this.interceptor.get('survey/userSurveys').toPromise();
   }
 
   GetSurveyById(id: number): Promise<Survey> {
     return this.interceptor.get(`survey/${id}`).toPromise();
+  }
+
+  EditSurvey(survey: Survey): Promise<any> {
+    return this.interceptor.post('survey/edit', survey).toPromise();
+  }
+
+  DeleteSurvey(id: number): Promise<any> {
+    return this.interceptor.delete(`survey/${id}`).toPromise();
   }
 }
