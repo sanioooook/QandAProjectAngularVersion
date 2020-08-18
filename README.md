@@ -4,7 +4,8 @@ Questions and Answers - this is a survey creation application written in angular
 Цель: изучить angular так же как и VueJs
 
 Использовалось:
-- MS SQL Server 2019 -Dapper 
+- MS SQL Server 2019
+- Dapper 
 - .Net Core 3 
 - Angular 
 - html & css
