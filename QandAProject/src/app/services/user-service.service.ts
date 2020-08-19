@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { User } from 'src/app/classes/user';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { User } from '../classes/user';
 import { serverAddress } from '../consts/server-address';
-import { Observable, Observer, Subscription } from 'rxjs';
-
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,55 +10,67 @@ import { Observable, Observer, Subscription } from 'rxjs';
 export class UserService {
   constructor(private http: HttpClient) {
     this.user = new User();
-    this.user.authorizationToken = localStorage.getItem('user') ?? '';
+    this.user.authorizeToken = localStorage.getItem('user') ?? '';
   }
 
   private user: User;
 
-  public getUser(): User {
-    return this.user;
+  public getAuthorizationToken(): string {
+    return this.user.authorizeToken;
   }
 
-  public async login(email: string, password: string): Promise<any> {
-    const data = await this.http.post<any>(
+  public login(email: string, password: string): Promise<any> {
+    return this.http.post<User>(
       serverAddress + 'user/login',
       {
         login: email,
         password
       }
-    ).toPromise();
-    return this.setAuthorizationToken(data.authorizeToken);
+    ).toPromise()
+    .then(data =>
+      this.setAuthorizationToken(data.authorizeToken)
+    )
+    .catch((Error: HttpErrorResponse) => {
+      window.alert(Error.error);
+    });
   }
 
-  public async registration(email: string, password: string): Promise<any> {
-    const data = await this.http.post<any>(
+  public registration(email: string, password: string): Promise<any> {
+    return this.http.post<User>(
       serverAddress + 'user/registration',
       {
         login: email,
         password
       }
-    ).toPromise();
-    return this.setAuthorizationToken(data.authorizeToken);
+    ).toPromise()
+      .then(data =>
+        this.setAuthorizationToken(data.authorizeToken)
+      )
+      .catch((Error: HttpErrorResponse) => {
+        window.alert(Error.error);
+      });
   }
 
   public IsUserLogged(): boolean{
-    return this.user.authorizationToken !== '';
+    return this.user.authorizeToken !== '';
   }
 
   public setAuthorizationToken(authorizeToken: string): void {
-    this.user.authorizationToken = authorizeToken;
+    this.user.authorizeToken = authorizeToken;
     localStorage.setItem('user', authorizeToken);
   }
 
-  public async logOut(): Promise<any> {
-    await this.http.get<any>(
+  public logOut(): Promise<any> {
+    return this.http.get<any>(
       serverAddress + 'user/logout',
       {
         headers: {
-          AuthorizationToken: this.user.authorizationToken
+          AuthorizationToken: this.getAuthorizationToken()
         }
-      }).toPromise();
-    this.user.authorizationToken = '';
-    localStorage.removeItem('user');
+      }).toPromise()
+      .then(_ => {
+        this.user.authorizeToken = '';
+        localStorage.removeItem('user');
+      });
   }
 }
