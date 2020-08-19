@@ -38,9 +38,22 @@
         <input type="button" value="Add" (click)="addAnswer()">
       </div>
     </div>
-    <div><input type="checkbox" [(ngModel)]="survey.addResponse">can user add answer?</div>
-    <div><input type="checkbox" [(ngModel)]="survey.severalAnswer">multivote?</div>
-    <input type="button" value="Aply" (click)="saveSurvey()">
+    <div>
+      <input
+        type="checkbox"
+        [(ngModel)]="survey.addResponse"
+        (change)="saveSurvey()"
+      >
+      can user add answer?
+    </div>
+    <div>
+      <input
+        type="checkbox"
+        [(ngModel)]="survey.severalAnswer"
+        (change)="saveSurvey()"
+      >
+      multivote?
+    </div>
   </div>
   <ng-template #notSetSurveyTemplate>
     download

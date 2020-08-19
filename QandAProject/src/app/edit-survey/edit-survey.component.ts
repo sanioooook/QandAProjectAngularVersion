@@ -54,9 +54,8 @@ export class EditSurveyComponent implements OnInit {
       answer.idSurvey = this.survey.id;
       answer.id = 0;
       this.surveyService.AddNewAnswer(answer)
-        .then((id: number) => {
-          answer.id = id;
-          this.survey.answers.push(answer);
+        .then((newAnswer: Answer) => {
+          this.survey.answers.push(newAnswer);
           this.newAnswer = '';
         })
         .catch((Error: HttpErrorResponse) => window.alert(Error.error));
@@ -68,13 +67,15 @@ export class EditSurveyComponent implements OnInit {
     .then()
     .catch((Error: HttpErrorResponse) => {
       window.alert(Error.error);
-      this.ngOnInit();
     });
   }
 
   showEditAnswerWindow(answer: Answer): void {
-    answer.textAnswer = window.prompt('edit answer', answer.textAnswer);
-    this.editAnswer(answer);
+    const newAnswer = window.prompt('edit answer', answer.textAnswer);
+    if (newAnswer !== null) {
+      answer.textAnswer = newAnswer;
+      this.editAnswer(answer);
+    }
   }
 
   deleteAnswer(answer: Answer): Promise<any> {

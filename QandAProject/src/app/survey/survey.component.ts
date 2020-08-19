@@ -45,8 +45,8 @@ export class SurveyComponent implements OnInit {
     answer.idSurvey = surveyId;
     answer.id = 0;
     this.surveyService.AddNewAnswer(answer)
-    .then(() => {
-      this.survey.answers.push(answer);
+    .then((newAnswer: Answer) => {
+      this.survey.answers.push(newAnswer);
       this.newAnswer = '';
     })
     .catch((Error: HttpErrorResponse) => window.alert(Error.error));

@@ -14,35 +14,35 @@ export class InterceptorService {
   constructor(private userService: UserService, private http: HttpClient) { }
 
   public get(url: string): Observable<any>{
-    const token = this.userService.getUser()?.authorizationToken;
+    const token = this.userService.getAuthorizationToken();
     return this.http.get<any>(
       serverAddress + url,
       {
         headers: {
-          AuthorizationToken: token ?? ''
+          AuthorizationToken: token
         }
       });
   }
 
   public post(url: string, body: any): Observable<any>{
-    const token = this.userService.getUser()?.authorizationToken;
+    const token = this.userService.getAuthorizationToken();
     return this.http.post<any>(
       serverAddress + url,
       body,
       {
         headers: {
-          AuthorizationToken: token ?? ''
+          AuthorizationToken: token
         }
       });
   }
 
   public delete(url: string): Observable<any> {
-    const token = this.userService.getUser()?.authorizationToken;
+    const token = this.userService.getAuthorizationToken();
     return this.http.delete<any>(
       serverAddress + url,
       {
         headers: {
-          AuthorizationToken: token ?? ''
+          AuthorizationToken: token
         }
       });
   }
