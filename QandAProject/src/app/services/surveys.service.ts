@@ -11,6 +11,10 @@ export class SurveysService {
 
   constructor(private interceptor: InterceptorService) { }
 
+  CreateSurvey(survey: Survey): Promise<any> {
+    return this.interceptor.post('survey/create', survey).toPromise();
+  }
+
   GetAllSurveys(): Promise<Survey[]> {
     return this.interceptor.get('survey').toPromise();
   }

@@ -1,0 +1,28 @@
+<div class="create-survey-form">
+  <div class="form">
+    <input type="text" [(ngModel)]="questionSurvey" placeholder="Question for survey"
+      [ngModelOptions]="{standalone: true}" class="input-question-survey">
+    <div class="answers" *ngFor="let answer of this.answers; index as i">
+      <div class="answer">
+        {{answer.textAnswer}}
+        <div
+        class="fa fa-trash"
+        aria-hidden="true"
+        (click)="answers.splice(i, 1)"
+      ></div>
+      <div
+        class="fa fa-pencil"
+        aria-hidden="true"
+        (click)="showEditAnswerWindow(answer)"
+      ></div>
+      </div>
+    </div>
+    <input type="text" [(ngModel)]="newAnswer" [ngModelOptions]="{standalone: true}" (keyup.enter)="PushAnswer()"
+      placeholder="New answer">
+    <div class="checkboxs">
+      <div><input type="checkbox" [(ngModel)]="severalAnswer" [ngModelOptions]="{standalone: true}">Several answer</div>
+      <div><input type="checkbox" [(ngModel)]="addResponse" [ngModelOptions]="{standalone: true}">Add response</div>
+    </div>
+    <button (click)="CreateSurvey()">Create survey</button>
+  </div>
+</div>

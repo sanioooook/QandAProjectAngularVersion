@@ -11,13 +11,14 @@ export class HomeComponent implements OnInit {
   constructor(public userService: UserService) { }
 
   linksNotAuthorizedUser = [
-    {title: 'Login', link: '/login'},
-    {title: 'Registration', link: '/registration'}
+    { title: 'Login', link: '/login' },
+    { title: 'Registration', link: '/registration' }
   ];
   linksAuthorizedUser = [
-    {title: 'All surveys', link: '/all-surveys'},
-    {title: 'Your surveys', link: '/your-surveys'},
-    {title: 'Polls in which you voted', link: '/your-voted-surveys'}
+    { title: 'Create survey', link: '/create-survey' },
+    { title: 'All surveys', link: '/all-surveys' },
+    { title: 'Your surveys', link: '/your-surveys' },
+    { title: 'Polls in which you voted', link: '/your-voted-surveys' }
   ];
 
   ngOnInit(): void {

@@ -12,6 +12,7 @@ import { AllSurveyComponent } from './all-survey/all-survey.component';
 import { UserSurveysComponent } from './user-surveys/user-surveys.component';
 import { SurveyComponent } from './survey/survey.component';
 import { EditSurveyComponent } from './edit-survey/edit-survey.component';
+import { CreateSurveyComponent } from './create-survey/create-survey.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { EditSurveyComponent } from './edit-survey/edit-survey.component';
     AllSurveyComponent,
     UserSurveysComponent,
     SurveyComponent,
-    EditSurveyComponent
+    EditSurveyComponent,
+    CreateSurveyComponent
   ],
   imports: [
     BrowserModule,

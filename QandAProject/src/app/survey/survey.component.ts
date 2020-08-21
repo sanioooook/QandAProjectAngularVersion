@@ -22,6 +22,8 @@ export class SurveyComponent implements OnInit {
   user: UserForPublic;
   newAnswer: string;
   survey: Survey;
+  voteCountInSurvey: number;
+
   ngOnInit(): void {
     this.interceptorService.get('User')
       .subscribe((userForPublic: UserForPublic) => this.user = userForPublic);
@@ -30,8 +32,8 @@ export class SurveyComponent implements OnInit {
       .subscribe(id => this.setSurvey(+id));
   }
 
-  isVote(survey: Survey): boolean {
-    for (const answer of survey.answers) {
+  isVote(): boolean {
+    for (const answer of this.survey.answers) {
       if (answer.isUserVote) {
         return true;
       }
@@ -45,34 +47,29 @@ export class SurveyComponent implements OnInit {
     answer.idSurvey = surveyId;
     answer.id = 0;
     this.surveyService.AddNewAnswer(answer)
-    .then((newAnswer: Answer) => {
-      this.survey.answers.push(newAnswer);
-      this.newAnswer = '';
-    })
-    .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+      .then((newAnswer: Answer) => {
+        this.survey.answers.push(newAnswer);
+        this.newAnswer = '';
+      })
+      .catch((Error: HttpErrorResponse) => window.alert(Error.error));
   }
 
   vote(answerId: number): void {
     const vote = new Vote();
     vote.id = 0;
     vote.idAnswer = answerId;
-    vote.voter = this.user.login;
     this.surveyService.Vote(vote)
-      .then(() => this.survey.answers.find(answer => answer.id === answerId).isUserVote = true)
+      .then()
       .catch((Error: HttpErrorResponse) => {
         window.alert(Error.error);
-        this.survey.answers.forEach(
-            answer => {
-              if (answer.id === answerId) {
-                answer.isUserVote = false;
-              }
-            }
-          );
-      });
+      })
+      .finally(() => this.ngOnInit());
   }
 
   processingSurvey(): void {
+    this.voteCountInSurvey = 0;
     this.survey.answers.forEach(answer => {
+      this.voteCountInSurvey += answer.votes.length;
       if (answer.votes.length > 0) {
         answer.isUserVote = false;
         answer.votes.forEach(voteInAnswer => {
@@ -86,11 +83,11 @@ export class SurveyComponent implements OnInit {
 
   setSurvey(id: number): void {
     this.surveyService.GetSurveyById(id)
-    .then(survey => {
-      this.survey = survey;
-      this.processingSurvey();
-    })
-  .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+      .then(survey => {
+        this.survey = survey;
+        this.processingSurvey();
+      })
+      .catch((Error: HttpErrorResponse) => window.alert(Error.error));
   }
 
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Entities.Interfaces;
 using Entities.Models;
@@ -11,16 +13,45 @@ namespace WebApiQandA.Services
     {
         private readonly IVoteRepository _voteRepository;
         private readonly IMapper _mapper;
+        private readonly ISurveyRepository _surveyRepository;
+        private readonly IAnswerRepository _answerRepository;
 
         public VoteService(IVoteRepository voteRepository,
-            IMapper mapper)
+                            IMapper mapper,
+                            ISurveyRepository surveyRepository,
+                            IAnswerRepository answerRepository)
         {
             _voteRepository = voteRepository;
             _mapper = mapper;
+            _answerRepository = answerRepository;
+            _surveyRepository = surveyRepository;
         }
 
         public VoteDto Create(VoteDto vote)
         {
+            var answers = new List<AnswerDto>();
+            var answer = _answerRepository.GetAnswerByAnswerId((int)vote.IdAnswer);
+            if(answer != null)
+            {
+                _answerRepository.GetAnswersBySurveyId(answer.IdSurvey)
+                    .ForEach(answer => answers.Add(_mapper.Map<AnswerDto>(answer)));
+                var survey = _surveyRepository.GetSurveyBySurveyId((int)answers[0].IdSurvey);
+                if(answers.SelectMany(answerDto => answerDto.Votes).Any(voteDto =>
+                    voteDto.Voter == vote.Voter && voteDto.IdAnswer == vote.IdAnswer))
+                {
+                    throw new Exception("You can't vote for the same option");
+                }
+
+                if(!survey.SeveralAnswer &&
+                   answers.Any(answer => answer.Votes.Find(voteDto => voteDto.Voter == vote.Voter) != null))
+                {
+                    throw new Exception("You don't have permissions for multi vote");
+                }
+            }
+            else
+            {
+                throw new Exception("Don't have this answer in database");
+            }
             return _mapper.Map<VoteDto>(_voteRepository.Create(_mapper.Map<Vote>(vote)));
         }
 
