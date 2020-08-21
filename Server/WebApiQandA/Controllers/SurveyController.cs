@@ -38,7 +38,7 @@ namespace WebApiQandA.Controllers
 
         // GET: api/Survey/5
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public IActionResult GetSurveyById(int id)
         {
             try
             {

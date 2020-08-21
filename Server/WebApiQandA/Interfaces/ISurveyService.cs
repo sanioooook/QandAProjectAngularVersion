@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Entities.Models;
 using WebApiQandA.DTO;
 
 namespace WebApiQandA.Interfaces
@@ -13,8 +12,6 @@ namespace WebApiQandA.Interfaces
         List<SurveyDto> GetSurveysByUser(int userId);
 
         List<SurveyDto> GetAllSurveys();
-
-        bool IsUserVote(User user, int surveyId);
 
         void EditSurvey(SurveyDto surveyDto);
 

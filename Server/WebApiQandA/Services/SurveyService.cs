@@ -57,15 +57,6 @@ namespace WebApiQandA.Services
             return surveysDto;
         }
 
-        public bool IsUserVote(User user, int surveyId)
-        {
-            return (from survey in GetAllSurveys()
-                    where survey.Id == surveyId
-                    from answer in survey.Answers
-                    from vote in answer.Votes
-                    select vote).Any(vote => vote.Voter == user.Login);
-        }
-
         public void EditSurvey(SurveyDto surveyDto)
         {
             _surveyRepository.EditSurvey(_mapper.Map<Survey>(surveyDto));

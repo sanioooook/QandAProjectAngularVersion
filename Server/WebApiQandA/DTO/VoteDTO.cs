@@ -11,7 +11,6 @@ namespace WebApiQandA.DTO
         [Required]
         public int? IdAnswer { get; set; }
 
-        [Required]
         public string Voter { get; set; } = null!;
 
         public DateTime DateVote { get; set; }
