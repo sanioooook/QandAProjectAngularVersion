@@ -24,16 +24,26 @@ namespace WebApiQandA.Controllers
         [HttpGet]
         public IActionResult GetAllSurveys()
         {
-            Request.Headers.TryGetValue("AuthorizationToken", out var token);
-            if(StringValues.IsNullOrEmpty(token))
+            try
             {
-                return BadRequest("Token is empty. Please, try again.");
+                Request.Headers.TryGetValue("AuthorizationToken", out var token);
+                if(StringValues.IsNullOrEmpty(token))
+                {
+                    return BadRequest("Token is empty. Please, try again.");
+                }
+
+                if(_userRepository.GetUserByToken(token) == null)
+                {
+                    throw new ArgumentException("Token is incorrect. Please, logout, login and try again", "Token");
+                }
+
+                return Ok(_surveyRepository.GetAllSurveys());
             }
-            if(_userRepository.GetUserByToken(token) == null)
+            catch(Exception e)
             {
-                return BadRequest("Token is incorrect. Please, logout, login and try again");
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
-            return Ok(_surveyRepository.GetAllSurveys());
         }
 
         // GET: api/Survey/5
@@ -60,7 +70,8 @@ namespace WebApiQandA.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -86,7 +97,8 @@ namespace WebApiQandA.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -110,7 +122,8 @@ namespace WebApiQandA.Controllers
             }
             catch(Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -149,7 +162,8 @@ namespace WebApiQandA.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -173,7 +187,8 @@ namespace WebApiQandA.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
     }

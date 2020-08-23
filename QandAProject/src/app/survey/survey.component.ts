@@ -51,7 +51,7 @@ export class SurveyComponent implements OnInit {
         this.survey.answers.push(newAnswer);
         this.newAnswer = '';
       })
-      .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+      .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   vote(answerId: number): void {
@@ -60,9 +60,7 @@ export class SurveyComponent implements OnInit {
     vote.idAnswer = answerId;
     this.surveyService.Vote(vote)
       .then()
-      .catch((Error: HttpErrorResponse) => {
-        window.alert(Error.error);
-      })
+      .catch((Error: HttpErrorResponse) => console.log(Error.error))
       .finally(() => this.ngOnInit());
   }
 
@@ -87,7 +85,7 @@ export class SurveyComponent implements OnInit {
         this.survey = survey;
         this.processingSurvey();
       })
-      .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+      .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
 }

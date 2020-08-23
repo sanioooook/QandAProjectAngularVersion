@@ -26,12 +26,9 @@ export class UserService {
         password
       }
     ).toPromise()
-    .then(data =>
-      this.setAuthorizationToken(data.authorizeToken)
-    )
-    .catch((Error: HttpErrorResponse) => {
-      window.alert(Error.error);
-    });
+      .then(data =>
+        this.setAuthorizationToken(data.authorizeToken)
+      );
   }
 
   public registration(email: string, password: string): Promise<any> {
@@ -44,13 +41,10 @@ export class UserService {
     ).toPromise()
       .then(data =>
         this.setAuthorizationToken(data.authorizeToken)
-      )
-      .catch((Error: HttpErrorResponse) => {
-        window.alert(Error.error);
-      });
+      );
   }
 
-  public IsUserLogged(): boolean{
+  public IsUserLogged(): boolean {
     return this.user.authorizeToken !== '';
   }
 
