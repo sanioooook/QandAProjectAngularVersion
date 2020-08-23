@@ -32,7 +32,7 @@ export class CreateSurveyComponent {
       survey.severalAnswer = this.severalAnswer;
       this.surveyService.CreateSurvey(survey)
       .then(_ => this.router.navigate(['home']))
-      .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+      .catch((Error: HttpErrorResponse) => console.log(Error.error));
     } // отобразить ошибку что число ответов не может быть равным нулю
   }
 

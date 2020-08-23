@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 // import { IUserService } from "../interfaces/user-service.interface";
 import { UserService } from './user-service.service';
 import { serverAddress } from '../consts/server-address';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class InterceptorService {
 
   constructor(private userService: UserService, private http: HttpClient) { }
 
-  public get(url: string): Observable<any>{
+  public get(url: string): Observable<any> {
     const token = this.userService.getAuthorizationToken();
     return this.http.get<any>(
       serverAddress + url,
@@ -21,7 +22,20 @@ export class InterceptorService {
         headers: {
           AuthorizationToken: token
         }
-      });
+      }).pipe(map(data => data),
+        catchError((err: HttpErrorResponse) => {
+          for (const property in err.error) {
+            if (Object.prototype.hasOwnProperty.call(err.error, property)) {
+              const element = err.error[property];
+              if (element as Array<string>){
+                element.forEach(elementForeach => {
+                  window.alert(elementForeach);
+                });
+              }
+            }
+          }
+          return throwError(err);
+        }));
   }
 
   public post(url: string, body: any): Observable<any>{
@@ -33,7 +47,7 @@ export class InterceptorService {
         headers: {
           AuthorizationToken: token
         }
-      });
+      }).pipe(map(data => data), catchError(this.catchCallback));
   }
 
   public delete(url: string): Observable<any> {
@@ -44,6 +58,17 @@ export class InterceptorService {
         headers: {
           AuthorizationToken: token
         }
-      });
+      }).pipe(map(data => data), catchError(this.catchCallback));
+  }
+  private catchCallback(err: HttpErrorResponse): Observable<any> {
+    for (const property in err.error.errors) {
+      if (Object.prototype.hasOwnProperty.call(err.error.errors, property)) {
+        const element = err.error.errors[property];
+        element.forEach(elementForeach => {
+          window.alert(`${property}: ${elementForeach}`);
+        });
+      }
+    }
+    return throwError(err);
   }
 }

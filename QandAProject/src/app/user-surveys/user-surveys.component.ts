@@ -24,7 +24,7 @@ export class UserSurveysComponent implements OnInit {
       .then(data => {
         this.surveys = data;
       })
-      .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+      .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   getNumberVotes(survey: Survey): number {

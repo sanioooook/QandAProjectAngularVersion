@@ -44,7 +44,7 @@ export class EditSurveyComponent implements OnInit {
           this.survey = null;
         }
       })
-      .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+      .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   addAnswer(): void {
@@ -58,16 +58,14 @@ export class EditSurveyComponent implements OnInit {
           this.survey.answers.push(newAnswer);
           this.newAnswer = '';
         })
-        .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+        .catch((Error: HttpErrorResponse) => console.log(Error.error));
     }
   }
 
   editAnswer(answer: Answer): void {
     this.surveyService.EditAnswer(answer)
     .then()
-    .catch((Error: HttpErrorResponse) => {
-      window.alert(Error.error);
-    });
+    .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   showEditAnswerWindow(answer: Answer): void {
@@ -80,23 +78,17 @@ export class EditSurveyComponent implements OnInit {
 
   deleteAnswer(answer: Answer): Promise<any> {
     return this.surveyService.DeleteAnswer(answer.id)
-      .catch((Error: HttpErrorResponse) => {
-        window.alert(Error.error);
-        this.ngOnInit();
-      });
+      .catch(_ =>  this.ngOnInit());
   }
 
   saveSurvey(): void {
     this.surveyService.EditSurvey(this.survey)
-      .catch((Error: HttpErrorResponse) => {
-        window.alert(Error.error);
-        this.ngOnInit();
-      });
+      .catch(_ => this.ngOnInit());
   }
 
   deleteSurvey(): void {
     this.surveyService.DeleteSurvey(this.survey.id)
     .then(_ => this.router.navigate(['home']))
-    .catch((Error: HttpErrorResponse) => window.alert(Error.error));
+    .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 }

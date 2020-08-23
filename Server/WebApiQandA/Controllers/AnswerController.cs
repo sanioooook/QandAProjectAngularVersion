@@ -42,7 +42,8 @@ namespace WebApiQandA.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -78,7 +79,8 @@ namespace WebApiQandA.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
 
@@ -112,7 +114,8 @@ namespace WebApiQandA.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
             }
         }
     }
