@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-// import { IUserService } from "../interfaces/user-service.interface";
+import { TdDialogService } from '@covalent/core/dialogs';
 import { UserService } from './user-service.service';
 import { serverAddress } from '../consts/server-address';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -12,7 +12,9 @@ import { map, catchError} from 'rxjs/operators';
 
 export class InterceptorService {
 
-  constructor(private userService: UserService, private http: HttpClient) { }
+  constructor(private userService: UserService,
+              private http: HttpClient,
+              private dialogService: TdDialogService) { }
 
   public get(url: string): Observable<any> {
     const token = this.userService.getAuthorizationToken();
@@ -29,7 +31,7 @@ export class InterceptorService {
               const element = err.error[property];
               if (element as Array<string>){
                 element.forEach(elementForeach => {
-                  window.alert(elementForeach);
+                  this.openAlert(elementForeach);
                 });
               }
             }
@@ -60,15 +62,24 @@ export class InterceptorService {
         }
       }).pipe(map(data => data), catchError(this.catchCallback));
   }
+
   private catchCallback(err: HttpErrorResponse): Observable<any> {
     for (const property in err.error.errors) {
       if (Object.prototype.hasOwnProperty.call(err.error.errors, property)) {
         const element = err.error.errors[property];
         element.forEach(elementForeach => {
-          window.alert(`${property}: ${elementForeach}`);
+          this.openAlert(`${property}: ${elementForeach}`);
         });
       }
     }
     return throwError(err);
+  }
+
+  private openAlert(message: string): void {
+    this.dialogService.openAlert({
+      message,
+      title: 'Alert',
+      closeButton: 'Close',
+    });
   }
 }

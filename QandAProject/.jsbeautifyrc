@@ -1,0 +1,7 @@
+{
+  "html": {
+    "end_with_newline": true,
+    "wrap_attributes": "force-aligned"
+
+  }
+}
