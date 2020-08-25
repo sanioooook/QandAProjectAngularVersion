@@ -6,8 +6,8 @@ import { SurveysService } from '../services/surveys.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Answer } from '../classes/answer';
 import { UserForPublic } from '../classes/user-for-public';
-import { InterceptorService } from '../services/interceptor.service';
 import { TdDialogService } from '@covalent/core/dialogs';
+import { UserService } from '../services/user-service.service';
 
 @Component({
   selector: 'app-edit-survey',
@@ -17,18 +17,17 @@ import { TdDialogService } from '@covalent/core/dialogs';
 export class EditSurveyComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private surveyService: SurveysService,
-              private interceptorService: InterceptorService,
+              private userService: UserService,
               private router: Router,
               private dialogService: TdDialogService) { }
 
-  user: UserForPublic;
+  user = new UserForPublic();
   newAnswer: string;
   survey: Survey;
   editQuestionMode: boolean;
 
   ngOnInit(): void {
-    this.interceptorService.get('User')
-      .subscribe((userForPublic: UserForPublic) => this.user = userForPublic);
+    this.userService.getUserLogin().then(login => this.user.login = login);
     this.route.paramMap.pipe(
       switchMap(params => params.getAll('id')))
       .subscribe(id => this.setSurvey(+id));

@@ -7,7 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Answer } from '../classes/answer';
 import { Vote } from '../classes/vote';
 import { UserForPublic } from '../classes/user-for-public';
-import { InterceptorService } from '../services/interceptor.service';
+import { UserService } from '../services/user-service.service';
 
 @Component({
   selector: 'app-survey',
@@ -17,7 +17,7 @@ import { InterceptorService } from '../services/interceptor.service';
 export class SurveyComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private surveyService: SurveysService,
-              private interceptorService: InterceptorService) { }
+              private userService: UserService) { }
 
   user: UserForPublic;
   newAnswer: string;
@@ -25,8 +25,7 @@ export class SurveyComponent implements OnInit {
   voteCountInSurvey: number;
 
   ngOnInit(): void {
-    this.interceptorService.get('User')
-      .subscribe((userForPublic: UserForPublic) => this.user = userForPublic);
+    this.userService.getUserLogin().then(login => this.user.login = login);
     this.route.paramMap.pipe(
       switchMap(params => params.getAll('id')))
       .subscribe(id => this.setSurvey(+id));
