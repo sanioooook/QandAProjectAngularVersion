@@ -87,5 +87,4 @@ export class SurveyComponent implements OnInit {
       })
       .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
-
 }

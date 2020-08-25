@@ -1,28 +1,39 @@
 <div class="component">
-  <div class="survey" *ngIf="survey; else elseTemplate">
-    <div class="survey-question">
-      {{survey.question}}
+    <div class="survey"
+         *ngIf="survey; else elseTemplate">
+        <div class="survey-question">
+            {{survey.question}}
+        </div>
+        <div class="survey-answers"
+             *ngIf="survey.answers">
+            <div class="answer"
+                 *ngFor="let answer of survey.answers"
+                 style.background="linear-gradient(to right,
+        antiquewhite {{answer.votes.length/voteCountInSurvey*100}}%,
+        transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)">
+                <mat-checkbox [(checked)]="answer.isUserVote"
+                              [disabled]="!survey.severalAnswer && isVote()||answer.isUserVote"
+                              (click)="vote(answer.id)">
+                    {{answer.textAnswer}}
+                </mat-checkbox>
+            </div>
+        </div>
+        <div class="survey-add-response">
+            <div *ngIf="survey.addResponse||survey.user && survey.user.login === user.login">
+                <input type="text"
+                       [(ngModel)]="newAnswer">
+                <input type="button"
+                       value="Add"
+                       (click)="addAnswer(survey.id)">
+            </div>
+        </div>
+        <div class="survey-creator"
+             *ngIf="survey.user">
+            careator: {{survey.user.login}}
+        </div>
     </div>
-    <div class="survey-answers" *ngIf="survey.answers">
-      <div class="answer" *ngFor="let answer of survey.answers"
-        style.background="linear-gradient(to right, antiquewhite {{answer.votes.length/voteCountInSurvey*100}}%, transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)">
-        <input type="checkbox" name="answer" [(ngModel)]="answer.isUserVote"
-          [disabled]="!survey.severalAnswer && isVote()||answer.isUserVote" (click)="vote(answer.id)">
-        {{answer.textAnswer}}
-      </div>
-    </div>
-    <div class="survey-add-response">
-      <div *ngIf="survey.addResponse||survey.user && survey.user.login === user.login">
-        <input type="text" [(ngModel)]="newAnswer">
-        <input type="button" value="Add" (click)="addAnswer(survey.id)">
-      </div>
-    </div>
-    <div class="survey-creator" *ngIf="survey.user">
-      careator: {{survey.user.login}}
-    </div>
-  </div>
 
-  <ng-template #elseTemplate>
-    download
-  </ng-template>
+    <ng-template #elseTemplate>
+        download
+    </ng-template>
 </div>

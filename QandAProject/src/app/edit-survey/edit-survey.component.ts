@@ -7,6 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Answer } from '../classes/answer';
 import { UserForPublic } from '../classes/user-for-public';
 import { InterceptorService } from '../services/interceptor.service';
+import { TdDialogService } from '@covalent/core/dialogs';
 
 @Component({
   selector: 'app-edit-survey',
@@ -17,7 +18,8 @@ export class EditSurveyComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private surveyService: SurveysService,
               private interceptorService: InterceptorService,
-              private router: Router) { }
+              private router: Router,
+              private dialogService: TdDialogService) { }
 
   user: UserForPublic;
   newAnswer: string;
@@ -69,11 +71,21 @@ export class EditSurveyComponent implements OnInit {
   }
 
   showEditAnswerWindow(answer: Answer): void {
-    const newAnswer = window.prompt('edit answer', answer.textAnswer);
-    if (newAnswer !== null) {
-      answer.textAnswer = newAnswer;
-      this.editAnswer(answer);
-    }
+    this.dialogService.openPrompt({
+      title: 'Edit answer',
+      message: 'Edit text answer',
+      value: answer.textAnswer,
+      cancelButton: 'Cancel',
+      acceptButton: 'Ok',
+    })
+      .afterClosed()
+      .subscribe(
+        (newAnswer: string) => {
+          if (newAnswer) {
+            answer.textAnswer = newAnswer;
+            this.editAnswer(answer);
+          }
+        });
   }
 
   deleteAnswer(answer: Answer): Promise<any> {
