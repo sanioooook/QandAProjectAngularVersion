@@ -4,7 +4,8 @@ namespace WebApiQandA.DTO
 {
     public class AuthorizeUserDto
     {
-        [Required]
         public string AuthorizeToken { get; set; }
+
+        public string Login { get; set; }
     }
 }

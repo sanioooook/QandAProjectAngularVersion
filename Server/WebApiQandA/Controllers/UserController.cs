@@ -49,7 +49,7 @@ namespace WebApiQandA.Controllers
                 }
 
                 _userService.Create(userDto);
-                return Ok(new AuthorizeUserDto {AuthorizeToken = _userService.Login(userDto)});
+                return Ok(new AuthorizeUserDto {AuthorizeToken = _userService.Login(userDto), Login = userDto.Login});
             }
             catch(Exception e)
             {
@@ -68,7 +68,7 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("userForLogin is null");
                 }
-                return Ok(new AuthorizeUserDto {AuthorizeToken = _userService.Login(user)});
+                return Ok(new AuthorizeUserDto {AuthorizeToken = _userService.Login(user), Login = user.Login});
             }
             catch (Exception e)
             {
