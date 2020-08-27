@@ -10,6 +10,7 @@ import { UserSurveysComponent } from './user-surveys/user-surveys.component';
 import { SurveyComponent } from './survey/survey.component';
 import { EditSurveyComponent } from './edit-survey/edit-survey.component';
 import { CreateSurveyComponent } from './create-survey/create-survey.component';
+import { UserVoteSurveysComponent } from './user-vote-surveys/user-vote-surveys.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [NotAuthorized] },
@@ -20,6 +21,7 @@ const routes: Routes = [
   { path: 'survey/:id', component: SurveyComponent, canActivate: [Authorized] },
   { path: 'edit-survey/:id', component: EditSurveyComponent, canActivate: [Authorized] },
   { path: 'create-survey', component: CreateSurveyComponent, canActivate: [Authorized] },
+  { path: 'user-vote-surveys', component: UserVoteSurveysComponent, canActivate: [Authorized] },
   { path: '**', redirectTo: 'home' },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];

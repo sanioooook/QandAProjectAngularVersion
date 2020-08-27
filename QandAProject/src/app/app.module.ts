@@ -21,6 +21,7 @@ import { UserSurveysComponent } from './user-surveys/user-surveys.component';
 import { SurveyComponent } from './survey/survey.component';
 import { EditSurveyComponent } from './edit-survey/edit-survey.component';
 import { CreateSurveyComponent } from './create-survey/create-survey.component';
+import { UserVoteSurveysComponent } from './user-vote-surveys/user-vote-surveys.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { CreateSurveyComponent } from './create-survey/create-survey.component';
     UserSurveysComponent,
     SurveyComponent,
     EditSurveyComponent,
-    CreateSurveyComponent
+    CreateSurveyComponent,
+    UserVoteSurveysComponent
   ],
   imports: [
     BrowserModule,

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using WebApiQandA.DTO;
@@ -119,6 +121,33 @@ namespace WebApiQandA.Controllers
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
                 }
                 return Ok(_surveyRepository.GetSurveysByUser(user.Id));
+            }
+            catch(Exception e)
+            {
+                ModelState.AddModelError("Errors", e.Message);
+                return BadRequest(ModelState);
+            }
+        }
+
+        // GET: api/Survey/UserVoteSurveys
+        [HttpGet("UserVoteSurveys")]
+        public IActionResult GetUserVoteSurveys()
+        {
+            try
+            {
+                Request.Headers.TryGetValue("AuthorizationToken", out var token);
+                if(StringValues.IsNullOrEmpty(token))
+                {
+                    throw new ArgumentException("Token is empty. Please, try again.");
+                }
+                var user = _userRepository.GetUserByToken(token);
+                if(user == null)
+                {
+                    throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
+                }
+                var userVoteSurveys = (from survey in _surveyRepository.GetAllSurveys() from answer in survey.Answers from vote in answer.Votes where vote.Voter == user.Login select survey).ToList();
+
+                return Ok(userVoteSurveys);
             }
             catch(Exception e)
             {

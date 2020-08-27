@@ -19,7 +19,7 @@ export class SurveyComponent implements OnInit {
               private surveyService: SurveysService,
               private userService: UserService) { }
 
-  user: UserForPublic;
+  user = new UserForPublic();
   newAnswer: string;
   survey: Survey;
   voteCountInSurvey: number;

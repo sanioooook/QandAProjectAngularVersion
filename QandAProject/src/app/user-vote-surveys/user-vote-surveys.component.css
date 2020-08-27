@@ -1,0 +1,21 @@
+.survey {
+  display: grid;
+  grid-template-columns: 40% 20% 20% 20%;
+  grid-template-rows: 100%;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid black;
+}
+
+.survey:nth-last-child(1) {
+  border-radius: 0 0 10px 10px;
+}
+
+.surveys {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+a {
+  color: black;
+}
