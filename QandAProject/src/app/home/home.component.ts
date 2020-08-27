@@ -18,7 +18,7 @@ export class HomeComponent implements OnInit {
     { title: 'Create survey', link: '/create-survey' },
     { title: 'All surveys', link: '/all-surveys' },
     { title: 'Your surveys', link: '/your-surveys' },
-    { title: 'Polls in which you voted', link: '/your-voted-surveys' }
+    { title: 'Polls in which you voted', link: '/user-vote-surveys' }
   ];
 
   ngOnInit(): void {

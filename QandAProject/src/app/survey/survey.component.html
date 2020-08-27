@@ -12,8 +12,8 @@
         antiquewhite {{answer.votes.length/voteCountInSurvey*100}}%,
         transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)">
                 <mat-checkbox [(checked)]="answer.isUserVote"
-                              [disabled]="!survey.severalAnswer && isVote()||answer.isUserVote"
-                              (click)="vote(answer.id)">
+                              [(disabled)]="!survey.severalAnswer && isVote() || answer.isUserVote"
+                              (change)="vote(answer.id)">
                     {{answer.textAnswer}}
                 </mat-checkbox>
             </div>

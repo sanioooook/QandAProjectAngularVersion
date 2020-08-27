@@ -19,6 +19,10 @@ export class SurveysService {
     return this.interceptor.get('survey').toPromise();
   }
 
+  GetUserVoteSurveys(): Promise<Survey[]> {
+    return this.interceptor.get('survey/userVoteSurveys').toPromise();
+  }
+
   Vote(vote: Vote): Promise<any> {
     return this.interceptor.post('vote', vote).toPromise();
   }
