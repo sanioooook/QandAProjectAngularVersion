@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Entities.Models;
 using WebApiQandA.DTO;
 
 namespace WebApiQandA.Interfaces
@@ -9,12 +10,14 @@ namespace WebApiQandA.Interfaces
 
         SurveyDto GetSurveyBySurveyId(int surveyId);
 
-        List<SurveyDto> GetSurveysByUser(int userId);
 
-        List<SurveyDto> GetAllSurveys();
+        List<SurveyDto> GetAllSurveys(Filtration filtration, User user,
+            Pagination<SurveyDto> pagination);
 
         void EditSurvey(SurveyDto surveyDto);
 
         void DeleteSurveyBySurveyId(int userId, int surveyId);
+
+        int GetCountSurveys(string surveyQuestionFilter = null);
     }
 }

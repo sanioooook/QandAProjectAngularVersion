@@ -40,20 +40,31 @@ namespace WebApiQandA.Services
         {
             return _mapper.Map<SurveyDto>(_surveyRepository.GetSurveyBySurveyId(surveyId));
         }
-
-        public List<SurveyDto> GetSurveysByUser(int userId)
+        
+        public List<SurveyDto> GetAllSurveys(Filtration filtration, User user, Pagination<SurveyDto> pagination)
         {
-            var surveysDto = new List<SurveyDto>();
-            _surveyRepository.GetSurveysByUserId(userId)
-                .ForEach(survey => surveysDto.Add(_mapper.Map<SurveyDto>(survey)));
-            return surveysDto;
-        }
+            if(filtration == null)
+            {
+                throw new ArgumentNullException(nameof(filtration));
+            }
 
-        public List<SurveyDto> GetAllSurveys()
-        {
             var surveysDto = new List<SurveyDto>();
-            _surveyRepository.GetAllSurveys()
-                .ForEach(survey => surveysDto.Add(_mapper.Map<SurveyDto>(survey)));
+            if(pagination.PageNumber != null&&pagination.PageSize != null)
+            {
+                _surveyRepository
+                    .GetAllSurveys((int)pagination.PageNumber, (int)pagination.PageSize)
+                    .ForEach(survey =>
+                    {
+                        var surveyDto = _mapper.Map<SurveyDto>(survey);
+                        //    if(surveyFilterDto.Creator != null && surveyFilterDto.Creator == surveyDto.User.Login ||
+                        //       surveyFilterDto.UserVote != null && IsUserVote(surveyDto, user) ||
+                        //       surveyFilterDto.UserVote == null && surveyFilterDto.Creator == null)
+                        //    {
+                        surveysDto.Add(surveyDto);
+                        //}
+                    });
+            }
+
             return surveysDto;
         }
 
@@ -66,6 +77,16 @@ namespace WebApiQandA.Services
         {
             _answerService.DeleteAnswersBySurveyId(surveyId);
             _surveyRepository.DeleteSurveyBySurveyId(userId, surveyId);
+        }
+
+        private bool IsUserVote(SurveyDto surveyDto, User user)
+        {
+            return surveyDto.Answers.SelectMany(answer => answer.Votes).Any(vote => vote.Voter == user.Login);
+        }
+
+        public int GetCountSurveys(string surveyQuestionFilter = null)
+        {
+            return _surveyRepository.GetCountSurveys(surveyQuestionFilter);
         }
     }
 }

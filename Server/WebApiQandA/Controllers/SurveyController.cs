@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using WebApiQandA.DTO;
@@ -13,18 +11,18 @@ namespace WebApiQandA.Controllers
     public class SurveyController : ControllerBase
     {
 
-        public SurveyController(ISurveyService surveyRepository, IUserService userRepository)
+        public SurveyController(ISurveyService surveyService, IUserService userService)
         {
-            _surveyRepository = surveyRepository;
-            _userRepository = userRepository;
+            _surveyService = surveyService;
+            _userService = userService;
         }
 
-        private readonly IUserService _userRepository;
-        private readonly ISurveyService _surveyRepository;
+        private readonly IUserService _userService;
+        private readonly ISurveyService _surveyService;
 
         // GET: api/Survey
         [HttpGet]
-        public IActionResult GetAllSurveys()
+        public IActionResult GetAllSurveys([FromQuery]Filtration filtration, [FromQuery]Pagination<SurveyDto> pagination)
         {
             try
             {
@@ -33,13 +31,18 @@ namespace WebApiQandA.Controllers
                 {
                     return BadRequest("Token is empty. Please, try again.");
                 }
-
-                if(_userRepository.GetUserByToken(token) == null)
+                var user = _userService.GetUserByToken(token);
+                if(user == null)
                 {
-                    throw new ArgumentException("Token is incorrect. Please, logout, login and try again", "Token");
+                    throw new ArgumentException("Token is incorrect. Please, logout, login and try again", nameof(token));
                 }
 
-                return Ok(_surveyRepository.GetAllSurveys());
+                var surveys = _surveyService.GetAllSurveys(filtration, user, pagination);
+                var surveysCount = _surveyService.GetCountSurveys();
+                pagination.Data = surveys;
+                pagination.TotalCount = surveysCount;
+                pagination.PageCount = surveysCount/pagination.PageSize;
+                return Ok(pagination);
             }
             catch(Exception e)
             {
@@ -59,11 +62,11 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("Token is empty. Please, try again.");
                 }
-                if(_userRepository.GetUserByToken(token) == null)
+                if(_userService.GetUserByToken(token) == null)
                 {
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
                 }
-                var survey = _surveyRepository.GetSurveyBySurveyId(id);
+                var survey = _surveyService.GetSurveyBySurveyId(id);
                 if (survey == null)
                 {
                     throw new ArgumentException("Not found");
@@ -88,68 +91,16 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("Token is empty. Please, try again.");
                 }
-                var user = _userRepository.GetUserByToken(token);
+                var user = _userService.GetUserByToken(token);
                 if(user == null)
                 {
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
                 }
                 surveyDto.User = new UserForPublic { Login = user.Login };
-                _surveyRepository.Create(surveyDto);
+                _surveyService.Create(surveyDto);
                 return Ok();
             }
             catch (Exception e)
-            {
-                ModelState.AddModelError("Errors", e.Message);
-                return BadRequest(ModelState);
-            }
-        }
-
-        // POST: api/Survey/UserSurveys
-        [HttpGet("UserSurveys")]
-        public IActionResult GetUserSurveys()
-        {
-            try
-            {
-                Request.Headers.TryGetValue("AuthorizationToken", out var token);
-                if(StringValues.IsNullOrEmpty(token))
-                {
-                    throw new ArgumentException("Token is empty. Please, try again.");
-                }
-                var user = _userRepository.GetUserByToken(token);
-                if(user == null)
-                {
-                    throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
-                }
-                return Ok(_surveyRepository.GetSurveysByUser(user.Id));
-            }
-            catch(Exception e)
-            {
-                ModelState.AddModelError("Errors", e.Message);
-                return BadRequest(ModelState);
-            }
-        }
-
-        // GET: api/Survey/UserVoteSurveys
-        [HttpGet("UserVoteSurveys")]
-        public IActionResult GetUserVoteSurveys()
-        {
-            try
-            {
-                Request.Headers.TryGetValue("AuthorizationToken", out var token);
-                if(StringValues.IsNullOrEmpty(token))
-                {
-                    throw new ArgumentException("Token is empty. Please, try again.");
-                }
-                var user = _userRepository.GetUserByToken(token);
-                if(user == null)
-                {
-                    throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
-                }
-                var userVoteSurveys = (from survey in _surveyRepository.GetAllSurveys() from answer in survey.Answers from vote in answer.Votes where vote.Voter == user.Login select survey).ToList();
-
-                return Ok(userVoteSurveys);
-            }
-            catch(Exception e)
             {
                 ModelState.AddModelError("Errors", e.Message);
                 return BadRequest(ModelState);
@@ -167,7 +118,7 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("Token is empty. Please, try again.");
                 }
-                var user = _userRepository.GetUserByToken(token);
+                var user = _userService.GetUserByToken(token);
                 if(user == null)
                 {
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
@@ -176,17 +127,17 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("SurveyId is null");
                 }
-                if(_surveyRepository.GetSurveyBySurveyId((int)surveyDto.Id).Equals(surveyDto))
+                if(_surveyService.GetSurveyBySurveyId((int)surveyDto.Id).Equals(surveyDto))
                 {
                     throw new ArgumentException("The passed object does not differ from the original one");
                 }
 
-                if(_surveyRepository.GetSurveyBySurveyId((int)surveyDto.Id).User.Login != user.Login)
+                if(_surveyService.GetSurveyBySurveyId((int)surveyDto.Id).User.Login != user.Login)
                 {
                     throw new ArgumentException("You don't have permissive to edit this survey");
                 }
 
-                _surveyRepository.EditSurvey(surveyDto);
+                _surveyService.EditSurvey(surveyDto);
                 return Ok();
             }
             catch (Exception e)
@@ -206,12 +157,12 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("Token is empty. Please, try again.");
                 }
-                var user = _userRepository.GetUserByToken(token);
+                var user = _userService.GetUserByToken(token);
                 if(user == null)
                 {
                    throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
                 }
-                _surveyRepository.DeleteSurveyBySurveyId(user.Id, id);
+                _surveyService.DeleteSurveyBySurveyId(user.Id, id);
                 return Ok();
             }
             catch (Exception e)

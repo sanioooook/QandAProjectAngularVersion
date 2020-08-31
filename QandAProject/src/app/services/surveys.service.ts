@@ -3,6 +3,8 @@ import { InterceptorService } from './interceptor.service';
 import { Survey } from '../classes/survey';
 import { Vote } from '../classes/vote';
 import { Answer } from '../classes/answer';
+import { Pagination } from '../classes/pagination';
+import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +17,10 @@ export class SurveysService {
     return this.interceptor.post('survey/create', survey).toPromise();
   }
 
-  GetAllSurveys(): Promise<Survey[]> {
-    return this.interceptor.get('survey').toPromise();
+  GetAllSurveys(surveyPagination: Pagination<Survey>): Promise<Pagination<Survey>> {
+    return this.interceptor.get('survey', new HttpParams()
+    .set('pageNumber', surveyPagination.pageNumber.toString())
+    .set('pageSize', surveyPagination.pageSize.toString())).toPromise();
   }
 
   GetUserVoteSurveys(): Promise<Survey[]> {
