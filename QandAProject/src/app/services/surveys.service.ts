@@ -3,6 +3,11 @@ import { InterceptorService } from './interceptor.service';
 import { Survey } from '../classes/survey';
 import { Vote } from '../classes/vote';
 import { Answer } from '../classes/answer';
+import { Pagination } from '../classes/pagination';
+import { HttpParams } from '@angular/common/http';
+import { Sort } from '../classes/sort';
+import { SurveySortBy } from '../classes/survey-sort-by.enum';
+import { Filter } from '../classes/filter';
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +20,17 @@ export class SurveysService {
     return this.interceptor.post('survey/create', survey).toPromise();
   }
 
-  GetAllSurveys(): Promise<Survey[]> {
-    return this.interceptor.get('survey').toPromise();
-  }
-
-  GetUserVoteSurveys(): Promise<Survey[]> {
-    return this.interceptor.get('survey/userVoteSurveys').toPromise();
+  GetAllSurveys(surveyPagination: Pagination<Survey>,
+                surveySort: Sort<SurveySortBy>,
+                filter: Filter): Promise<Pagination<Survey>> {
+    return this.interceptor.get(
+      'survey', new HttpParams()
+    .set('pageNumber', surveyPagination.pageNumber.toString())
+    .set('pageSize', surveyPagination.pageSize.toString())
+    .set('sortBy', surveySort.sortBy.toString())
+    .set('sortDirection', surveySort.sortDirection.toString())
+    .set('filter', filter.searchQuery)
+    ).toPromise();
   }
 
   Vote(vote: Vote): Promise<any> {
@@ -37,10 +47,6 @@ export class SurveysService {
 
   DeleteAnswer(id: number): Promise<any> {
     return this.interceptor.delete(`answer/${id}`).toPromise();
-  }
-
-  GetUserSurveys(): Promise<Survey[]> {
-    return this.interceptor.get('survey/userSurveys').toPromise();
   }
 
   GetSurveyById(id: number): Promise<Survey> {

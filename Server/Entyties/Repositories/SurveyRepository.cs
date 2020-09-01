@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -29,14 +30,20 @@ namespace Entities.Repositories
             return _db.Query<Survey>("SELECT * FROM Survey WHERE Id = @surveyId", new { surveyId }).FirstOrDefault();
         }
 
-        public List<Survey> GetSurveysByUserId(int userId)
+        public int GetCountSurveys(string surveyQuestionFilter = null)
         {
-            return _db.Query<Survey>("SELECT * FROM Survey WHERE IdCreator = @userId", new { userId }).ToList();
+            if(surveyQuestionFilter == null)
+            {
+                return _db.QuerySingle<int>("SELECT COUNT(*) FROM Survey");
+            }
+            return _db.QuerySingle<int>("SELECT COUNT(*) FROM Survey WHERE Question = @question",
+                new { question = surveyQuestionFilter });
         }
 
         public List<Survey> GetAllSurveys()
         {
-            return _db.Query<Survey>("SELECT * FROM Survey").ToList();
+            return _db.Query<Survey>(
+                "SELECT * FROM Survey").ToList();
         }
         
         public void EditSurvey(Survey survey)

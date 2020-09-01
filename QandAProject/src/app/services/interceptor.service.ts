@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { TdDialogService } from '@covalent/core/dialogs';
 import { UserService } from './user-service.service';
 import { serverAddress } from '../consts/server-address';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError} from 'rxjs/operators';
 
@@ -16,14 +16,15 @@ export class InterceptorService {
               private http: HttpClient,
               private dialogService: TdDialogService) { }
 
-  public get(url: string): Observable<any> {
+  public get(url: string, httpParams: HttpParams = null): Observable<any> {
     const token = this.userService.getAuthorizationToken();
     return this.http.get<any>(
       serverAddress + url,
       {
         headers: {
           AuthorizationToken: token
-        }
+        },
+        params: httpParams
       }).pipe(map(data => data),
         catchError((err: HttpErrorResponse) => {
           for (const property in err.error) {
@@ -40,7 +41,7 @@ export class InterceptorService {
         }));
   }
 
-  public post(url: string, body: any): Observable<any>{
+  public post(url: string, body: any, httpParams: HttpParams = null): Observable<any>{
     const token = this.userService.getAuthorizationToken();
     return this.http.post<any>(
       serverAddress + url,
@@ -48,7 +49,8 @@ export class InterceptorService {
       {
         headers: {
           AuthorizationToken: token
-        }
+        },
+        params: httpParams
       }).pipe(map(data => data), catchError(this.catchCallback));
   }
 

@@ -9,7 +9,7 @@ namespace Entities.Interfaces
 
         Survey GetSurveyBySurveyId(int id);
 
-        List<Survey> GetSurveysByUserId(int userId);
+        int GetCountSurveys(string surveyQuestionFilter = null);
 
         List<Survey> GetAllSurveys();
         
