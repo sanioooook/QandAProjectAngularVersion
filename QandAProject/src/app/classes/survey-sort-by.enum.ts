@@ -1,4 +1,5 @@
 export enum SurveySortBy {
+  Id,
   Question,
   NumberAnswers,
   TimeCreate,

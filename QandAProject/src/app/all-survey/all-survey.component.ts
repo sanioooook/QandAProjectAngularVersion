@@ -10,6 +10,7 @@ import { Pagination } from '../classes/pagination';
 import { SurveySortBy } from '../classes/survey-sort-by.enum';
 import { SortDirection } from '../classes/sort-direction.enum';
 import { Sort } from '../classes/sort';
+import { Filter } from '../classes/filter';
 
 @Component({
   selector: 'app-all-survey',
@@ -28,10 +29,12 @@ export class AllSurveyComponent implements OnInit {
   private user: UserForPublic;
   private sortBy = SurveySortBy.Question;
   private sortDirection = SortDirection.Ascending;
+  public filter = new Filter();
 
   ngOnInit(): void {
     this.user = new UserForPublic();
     this.userService.getUserLogin().then(login => this.user.login = login);
+    this.filter.searchQuery = '';
     this.getSurveys();
   }
 
@@ -47,7 +50,7 @@ export class AllSurveyComponent implements OnInit {
     const sort = new Sort<SurveySortBy>();
     sort.sortBy = this.sortBy;
     sort.sortDirection = this.sortDirection;
-    this.surveysService.GetAllSurveys(paginator, sort)
+    this.surveysService.GetAllSurveys(paginator, sort, this.filter)
       .then(data => {
         this.surveyPagination = data;
         this.dataSource = new MatTableDataSource(this.surveyPagination.data);
@@ -55,18 +58,10 @@ export class AllSurveyComponent implements OnInit {
       .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
-  applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-
   sortData(sort): void {
     const data = this.surveyPagination.data.slice();
     if (!sort.active || sort.direction === '') {
-      this.dataSource = new MatTableDataSource(data);
+      // this.dataSource = new MatTableDataSource(data);
       return;
     }
     if (sort.direction === 'asc') {

@@ -1,9 +1,10 @@
 <ng-template tdLoading
              [tdLoadingUntil]="surveyPagination">
     <mat-form-field>
-        <mat-label>Filter</mat-label>
+        <mat-label>Search</mat-label>
         <input matInput
-               (keyup)="applyFilter($event)"
+               (input)="getSurveys()"
+               [(ngModel)]="filter.searchQuery"
                placeholder="Ex. Where are we going"
                #input>
     </mat-form-field>
@@ -64,7 +65,7 @@
         <tr class="mat-row"
             *matNoDataRow>
             <td class="mat-cell"
-                colspan="4">No data matching the filter "{{input.value}}"</td>
+                colspan="4">No data matching the filter "{{filter.searchQuery}}"</td>
         </tr>
     </table>
     <mat-paginator (page)="requestNewPage($event)"

@@ -23,7 +23,8 @@ namespace WebApiQandA.Controllers
 
         // GET: api/Survey
         [HttpGet]
-        public IActionResult GetAllSurveys([FromQuery]Sort<SurveySortBy> sort, [FromQuery]Pagination<SurveyDto> pagination)
+        public IActionResult GetAllSurveys([FromQuery] Sort<SurveySortBy> sort,
+            [FromQuery] Pagination<SurveyDto> pagination, [FromQuery] string filter)
         {
             try
             {
@@ -38,7 +39,7 @@ namespace WebApiQandA.Controllers
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again", nameof(token));
                 }
 
-                var surveys = _surveyService.GetAllSurveys(sort, user, pagination);
+                var surveys = _surveyService.GetAllSurveys(sort, user, pagination, new Filter() { SearchQuery = filter });
                 var surveysCount = _surveyService.GetCountSurveys();
                 pagination.Data = surveys;
                 pagination.TotalCount = surveysCount;

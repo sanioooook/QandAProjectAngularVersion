@@ -1,7 +1,7 @@
 ﻿
 namespace WebApiQandA.DTO
 {
-    public class Filtration
+    public class Filter
     {
         public string SearchQuery { get; set; }
     }

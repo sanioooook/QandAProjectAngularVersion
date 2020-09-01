@@ -2,6 +2,7 @@
 {
     public enum SurveySortBy
     {
+        Id,
         Question,
         NumberAnswers,
         TimeCreate,

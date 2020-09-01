@@ -42,9 +42,9 @@ namespace WebApiQandA.Services
         {
             return _mapper.Map<SurveyDto>(_surveyRepository.GetSurveyBySurveyId(surveyId));
         }
-        
+
         [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
-        public IEnumerable<SurveyDto> GetAllSurveys(Sort<SurveySortBy> sort, User user, Pagination<SurveyDto> pagination)
+        public IEnumerable<SurveyDto> GetAllSurveys(Sort<SurveySortBy> sort, User user, Pagination<SurveyDto> pagination, Filter filter)
         {
             var surveysDto = new List<SurveyDto>();
             if(pagination.PageNumber != null && pagination.PageSize != null)
@@ -58,88 +58,62 @@ namespace WebApiQandA.Services
                     case SurveySortBy.NumberAnswers:
                     {
                         surveysDto.Sort((a, b) => a.Answers.Count.CompareTo(b.Answers.Count));
-                        if(sort.SortDirection == SortDirection.Ascending)
-                        {
-                            surveysDto.OrderBy(survey => survey.Answers.Count);
-                        }
-                        else
-                        {
-                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.Answers.Count descending select surveyDto).ToList();
-                        }
+                        surveysDto = sort.SortDirection == SortDirection.Ascending
+                            ? surveysDto.OrderBy(survey => survey.Answers.Count).ToList()
+                            : surveysDto.OrderByDescending(survey => survey.Answers.Count).ToList();
                         break;
                     }
                     case SurveySortBy.NumberVotes:
                     {
                         surveysDto.Sort((a, b) => GetCountVotesInSurvey(a).CompareTo(GetCountVotesInSurvey(b)));
-                        if(sort.SortDirection == SortDirection.Ascending)
-                        {
-                            surveysDto.OrderBy(GetCountVotesInSurvey);
-                        }
-                        else
-                        {
-                           /* surveysDto.OrderByDescending(GetCountVotesInSurvey);*/
-                            surveysDto = (from surveyDto in surveysDto orderby GetCountVotesInSurvey(surveyDto) descending select surveyDto).ToList();
-                        }
+                        surveysDto = sort.SortDirection == SortDirection.Ascending
+                            ? surveysDto.OrderBy(GetCountVotesInSurvey).ToList()
+                            : surveysDto.OrderByDescending(GetCountVotesInSurvey).ToList();
                         break;
                     }
                     case SurveySortBy.PermissionEdit:
                     {
                         surveysDto.Sort((a, b) => IsUserSurvey(a, user).CompareTo(IsUserSurvey(b, user)));
-                        if(sort.SortDirection == SortDirection.Ascending)
-                        {
-                            surveysDto.OrderBy(survey => IsUserSurvey(survey, user));
-                        }
-                        else
-                        {
-                            surveysDto = (from surveyDto in surveysDto orderby IsUserSurvey(surveyDto, user) descending select surveyDto).ToList();
-                        }
+                        surveysDto = sort.SortDirection == SortDirection.Ascending
+                            ? surveysDto.OrderBy(survey => IsUserSurvey(survey, user)).ToList()
+                            : surveysDto.OrderByDescending(survey => IsUserSurvey(survey, user)).ToList();
                         break;
                     }
                     case SurveySortBy.Question:
                     {
                         surveysDto.Sort((a, b) => string.Compare(a.Question, b.Question, StringComparison.Ordinal));
-                        if(sort.SortDirection == SortDirection.Ascending)
-                        {
-                            surveysDto.OrderBy(survey => survey.Question);
-                        }
-                        else
-                        {
-                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.Question descending select surveyDto).ToList();
-                        }
+                        surveysDto = sort.SortDirection == SortDirection.Ascending
+                            ? surveysDto.OrderBy(survey => survey.Question).ToList()
+                            : surveysDto.OrderByDescending(survey => survey.Question).ToList();
                         break;
                     }
                     case SurveySortBy.TimeCreate:
                     {
                         surveysDto.Sort((a, b) => a.TimeCreate.CompareTo(b.TimeCreate));
-                        if(sort.SortDirection == SortDirection.Ascending)
-                        {
-                            surveysDto.OrderBy(survey => survey.TimeCreate);
-                        }
-                        else
-                        {
-                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.TimeCreate descending select surveyDto).ToList();
-                        }
+                        surveysDto = sort.SortDirection == SortDirection.Ascending
+                            ? surveysDto.OrderBy(survey => survey.TimeCreate).ToList()
+                            : surveysDto.OrderByDescending(survey => survey.TimeCreate).ToList();
+                        break;
+                    }
+                    case SurveySortBy.Id:
+                    {
+                        surveysDto.Sort((a, b) => a.Id.Value.CompareTo(b.Id.Value));
+                        surveysDto = sort.SortDirection == SortDirection.Ascending
+                            ? surveysDto.OrderBy(survey => survey.Id).ToList()
+                            : surveysDto.OrderByDescending(survey => survey.Id).ToList();
                         break;
                     }
                     default:
-                    {
-                        surveysDto.Sort((a, b) => a.Id.Value.CompareTo(b.Id.Value));
-                        if(sort.SortDirection == SortDirection.Ascending)
-                        {
-                            surveysDto.OrderBy(survey => survey.Id);
-                        }
-                        else
-                        {
-                            surveysDto.OrderByDescending(survey => survey.Id);
-                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.Id descending select surveyDto).ToList();
-                        }
-                        break;
-                    }
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                if(!string.IsNullOrWhiteSpace(filter.SearchQuery))
+                {
+                    surveysDto = surveysDto.Where(survey => survey.Question.ToLower().Trim().Contains(filter.SearchQuery.ToLower().Trim())).ToList();
                 }
                 surveysDto = surveysDto
                     .Skip((int)(pagination.PageNumber * pagination.PageSize))
-                    .Take((int)pagination.PageSize)
-                    .ToList();
+                    .Take((int)pagination.PageSize).ToList();
             }
 
             return surveysDto;
