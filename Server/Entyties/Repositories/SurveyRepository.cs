@@ -40,9 +40,10 @@ namespace Entities.Repositories
                 new { question = surveyQuestionFilter });
         }
 
-        public List<Survey> GetAllSurveys(int page, int pageSize)
+        public List<Survey> GetAllSurveys()
         {
-            return _db.Query<Survey>("SELECT * FROM Survey ORDER BY Id OFFSET @page*@pageSize ROWS FETCH NEXT @pageSize ROWS ONLY", new { page, pageSize }).ToList();
+            return _db.Query<Survey>(
+                "SELECT * FROM Survey").ToList();
         }
         
         public void EditSurvey(Survey survey)

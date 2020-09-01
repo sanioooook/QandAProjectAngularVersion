@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoMapper;
+using Entities.Enums;
 using Entities.Interfaces;
 using Entities.Models;
 using WebApiQandA.DTO;
@@ -26,7 +28,7 @@ namespace WebApiQandA.Services
 
         public void Create(SurveyDto surveyDto)
         {
-            surveyDto.TimeCreate = DateTime.Now; ;
+            surveyDto.TimeCreate = DateTime.Now;
             var survey = _surveyRepository.CreateSurvey(_mapper.Map<Survey>(surveyDto));
             surveyDto.Answers.ForEach(answer =>
             {
@@ -41,28 +43,103 @@ namespace WebApiQandA.Services
             return _mapper.Map<SurveyDto>(_surveyRepository.GetSurveyBySurveyId(surveyId));
         }
         
-        public List<SurveyDto> GetAllSurveys(Filtration filtration, User user, Pagination<SurveyDto> pagination)
+        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
+        public IEnumerable<SurveyDto> GetAllSurveys(Sort<SurveySortBy> sort, User user, Pagination<SurveyDto> pagination)
         {
-            if(filtration == null)
-            {
-                throw new ArgumentNullException(nameof(filtration));
-            }
-
             var surveysDto = new List<SurveyDto>();
-            if(pagination.PageNumber != null&&pagination.PageSize != null)
+            if(pagination.PageNumber != null && pagination.PageSize != null)
             {
+
                 _surveyRepository
-                    .GetAllSurveys((int)pagination.PageNumber, (int)pagination.PageSize)
-                    .ForEach(survey =>
+                    .GetAllSurveys()
+                    .ForEach(survey => surveysDto.Add(_mapper.Map<SurveyDto>(survey)));
+                switch(sort.SortBy)
+                {
+                    case SurveySortBy.NumberAnswers:
                     {
-                        var surveyDto = _mapper.Map<SurveyDto>(survey);
-                        //    if(surveyFilterDto.Creator != null && surveyFilterDto.Creator == surveyDto.User.Login ||
-                        //       surveyFilterDto.UserVote != null && IsUserVote(surveyDto, user) ||
-                        //       surveyFilterDto.UserVote == null && surveyFilterDto.Creator == null)
-                        //    {
-                        surveysDto.Add(surveyDto);
-                        //}
-                    });
+                        surveysDto.Sort((a, b) => a.Answers.Count.CompareTo(b.Answers.Count));
+                        if(sort.SortDirection == SortDirection.Ascending)
+                        {
+                            surveysDto.OrderBy(survey => survey.Answers.Count);
+                        }
+                        else
+                        {
+                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.Answers.Count descending select surveyDto).ToList();
+                        }
+                        break;
+                    }
+                    case SurveySortBy.NumberVotes:
+                    {
+                        surveysDto.Sort((a, b) => GetCountVotesInSurvey(a).CompareTo(GetCountVotesInSurvey(b)));
+                        if(sort.SortDirection == SortDirection.Ascending)
+                        {
+                            surveysDto.OrderBy(GetCountVotesInSurvey);
+                        }
+                        else
+                        {
+                           /* surveysDto.OrderByDescending(GetCountVotesInSurvey);*/
+                            surveysDto = (from surveyDto in surveysDto orderby GetCountVotesInSurvey(surveyDto) descending select surveyDto).ToList();
+                        }
+                        break;
+                    }
+                    case SurveySortBy.PermissionEdit:
+                    {
+                        surveysDto.Sort((a, b) => IsUserSurvey(a, user).CompareTo(IsUserSurvey(b, user)));
+                        if(sort.SortDirection == SortDirection.Ascending)
+                        {
+                            surveysDto.OrderBy(survey => IsUserSurvey(survey, user));
+                        }
+                        else
+                        {
+                            surveysDto = (from surveyDto in surveysDto orderby IsUserSurvey(surveyDto, user) descending select surveyDto).ToList();
+                        }
+                        break;
+                    }
+                    case SurveySortBy.Question:
+                    {
+                        surveysDto.Sort((a, b) => string.Compare(a.Question, b.Question, StringComparison.Ordinal));
+                        if(sort.SortDirection == SortDirection.Ascending)
+                        {
+                            surveysDto.OrderBy(survey => survey.Question);
+                        }
+                        else
+                        {
+                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.Question descending select surveyDto).ToList();
+                        }
+                        break;
+                    }
+                    case SurveySortBy.TimeCreate:
+                    {
+                        surveysDto.Sort((a, b) => a.TimeCreate.CompareTo(b.TimeCreate));
+                        if(sort.SortDirection == SortDirection.Ascending)
+                        {
+                            surveysDto.OrderBy(survey => survey.TimeCreate);
+                        }
+                        else
+                        {
+                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.TimeCreate descending select surveyDto).ToList();
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        surveysDto.Sort((a, b) => a.Id.Value.CompareTo(b.Id.Value));
+                        if(sort.SortDirection == SortDirection.Ascending)
+                        {
+                            surveysDto.OrderBy(survey => survey.Id);
+                        }
+                        else
+                        {
+                            surveysDto.OrderByDescending(survey => survey.Id);
+                            surveysDto = (from surveyDto in surveysDto orderby surveyDto.Id descending select surveyDto).ToList();
+                        }
+                        break;
+                    }
+                }
+                surveysDto = surveysDto
+                    .Skip((int)(pagination.PageNumber * pagination.PageSize))
+                    .Take((int)pagination.PageSize)
+                    .ToList();
             }
 
             return surveysDto;
@@ -79,14 +156,19 @@ namespace WebApiQandA.Services
             _surveyRepository.DeleteSurveyBySurveyId(userId, surveyId);
         }
 
-        private bool IsUserVote(SurveyDto surveyDto, User user)
-        {
-            return surveyDto.Answers.SelectMany(answer => answer.Votes).Any(vote => vote.Voter == user.Login);
-        }
-
         public int GetCountSurveys(string surveyQuestionFilter = null)
         {
             return _surveyRepository.GetCountSurveys(surveyQuestionFilter);
+        }
+
+        private static int GetCountVotesInSurvey(SurveyDto surveyDto)
+        {
+            return surveyDto.Answers.Sum(answer => answer.Votes.Count);
+        }
+
+        private static bool IsUserSurvey(SurveyDto surveyDto, User user)
+        {
+            return surveyDto.User.Login == user.Login;
         }
     }
 }

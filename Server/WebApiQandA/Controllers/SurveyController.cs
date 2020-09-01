@@ -1,4 +1,5 @@
 ﻿using System;
+using Entities.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using WebApiQandA.DTO;
@@ -22,7 +23,7 @@ namespace WebApiQandA.Controllers
 
         // GET: api/Survey
         [HttpGet]
-        public IActionResult GetAllSurveys([FromQuery]Filtration filtration, [FromQuery]Pagination<SurveyDto> pagination)
+        public IActionResult GetAllSurveys([FromQuery]Sort<SurveySortBy> sort, [FromQuery]Pagination<SurveyDto> pagination)
         {
             try
             {
@@ -37,7 +38,7 @@ namespace WebApiQandA.Controllers
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again", nameof(token));
                 }
 
-                var surveys = _surveyService.GetAllSurveys(filtration, user, pagination);
+                var surveys = _surveyService.GetAllSurveys(sort, user, pagination);
                 var surveysCount = _surveyService.GetCountSurveys();
                 pagination.Data = surveys;
                 pagination.TotalCount = surveysCount;

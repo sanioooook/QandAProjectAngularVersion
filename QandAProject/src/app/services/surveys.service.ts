@@ -5,6 +5,8 @@ import { Vote } from '../classes/vote';
 import { Answer } from '../classes/answer';
 import { Pagination } from '../classes/pagination';
 import { HttpParams } from '@angular/common/http';
+import { Sort } from '../classes/sort';
+import { SurveySortBy } from '../classes/survey-sort-by.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -17,10 +19,15 @@ export class SurveysService {
     return this.interceptor.post('survey/create', survey).toPromise();
   }
 
-  GetAllSurveys(surveyPagination: Pagination<Survey>): Promise<Pagination<Survey>> {
-    return this.interceptor.get('survey', new HttpParams()
+  GetAllSurveys(surveyPagination: Pagination<Survey>,
+                surveySort: Sort<SurveySortBy>): Promise<Pagination<Survey>> {
+    return this.interceptor.get(
+      'survey', new HttpParams()
     .set('pageNumber', surveyPagination.pageNumber.toString())
-    .set('pageSize', surveyPagination.pageSize.toString())).toPromise();
+    .set('pageSize', surveyPagination.pageSize.toString())
+    .set('sortBy', surveySort.sortBy.toString())
+    .set('sortDirection', surveySort.sortDirection.toString())
+    ).toPromise();
   }
 
   GetUserVoteSurveys(): Promise<Survey[]> {

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Entities.Enums;
 using Entities.Models;
 using WebApiQandA.DTO;
 
@@ -11,8 +12,7 @@ namespace WebApiQandA.Interfaces
         SurveyDto GetSurveyBySurveyId(int surveyId);
 
 
-        List<SurveyDto> GetAllSurveys(Filtration filtration, User user,
-            Pagination<SurveyDto> pagination);
+        IEnumerable<SurveyDto> GetAllSurveys(Sort<SurveySortBy> sort, User user, Pagination<SurveyDto> pagination);
 
         void EditSurvey(SurveyDto surveyDto);
 

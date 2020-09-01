@@ -1,13 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { Sort } from '@angular/material/sort';
+import { PageEvent } from '@angular/material/paginator';
 import { SurveysService } from '../services/surveys.service';
 import { Survey } from '../classes/survey';
 import { UserService } from '../services/user-service.service';
 import { UserForPublic } from '../classes/user-for-public';
 import { Pagination } from '../classes/pagination';
+import { SurveySortBy } from '../classes/survey-sort-by.enum';
+import { SortDirection } from '../classes/sort-direction.enum';
+import { Sort } from '../classes/sort';
 
 @Component({
   selector: 'app-all-survey',
@@ -21,10 +23,11 @@ export class AllSurveyComponent implements OnInit {
               private userService: UserService) {
   }
 
-  public surveys: Pagination<Survey>;
+  public surveyPagination: Pagination<Survey>;
   public dataSource: MatTableDataSource<Survey>;
   private user: UserForPublic;
-
+  private sortBy = SurveySortBy.Question;
+  private sortDirection = SortDirection.Ascending;
 
   ngOnInit(): void {
     this.user = new UserForPublic();
@@ -32,19 +35,22 @@ export class AllSurveyComponent implements OnInit {
     this.getSurveys();
   }
 
-  getSurveys(surveyPagination: Pagination<Survey> = null): void {
+  getSurveys(): void {
     let paginator = new Pagination<Survey>();
-    if (!surveyPagination) {
+    if (!this.surveyPagination) {
       paginator.pageNumber = 0;
       paginator.pageSize = 10;
     }
     else {
-      paginator = surveyPagination;
+      paginator = this.surveyPagination;
     }
-    this.surveysService.GetAllSurveys(paginator)
+    const sort = new Sort<SurveySortBy>();
+    sort.sortBy = this.sortBy;
+    sort.sortDirection = this.sortDirection;
+    this.surveysService.GetAllSurveys(paginator, sort)
       .then(data => {
-        this.surveys = data;
-        this.dataSource = new MatTableDataSource(this.surveys.data);
+        this.surveyPagination = data;
+        this.dataSource = new MatTableDataSource(this.surveyPagination.data);
       })
       .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
@@ -57,29 +63,37 @@ export class AllSurveyComponent implements OnInit {
     }
   }
 
-  sortData(sort: Sort): void {
-    const data = this.surveys.data.slice();
+  sortData(sort): void {
+    const data = this.surveyPagination.data.slice();
     if (!sort.active || sort.direction === '') {
       this.dataSource = new MatTableDataSource(data);
       return;
     }
-    const isAsc = sort.direction === 'asc';
-    this.dataSource = new MatTableDataSource(data.sort((a, b) => {
-      switch (sort.active) {
-        case 'question': return this.compare(a.question, b.question, isAsc);
-        case 'numAnswers': return this.compare(a.answers.length, b.answers.length, isAsc);
-        case 'timeCreateSurvey': return this.compare(a.timeCreate, b.timeCreate, isAsc);
-        case 'numberVotes':
-          return this.compare(this.getNumberVotes(a), this.getNumberVotes(b), isAsc);
-        case 'canEditSurvey':
-          return this.compare(+this.isUserOwner(a), +this.isUserOwner(b), isAsc);
-        default: return 0;
-      }
-    }));
+    if (sort.direction === 'asc') {
+      this.sortDirection = SortDirection.Ascending;
+    }
+    else {
+      this.sortDirection = SortDirection.Descending;
+    }
+    switch (sort.active) {
+      case 'Question':
+        this.sortBy = SurveySortBy.Question;
+        break;
+      case 'NumberAnswers':
+        this.sortBy = SurveySortBy.NumberAnswers;
+        break;
+      case 'NumberVotes':
+        this.sortBy = SurveySortBy.NumberVotes;
+        break;
+      case 'PermissionEdit':
+        this.sortBy = SurveySortBy.PermissionEdit;
+        break;
+    }
+    this.getSurveys();
   }
 
-  private compare(a: number | string, b: number | string, isAsc: boolean): number {
-    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  isUserOwner(survey: Survey): boolean {
+    return survey.user.login === this.user.login;
   }
 
   getNumberVotes(survey: Survey): number {
@@ -88,14 +102,9 @@ export class AllSurveyComponent implements OnInit {
     return numberVotes;
   }
 
-  isUserOwner(survey: Survey): boolean {
-    return survey.user.login === this.user.login;
-  }
-
   requestNewPage(pageEvent: PageEvent): void {
-    const paginator = new Pagination<Survey>();
-    paginator.pageNumber = pageEvent.pageIndex;
-    paginator.pageSize = pageEvent.pageSize;
-    this.getSurveys(paginator);
+    this.surveyPagination.pageNumber = pageEvent.pageIndex;
+    this.surveyPagination.pageSize = pageEvent.pageSize;
+    this.getSurveys();
   }
 }

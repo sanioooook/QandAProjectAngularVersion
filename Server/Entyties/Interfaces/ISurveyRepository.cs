@@ -11,7 +11,7 @@ namespace Entities.Interfaces
 
         int GetCountSurveys(string surveyQuestionFilter = null);
 
-        List<Survey> GetAllSurveys(int page, int pageSize);
+        List<Survey> GetAllSurveys();
         
         void EditSurvey(Survey surveyDto);
 
