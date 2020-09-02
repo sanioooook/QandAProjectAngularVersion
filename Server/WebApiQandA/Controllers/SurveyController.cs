@@ -39,12 +39,7 @@ namespace WebApiQandA.Controllers
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again", nameof(token));
                 }
 
-                var surveys = _surveyService.GetAllSurveys(sort, user, pagination, new Filter() { SearchQuery = filter });
-                var surveysCount = _surveyService.GetCountSurveys();
-                pagination.Data = surveys;
-                pagination.TotalCount = surveysCount;
-                pagination.PageCount = surveysCount/pagination.PageSize;
-                return Ok(pagination);
+                return Ok(_surveyService.GetAllSurveys(sort, user, pagination, new Filter() { SearchQuery = filter }));
             }
             catch(Exception e)
             {

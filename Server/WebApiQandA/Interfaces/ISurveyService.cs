@@ -12,7 +12,8 @@ namespace WebApiQandA.Interfaces
         SurveyDto GetSurveyBySurveyId(int surveyId);
 
 
-        IEnumerable<SurveyDto> GetAllSurveys(Sort<SurveySortBy> sort, User user, Pagination<SurveyDto> pagination, Filter filter);
+        Pagination<SurveyDto> GetAllSurveys(Sort<SurveySortBy> sort, User user, Pagination<SurveyDto> pagination,
+            Filter filter);
 
         void EditSurvey(SurveyDto surveyDto);
 
