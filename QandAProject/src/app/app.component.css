@@ -1,14 +1,7 @@
-.Header {
-  background-color: chocolate;
-  display: flex;
-  justify-content: space-around;
-}
-
-.authorize-links {
-  text-decoration: none;
-  cursor: pointer;
-}
-  
 a, .authorize-links {
   color: white;
+}
+
+.spacer {
+  flex: 1 1 auto;
 }

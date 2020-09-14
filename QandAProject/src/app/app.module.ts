@@ -14,6 +14,21 @@ import { ErrorStateMatcher, ShowOnDirtyErrorStateMatcher } from '@angular/materi
 import { MatTableModule } from '@angular/material/table';
 import { CovalentLoadingModule } from '@covalent/core/loading';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import {
+  NgxMatDatetimePickerModule,
+  NgxMatNativeDateModule,
+  NgxMatTimepickerModule
+} from '@angular-material-components/datetime-picker';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSortModule } from '@angular/material/sort';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -22,9 +37,7 @@ import { HomeComponent } from './home/home.component';
 import { AllSurveyComponent } from './all-survey/all-survey.component';
 import { SurveyComponent } from './survey/survey.component';
 import { EditSurveyComponent } from './edit-survey/edit-survey.component';
-import { CreateSurveyComponent } from './create-survey/create-survey.component';
-import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { CreateSurveyComponent, SettingDialog } from './create-survey/create-survey.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +49,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     SurveyComponent,
     EditSurveyComponent,
     CreateSurveyComponent,
+    SettingDialog
   ],
   imports: [
     BrowserModule,
@@ -54,7 +68,18 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     CovalentLoadingModule,
     MatIconModule,
     MatSortModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatButtonModule,
+    MatToolbarModule,
+    MatTooltipModule,
+    NgxMatDatetimePickerModule,
+    NgxMatTimepickerModule,
+    NgxMatNativeDateModule,
+    MatDatepickerModule,
+    MatCardModule,
+    MatDialogModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
   ],
   providers: [
     {provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher}

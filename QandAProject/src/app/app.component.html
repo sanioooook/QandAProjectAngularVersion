@@ -1,14 +1,21 @@
 <td-layout>
-  <header class="Header" *ngIf="userService.IsUserLogged(); else elseTemplate">
-    <div class="authorize-links" (click)="navigateHome()">Home</div>
-    <div class="authorize-links" (click)="logOut()">logOut</div>
-  </header>
-  <ng-template #elseTemplate>
-    <header class="Header">
-      <div *ngFor="let link of links">
-        <a [routerLink]="[link.link]">{{link.title}}</a>
-      </div>
-    </header>
-  </ng-template>
-  <router-outlet></router-outlet>
+    <mat-toolbar color="primary">
+        <a mat-icon-button
+           routerLink="/">
+            <mat-icon>home</mat-icon>
+        </a>
+        <span>{{title}}</span>
+        <span class="spacer"></span>
+        <button mat-icon-button
+                (click)="logOut()"
+                *ngIf="userService.IsUserLogged(); else notLoggedUserTemplate">
+            <mat-icon>exit_to_app</mat-icon>
+        </button>
+        <ng-template #notLoggedUserTemplate>
+            <a routerLink="/login-or-registration"
+               mat-icon-button>
+                <mat-icon>login</mat-icon>
+            </a></ng-template>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
 </td-layout>

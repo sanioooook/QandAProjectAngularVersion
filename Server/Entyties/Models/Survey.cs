@@ -15,5 +15,9 @@ namespace Entities.Models
 		public bool AddResponse { get; set; }
 
         public DateTime TimeCreate { get; set; }
+
+		public DateTime AbilityVoteFrom { get; set; }
+
+		public DateTime? AbilityVoteTo { get; set; }
 	}
 }

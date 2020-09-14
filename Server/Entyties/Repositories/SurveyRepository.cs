@@ -21,8 +21,12 @@ namespace Entities.Repositories
 
         public Survey CreateSurvey(Survey survey)
         {
-            return _db.QuerySingle<Survey>("INSERT INTO Survey (Question, IdCreator, AddResponse, SeveralAnswer, TimeCreate)" +
-                       "OUTPUT INSERTED.* VALUES(@Question, @IdCreator, @AddResponse, @SeveralAnswer, @TimeCreate)", survey);
+            //if(survey.AbilityVoteTo == DateTime.MinValue)
+            //{
+            //    survey.AbilityVoteTo = null;
+            //}
+            return _db.QuerySingle<Survey>("INSERT INTO Survey (Question, IdCreator, AddResponse, SeveralAnswer, TimeCreate, AbilityVoteFrom, AbilityVoteTo)" +
+                       "OUTPUT INSERTED.* VALUES(@Question, @IdCreator, @AddResponse, @SeveralAnswer, @TimeCreate, @AbilityVoteFrom, @AbilityVoteTo)", survey);
         }
 
         public Survey GetSurveyBySurveyId(int surveyId)
@@ -48,7 +52,10 @@ namespace Entities.Repositories
         
         public void EditSurvey(Survey survey)
         {
-            _db.Execute("UPDATE Survey SET Question = @Question, AddResponse = @AddResponse, SeveralAnswer = @SeveralAnswer WHERE Id = @Id", survey);
+            _db.Execute(
+                "UPDATE Survey SET Question = @Question, AddResponse = @AddResponse, SeveralAnswer = @SeveralAnswer, " +
+                "AbilityVoteFrom = @AbilityVoteFrom, AbilityVoteTo = @AbilityVoteTo WHERE Id = @Id",
+                survey);
         }
 
         public void DeleteSurveyBySurveyId(int userId, int surveyId)

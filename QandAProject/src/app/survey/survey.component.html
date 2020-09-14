@@ -1,39 +1,58 @@
-<div class="component">
-    <div class="survey"
-         *ngIf="survey; else elseTemplate">
-        <div class="survey-question">
+<mat-card>
+    <ng-container *ngIf="!survey; else surveyDownloaded">
+        <mat-spinner></mat-spinner>
+    </ng-container>
+    <ng-template #surveyDownloaded>
+        <mat-card-title class="survey-question">
             {{survey.question}}
-        </div>
-        <div class="survey-answers"
-             *ngIf="survey.answers">
-            <div class="answer"
-                 *ngFor="let answer of survey.answers"
-                 style.background="linear-gradient(to right,
-        antiquewhite {{answer.votes.length/voteCountInSurvey*100}}%,
+        </mat-card-title>
+        <mat-card-content class="survey-answers"
+                          *ngIf="survey.answers">
+            <section class="answer mat-primary"
+                     *ngFor="let answer of survey.answers"
+                     style.background="linear-gradient(to right,
+             #7b1fa2 {{answer.votes.length/voteCountInSurvey*100}}%,
         transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)">
                 <mat-checkbox [(checked)]="answer.isUserVote"
-                              [(disabled)]="!survey.severalAnswer && isVote() || answer.isUserVote"
+                              [disabled]="!getAbilityVote(answer)"
                               (change)="vote(answer.id)">
                     {{answer.textAnswer}}
                 </mat-checkbox>
-            </div>
-        </div>
-        <div class="survey-add-response">
-            <div *ngIf="survey.addResponse||survey.user && survey.user.login === user.login">
+            </section>
+        </mat-card-content>
+        <mat-card-actions class="survey-add-response"
+                          *ngIf="survey.addResponse ||
+                          survey.user &&
+                          survey.user.login === user.login">
+            <mat-form-field appearance="outline">
+                <mat-label>New answer</mat-label>
                 <input type="text"
-                       [(ngModel)]="newAnswer">
-                <input type="button"
-                       value="Add"
-                       (click)="addAnswer(survey.id)">
-            </div>
-        </div>
+                       matInput
+                       [(ngModel)]="newAnswer"
+                       (keyup.enter)="addAnswer(survey.id)">
+                <button matSuffix
+                        mat-icon-button
+                        (click)="addAnswer(survey.id)">
+                    <mat-icon>add</mat-icon>
+                </button>
+            </mat-form-field>
+        </mat-card-actions>
         <div class="survey-creator"
              *ngIf="survey.user">
             careator: {{survey.user.login}}
         </div>
-    </div>
-
-    <ng-template #elseTemplate>
-        download
+        <div class="time-permission">
+        <ng-container *ngIf="getNowDate()<survey.abilityVoteFrom; else elseTemplate">
+            You will be able to vote via {{getDeadtimeFrom(survey.abilityVoteFrom)}} (start from {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
+        </ng-container>
+        <ng-template #elseTemplate>
+            <ng-container *ngIf="survey.abilityVoteTo; else timeIsUnlimited">
+              Voting will end {{getDeadtimeFrom(survey.abilityVoteTo)}} (end {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
+            </ng-container>
+            <ng-template #timeIsUnlimited>
+                Voting time is unlimited
+            </ng-template>
+        </ng-template>
+      </div>
     </ng-template>
-</div>
+</mat-card>

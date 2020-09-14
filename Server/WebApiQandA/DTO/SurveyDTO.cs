@@ -24,7 +24,14 @@ namespace WebApiQandA.DTO
         [Required]
         public bool AddResponse { get; set; }
 
+        [DataType(DataType.DateTime)]
         public DateTime TimeCreate { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime AbilityVoteFrom { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? AbilityVoteTo { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -38,7 +45,9 @@ namespace WebApiQandA.DTO
                                     && temp.User.Equals(User)
                                     && temp.AddResponse == AddResponse
                                     && temp.SeveralAnswer == SeveralAnswer
-                                    && temp.Question == Question);
+                                    && temp.Question == Question
+                                    && temp.AbilityVoteFrom == AbilityVoteFrom
+                                    && temp.AbilityVoteTo == AbilityVoteTo);
         }
 
         public override int GetHashCode()

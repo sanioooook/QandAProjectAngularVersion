@@ -1,14 +1,6 @@
-<ng-container *ngIf="userService.IsUserLogged(); else elseTemplate">
-  <div class="links">
-    <div *ngFor="let link of linksAuthorizedUser">
-      <a [routerLink]="[link.link]">{{link.title}}</a>
+<mat-card class="links">
+    <div *ngFor="let link of getLinks()">
+        <a [routerLink]="[link.link]"
+        mat-button>{{link.title}}</a>
     </div>
-  </div>
-</ng-container>
-<ng-template #elseTemplate>
-  <div class="links">
-    <div *ngFor="let link of linksNotAuthorizedUser">
-      <a [routerLink]="[link.link]">{{link.title}}</a>
-    </div>
-  </div>
-</ng-template>
+</mat-card>

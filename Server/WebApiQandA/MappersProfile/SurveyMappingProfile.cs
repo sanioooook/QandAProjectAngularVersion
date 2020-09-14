@@ -34,6 +34,7 @@ namespace WebApiQandA.MappersProfile
         {
             destination.Answers = _answerService.GetAnswersBySurveyId(source.Id);
             destination.User = _userService.GetUserById(source.IdCreator);
+            destination.AbilityVoteTo = source.AbilityVoteTo;
         }
     }
 
@@ -49,6 +50,7 @@ namespace WebApiQandA.MappersProfile
         public void Process(SurveyDto source, Survey destination, ResolutionContext context)
         {
             destination.IdCreator = _userService.GetUserByLogin(source.User.Login).Id;
+            destination.AbilityVoteTo = source.AbilityVoteTo;
         }
     }
 

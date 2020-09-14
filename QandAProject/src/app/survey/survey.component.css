@@ -1,32 +1,21 @@
-.component {
-  justify-content: center;
-  display: flex;
-}
-
-.survey {
+.mat-card {
+  width: fit-content;
+  margin: auto;
   display: flex;
   flex-direction: column;
-  width: fit-content;
-  padding: 10px;
-  border: 1px solid black;
-  border-radius: 10px;
-}
-
-.survey-answers {
-  margin: 5px 0;
 }
 
 .survey-add-response {
-  height: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  white-space: nowrap;
+  margin: auto;
 }
 
-.survey-creator { 
+.survey-creator {
   align-items: flex-end;
   display: flex;
   flex: auto;
   justify-content: center;
+}
+
+.time-permission {
+  margin: auto;
 }

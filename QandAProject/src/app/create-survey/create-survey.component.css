@@ -1,13 +1,6 @@
-.create-survey-form {
-  border: 1px solid black;
-  border: 1px solid black;
+.mat-card {
   width: fit-content;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 10px auto;
-}
-
-.form {
+  margin: auto;
   display: flex;
   flex-direction: column;
 }
@@ -20,4 +13,8 @@
 .answer {
   display: grid;
   grid-template-columns: 80% 10% 10%;
+}
+
+.mat-form-field-wrapper {
+  padding-bottom: 0.34375em;
 }
