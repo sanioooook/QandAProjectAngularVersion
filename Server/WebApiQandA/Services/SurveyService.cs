@@ -28,6 +28,14 @@ namespace WebApiQandA.Services
 
         public void Create(SurveyDto surveyDto)
         {
+            surveyDto.AbilityVoteFrom = surveyDto.AbilityVoteFrom == DateTime.MinValue
+                ? DateTime.Now.ToUniversalTime()
+                : surveyDto.AbilityVoteFrom.ToUniversalTime();
+
+            if(surveyDto.AbilityVoteTo == DateTime.MinValue)
+            {
+                surveyDto.AbilityVoteTo = null;
+            }
             surveyDto.TimeCreate = DateTime.Now;
             var survey = _surveyRepository.CreateSurvey(_mapper.Map<Survey>(surveyDto));
             surveyDto.Answers.ForEach(answer =>

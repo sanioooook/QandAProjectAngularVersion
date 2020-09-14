@@ -10,23 +10,14 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class AppComponent {
   constructor(public userService: UserService, private router: Router){
-
   }
   title = 'QandAProject';
-  links = [
-    {title: 'Login', link: 'login'},
-    {title: 'Registration', link: 'registration'}
-  ];
-
-  navigateHome(): void{
-    this.router.navigate(['home']);
-  }
 
   logOut(): void {
     this.userService.logOut().then(
       _ => this.router.navigate(['home']),
       (Error: HttpErrorResponse) =>
-        window.alert(Error.error.error)
+        console.log(Error.error.error)
     );
   }
 }

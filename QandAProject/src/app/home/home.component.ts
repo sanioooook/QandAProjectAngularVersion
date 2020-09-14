@@ -10,18 +10,25 @@ export class HomeComponent implements OnInit {
 
   constructor(public userService: UserService) { }
 
-  linksNotAuthorizedUser = [
+  private linksNotAuthorizedUser = [
     { title: 'Login', link: '/login' },
     { title: 'Registration', link: '/registration' }
   ];
-  linksAuthorizedUser = [
+  private linksAuthorizedUser = [
     { title: 'Create survey', link: '/create-survey' },
-    { title: 'All surveys', link: '/all-surveys' },
-    { title: 'Your surveys', link: '/your-surveys' },
-    { title: 'Polls in which you voted', link: '/user-vote-surveys' }
+    { title: 'All surveys', link: '/all-surveys' }
   ];
 
   ngOnInit(): void {
+  }
+
+  getLinks(): any {
+    if (this.userService.IsUserLogged()) {
+      return this.linksAuthorizedUser;
+    }
+    else {
+      return this.linksNotAuthorizedUser;
+    }
   }
 
 }

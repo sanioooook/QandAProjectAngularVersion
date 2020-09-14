@@ -1,34 +1,13 @@
-.component {
-  justify-content: center;
-  display: flex;
-}
-
-.survey {
+.mat-card {
+  width: fit-content;
+  margin: auto;
   display: flex;
   flex-direction: column;
-  width: fit-content;
-  padding: 10px;
-  border: 1px solid black;
-  border-radius: 10px;
 }
 
-.survey-answers {
-  margin: 5px 0;
-}
-
-.survey-add-response {
-  height: 25px;
+.checkboxs {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  white-space: nowrap;
-}
-
-.survey-creator { 
-  align-items: flex-end;
-  display: flex;
-  flex: auto;
-  justify-content: center;
+  flex-direction: column;
 }
 
 .answer {
@@ -36,7 +15,6 @@
   grid-template-columns: 80% 10% 10%;
 }
 
-.survey-question {
-  display: grid;
-  grid-template-columns: 80% 10% 10%;
+.mat-form-field-wrapper {
+  padding-bottom: 0.34375em;
 }

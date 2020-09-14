@@ -27,8 +27,8 @@ export class AllSurveyComponent implements OnInit {
   public surveyPagination: Pagination<Survey>;
   public dataSource: MatTableDataSource<Survey>;
   private user: UserForPublic;
-  private sortBy = SurveySortBy.Question;
-  private sortDirection = SortDirection.Ascending;
+  private sortBy = SurveySortBy.Id;
+  private sortDirection = SortDirection.Descending;
   public filter = new Filter();
 
   ngOnInit(): void {
@@ -59,9 +59,7 @@ export class AllSurveyComponent implements OnInit {
   }
 
   sortData(sort): void {
-    const data = this.surveyPagination.data.slice();
     if (!sort.active || sort.direction === '') {
-      // this.dataSource = new MatTableDataSource(data);
       return;
     }
     if (sort.direction === 'asc') {
@@ -82,6 +80,9 @@ export class AllSurveyComponent implements OnInit {
         break;
       case 'PermissionEdit':
         this.sortBy = SurveySortBy.PermissionEdit;
+        break;
+      case 'TimeCreate':
+        this.sortBy = SurveySortBy.TimeCreate;
         break;
     }
     this.getSurveys();

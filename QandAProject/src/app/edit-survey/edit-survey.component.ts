@@ -5,9 +5,11 @@ import { switchMap } from 'rxjs/operators';
 import { SurveysService } from '../services/surveys.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Answer } from '../classes/answer';
-import { UserForPublic } from '../classes/user-for-public';
 import { TdDialogService } from '@covalent/core/dialogs';
-import { UserService } from '../services/user-service.service';
+import { FormControl, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { SettingDialog } from '../create-survey/create-survey.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-edit-survey',
@@ -17,45 +19,44 @@ import { UserService } from '../services/user-service.service';
 export class EditSurveyComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               private surveyService: SurveysService,
-              private userService: UserService,
               private router: Router,
-              private dialogService: TdDialogService) { }
+              private dialogService: TdDialogService,
+              private dialog: MatDialog,
+              private snackBar: MatSnackBar) { }
 
-  user = new UserForPublic();
-  newAnswer: string;
+  newAnswer = '';
   survey: Survey;
-  editQuestionMode: boolean;
+  question = new FormControl([Validators.required]);
 
   ngOnInit(): void {
-    this.userService.getUserLogin().then(login => this.user.login = login);
     this.route.paramMap.pipe(
       switchMap(params => params.getAll('id')))
       .subscribe(id => this.setSurvey(+id));
-    this.editQuestionMode = false;
-    this.newAnswer = '';
+  }
+
+  getErrorMessage(): string {
+    if (this.question.hasError('required')) {
+      return 'You must enter a value';
+    }
   }
 
   setSurvey(id: number): void {
     this.surveyService.GetSurveyById(id)
       .then(survey => {
-        if (survey.user.login === this.user.login) {
-          this.survey = survey;
-        }
-        else {
-          this.survey = null;
-        }
+        this.survey = survey;
       })
       .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   addAnswer(): void {
-    if (this.newAnswer.trim() !== '') {
+    if (this.newAnswer) {
       const answer = new Answer();
       answer.textAnswer = this.newAnswer;
       answer.idSurvey = this.survey.id;
       answer.id = 0;
       this.surveyService.AddNewAnswer(answer)
         .then((newAnswer: Answer) => {
+          this.openSnackBar('Answer successfully added', 'OK');
           this.survey.answers.push(newAnswer);
           this.newAnswer = '';
         })
@@ -63,10 +64,10 @@ export class EditSurveyComponent implements OnInit {
     }
   }
 
-  editAnswer(answer: Answer): void {
+  private editAnswer(answer: Answer): void {
     this.surveyService.EditAnswer(answer)
-    .then()
-    .catch((Error: HttpErrorResponse) => console.log(Error.error));
+    .then(_ => this.openSnackBar('Answer successfully edited', 'OK'))
+      .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   showEditAnswerWindow(answer: Answer): void {
@@ -89,17 +90,32 @@ export class EditSurveyComponent implements OnInit {
 
   deleteAnswer(answer: Answer): Promise<any> {
     return this.surveyService.DeleteAnswer(answer.id)
-      .catch(_ =>  this.ngOnInit());
+      .then(_ => this.openSnackBar('Answer successfully deleted', 'OK'))
+      .catch(_ => this.ngOnInit());
   }
 
   saveSurvey(): void {
     this.surveyService.EditSurvey(this.survey)
+    .then(_ => this.openSnackBar('Survey successfully saved', 'OK'))
       .catch(_ => this.ngOnInit());
   }
 
   deleteSurvey(): void {
     this.surveyService.DeleteSurvey(this.survey.id)
-    .then(_ => this.router.navigate(['home']))
-    .catch((Error: HttpErrorResponse) => console.log(Error.error));
+      .then(_ => {
+        this.openSnackBar('Survey successfully deleted', 'OK');
+        this.router.navigate(['home']);
+      })
+      .catch((Error: HttpErrorResponse) => console.log(Error.error));
+  }
+
+  openSettings(): void {
+    this.dialog.open(SettingDialog, { data: this.survey });
+  }
+
+  openSnackBar(message: string, action: string): void {
+    this.snackBar.open(message, action, {
+      duration: 2000,
+    });
   }
 }

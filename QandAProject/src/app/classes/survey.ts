@@ -15,5 +15,9 @@ export class Survey {
 
   public user: UserForPublic;
 
-  public timeCreate: string;
+  public timeCreate: Date;
+
+  public abilityVoteFrom: Date;
+
+  public abilityVoteTo: Date = null;
 }

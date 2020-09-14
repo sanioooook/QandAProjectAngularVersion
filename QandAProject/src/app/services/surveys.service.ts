@@ -8,6 +8,9 @@ import { HttpParams } from '@angular/common/http';
 import { Sort } from '../classes/sort';
 import { SurveySortBy } from '../classes/survey-sort-by.enum';
 import { Filter } from '../classes/filter';
+import { map, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import * as momentTimezone from 'moment-timezone';
 
 @Injectable({
   providedIn: 'root'
@@ -25,12 +28,18 @@ export class SurveysService {
                 filter: Filter): Promise<Pagination<Survey>> {
     return this.interceptor.get(
       'survey', new HttpParams()
-    .set('pageNumber', surveyPagination.pageNumber.toString())
-    .set('pageSize', surveyPagination.pageSize.toString())
-    .set('sortBy', surveySort.sortBy.toString())
-    .set('sortDirection', surveySort.sortDirection.toString())
-    .set('filter', filter.searchQuery)
-    ).toPromise();
+        .set('pageNumber', surveyPagination.pageNumber.toString())
+        .set('pageSize', surveyPagination.pageSize.toString())
+        .set('sortBy', surveySort.sortBy.toString())
+        .set('sortDirection', surveySort.sortDirection.toString())
+        .set('filter', filter.searchQuery)
+    ).pipe(map((data: Pagination<Survey>) => {
+      data.data.forEach(survey => {
+        survey.abilityVoteFrom = momentTimezone.utc(survey.abilityVoteFrom).local().toDate();
+        survey.abilityVoteTo = momentTimezone.utc(survey.abilityVoteTo).local().toDate();
+      });
+      return data;
+    }), catchError(err => throwError(err))).toPromise();
   }
 
   Vote(vote: Vote): Promise<any> {
@@ -50,7 +59,12 @@ export class SurveysService {
   }
 
   GetSurveyById(id: number): Promise<Survey> {
-    return this.interceptor.get(`survey/${id}`).toPromise();
+    return this.interceptor.get(`survey/${id}`)
+      .pipe(map((survey: Survey) => {
+        survey.abilityVoteFrom = new Date(survey.abilityVoteFrom + '');
+        survey.abilityVoteTo = survey.abilityVoteTo ? new Date(survey.abilityVoteTo + '') : null;
+        return survey;
+      }), catchError(err => throwError(err))).toPromise();
   }
 
   EditSurvey(survey: Survey): Promise<any> {

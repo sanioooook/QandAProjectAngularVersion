@@ -34,25 +34,28 @@ namespace WebApiQandA.Services
             if(answer != null)
             {
                 _answerRepository.GetAnswersBySurveyId(answer.IdSurvey)
-                    .ForEach(answer => answers.Add(_mapper.Map<AnswerDto>(answer)));
+                    .ForEach(source => answers.Add(_mapper.Map<AnswerDto>(source)));
                 var survey = _surveyRepository.GetSurveyBySurveyId((int)answers[0].IdSurvey);
                 if(answers.SelectMany(answerDto => answerDto.Votes).Any(voteDto =>
                     voteDto.Voter == vote.Voter && voteDto.IdAnswer == vote.IdAnswer))
                 {
                     throw new Exception("You can't vote for the same option");
                 }
-
                 if(!survey.SeveralAnswer &&
-                   answers.Any(answer => answer.Votes.Find(voteDto => voteDto.Voter == vote.Voter) != null))
+                   answers.Any(answerDto => answerDto.Votes.Find(voteDto => voteDto.Voter == vote.Voter) != null))
                 {
                     throw new Exception("You don't have permissions for multi vote");
                 }
+
+                if(DateTime.Now.ToUniversalTime() < survey.AbilityVoteFrom && survey.AbilityVoteTo > DateTime.Now.ToUniversalTime())
+                {
+                    throw new Exception("You can't vote, because time is out");
+                }
+
+                return _mapper.Map<VoteDto>(_voteRepository.Create(_mapper.Map<Vote>(vote)));
             }
-            else
-            {
-                throw new Exception("Don't have this answer in database");
-            }
-            return _mapper.Map<VoteDto>(_voteRepository.Create(_mapper.Map<Vote>(vote)));
+
+            throw new Exception("Don't have this answer in database");
         }
 
         public VoteDto GetVoteByVoteId(int voteId)

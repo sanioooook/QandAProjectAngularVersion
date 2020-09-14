@@ -1,61 +1,54 @@
-<div class="component">
-  <div class="survey" *ngIf="survey; else notSetSurveyTemplate">
-    <div *ngIf="!editQuestionMode; else editQuestionTemplate" class="survey-question">
-      {{survey.question}}
-      <div
-        class="fa fa-pencil"
-        (click)="editQuestionMode=true"
-      ></div>
-      <div
-        class="fa fa-trash"
-        (click)="deleteSurvey()"
-      ></div>
-    </div>
-    <ng-template #editQuestionTemplate>
-      <div class="edit-question-inputs">
-        <input type="text" [(ngModel)]="survey.question">
-        <input type="button" value="Edit" (click)="editQuestionMode=false">
-      </div>
+<mat-card>
+    <ng-container *ngIf="!survey; else surveyDownloaded">
+        <mat-spinner></mat-spinner>
+    </ng-container>
+    <ng-template #surveyDownloaded>
+        <mat-card-actions>
+            <button mat-icon-button
+                    (click)="openSettings()">
+                <mat-icon>settings</mat-icon>
+            </button>
+        </mat-card-actions>
+        <mat-form-field appearance="outline">
+            <mat-label>Question for survey</mat-label>
+            <input required
+                   matInput
+                   [(ngModel)]="survey.question"
+                   placeholder="Ex. Where do we go this weekend?"
+                   [formControl]="question">
+            <mat-error *ngIf="question.invalid">{{getErrorMessage()}}</mat-error>
+        </mat-form-field>
+        <div class="answers"
+             *ngFor="let answer of this.survey.answers; index as i">
+            <div class="answer">
+                {{answer.textAnswer}}
+                <mat-icon [ngStyle]="{'cursor':'pointer'}"
+                          (click)="deleteAnswer(answer).then(survey.answers.splice(i, 1))"
+                          matTooltip="Delete this answer"
+                          matTooltipPosition="below">
+                    delete
+                </mat-icon>
+                <mat-icon [ngStyle]="{'cursor':'pointer'}"
+                          (click)="showEditAnswerWindow(answer)"
+                          matTooltip="Edit this answer"
+                          matTooltipPosition="below">
+                    edit
+                </mat-icon>
+            </div>
+        </div>
+        <mat-form-field appearance="outline">
+            <mat-label>New answer</mat-label>
+            <input matInput
+                   [(ngModel)]="newAnswer"
+                   (keyup.enter)="addAnswer()">
+            <button matSuffix
+                    mat-icon-button
+                    (click)="addAnswer()">
+                <mat-icon>add</mat-icon>
+            </button>
+        </mat-form-field>
+        <button mat-stroked-button
+                color="primory"
+                (click)="saveSurvey()">Save survey</button>
     </ng-template>
-    <div class="survey-answers">
-      <div class="answer" *ngFor="let answer of survey.answers; index as i">
-        {{answer.textAnswer}}
-        <div
-          class="fa fa-trash"
-          aria-hidden="true"
-          (click)="deleteAnswer(answer).then(survey.answers.splice(i, 1))"
-        ></div>
-        <div
-          class="fa fa-pencil"
-          aria-hidden="true"
-          (click)="showEditAnswerWindow(answer)"
-        ></div>
-      </div>
-    </div>
-    <div class="survey-add-response">
-      <div>
-        <input type="text" [(ngModel)]="newAnswer" (keyup.enter)="addAnswer()">
-        <input type="button" value="Add" (click)="addAnswer()">
-      </div>
-    </div>
-    <div>
-      <input
-        type="checkbox"
-        [(ngModel)]="survey.addResponse"
-        (change)="saveSurvey()"
-      >
-      can user add answer?
-    </div>
-    <div>
-      <input
-        type="checkbox"
-        [(ngModel)]="survey.severalAnswer"
-        (change)="saveSurvey()"
-      >
-      multivote?
-    </div>
-  </div>
-  <ng-template #notSetSurveyTemplate>
-    download
-  </ng-template>
-</div>
+</mat-card>
