@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { TdDialogService } from '@covalent/core/dialogs';
 import { User } from '../classes/user';
 import { serverAddress } from '../consts/server-address';
 import { UserForPublic } from '../classes/user-for-public';
@@ -9,7 +11,8 @@ import { UserForPublic } from '../classes/user-for-public';
   providedIn: 'root'
 })
 export class UserService {
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,
+              public dialogService: TdDialogService) {
     this.user = new User();
     this.user.authorizeToken = localStorage.getItem('user') ?? '';
   }
@@ -21,7 +24,7 @@ export class UserService {
   }
 
   public getUserLogin(): Promise<string> {
-    if (this.user.login){
+    if (this.user.login) {
       return new Promise<string>(resolve => resolve(this.user.login));
     }
     else if (this.user.authorizeToken) {
@@ -30,7 +33,7 @@ export class UserService {
           this.setUserLogin(user.login);
           resolve(user.login);
         },
-        error => reject(error));
+          error => reject(error));
       });
     }
     return new Promise((_, reject) => reject('not have token'));
@@ -43,7 +46,7 @@ export class UserService {
         login: email,
         password
       }
-    ).toPromise()
+    ).pipe(map(data => data), catchError(err => this.catchCallback(err))).toPromise()
       .then(data => {
         this.setAuthorizationToken(data.authorizeToken);
         this.setUserLogin(data.login);
@@ -58,12 +61,12 @@ export class UserService {
         login: email,
         password
       }
-    ).toPromise()
-    .then(data => {
-      this.setAuthorizationToken(data.authorizeToken);
-      this.setUserLogin(data.login);
-    }
-    );
+    ).pipe(map(data => data), catchError(err => this.catchCallback(err))).toPromise()
+      .then(data => {
+        this.setAuthorizationToken(data.authorizeToken);
+        this.setUserLogin(data.login);
+      }
+      );
   }
 
   public IsUserLogged(): boolean {
@@ -86,7 +89,7 @@ export class UserService {
         headers: {
           AuthorizationToken: this.getAuthorizationToken()
         }
-      }).toPromise()
+      }).pipe(map(data => data), catchError(err => this.catchCallback(err))).toPromise()
       .then(_ => {
         this.user.authorizeToken = '';
         localStorage.removeItem('user');
@@ -102,5 +105,25 @@ export class UserService {
           AuthorizationToken: this.user.authorizeToken
         }
       });
+  }
+
+  private catchCallback(err: HttpErrorResponse): Observable<any> {
+    for (const propertyOnError in err.error) {
+      if (Object.prototype.hasOwnProperty.call(err.error, propertyOnError)) {
+        const element = err.error[propertyOnError];
+        element.forEach(elementForeach => {
+          this.openAlert(`${propertyOnError}: ${elementForeach}`);
+        });
+      }
+    }
+    return throwError(err);
+  }
+
+  private openAlert(message: string): void {
+    this.dialogService.openAlert({
+      message,
+      title: 'Alert',
+      closeButton: 'Close',
+    });
   }
 }

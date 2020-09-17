@@ -9,15 +9,16 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(public userService: UserService, private router: Router){
+  constructor(public userService: UserService,
+              private router: Router) {
   }
-  title = 'QandAProject';
+  title = 'QandA';
 
   logOut(): void {
     this.userService.logOut().then(
-      _ => this.router.navigate(['home']),
-      (Error: HttpErrorResponse) =>
-        console.log(Error.error.error)
+      _ => this.router.navigate(['/login-or-registration']),
+      (err: HttpErrorResponse) =>
+        console.log(err)
     );
   }
 }

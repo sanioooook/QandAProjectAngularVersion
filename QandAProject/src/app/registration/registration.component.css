@@ -1,4 +1,5 @@
 .registration-form {
+  display: flex;
   justify-content: center;
   flex-direction: column;
   flex-wrap: wrap;
@@ -8,25 +9,4 @@
 
 h1 {
   margin: auto;
-}
-
-input.ng-touched.ng-invalid {
-  border: solid red 1px;
-}
-
-input.ng-touched.ng-valid {
-  border: solid green 1px;
-}
-
-.inputs,
-.registration-form {
-  display: flex;
-  padding: 10px;
-  border: 1px solid black;
-  border-radius: 10px;
-  outline: none;
-}
-
-.inputs {
-  margin-bottom: 5px;
 }
