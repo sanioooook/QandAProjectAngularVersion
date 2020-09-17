@@ -26,19 +26,7 @@ export class InterceptorService {
         },
         params: httpParams
       }).pipe(map(data => data),
-        catchError((err: HttpErrorResponse) => {
-          for (const property in err.error) {
-            if (Object.prototype.hasOwnProperty.call(err.error, property)) {
-              const element = err.error[property];
-              if (element as Array<string>){
-                element.forEach(elementForeach => {
-                  this.openAlert(elementForeach);
-                });
-              }
-            }
-          }
-          return throwError(err);
-        }));
+        catchError(err => this.catchCallback(err)));
   }
 
   public post(url: string, body: any, httpParams: HttpParams = null): Observable<any>{
@@ -51,7 +39,7 @@ export class InterceptorService {
           AuthorizationToken: token
         },
         params: httpParams
-      }).pipe(map(data => data), catchError(this.catchCallback));
+      }).pipe(map(data => data), catchError(err => this.catchCallback(err)));
   }
 
   public delete(url: string): Observable<any> {
@@ -62,13 +50,13 @@ export class InterceptorService {
         headers: {
           AuthorizationToken: token
         }
-      }).pipe(map(data => data), catchError(this.catchCallback));
+      }).pipe(map(data => data), catchError(err => this.catchCallback(err)));
   }
 
   private catchCallback(err: HttpErrorResponse): Observable<any> {
-    for (const property in err.error.errors) {
-      if (Object.prototype.hasOwnProperty.call(err.error.errors, property)) {
-        const element = err.error.errors[property];
+    for (const property in err.error) {
+      if (Object.prototype.hasOwnProperty.call(err.error, property)) {
+        const element = err.error[property];
         element.forEach(elementForeach => {
           this.openAlert(`${property}: ${elementForeach}`);
         });

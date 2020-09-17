@@ -29,6 +29,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -38,6 +39,7 @@ import { AllSurveyComponent } from './all-survey/all-survey.component';
 import { SurveyComponent } from './survey/survey.component';
 import { EditSurveyComponent } from './edit-survey/edit-survey.component';
 import { CreateSurveyComponent, SettingDialog } from './create-survey/create-survey.component';
+import { LoginOrRegistrationComponent } from './login-or-registration/login-or-registration.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +51,8 @@ import { CreateSurveyComponent, SettingDialog } from './create-survey/create-sur
     SurveyComponent,
     EditSurveyComponent,
     CreateSurveyComponent,
-    SettingDialog
+    SettingDialog,
+    LoginOrRegistrationComponent,
   ],
   imports: [
     BrowserModule,
@@ -80,6 +83,7 @@ import { CreateSurveyComponent, SettingDialog } from './create-survey/create-sur
     MatDialogModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    MatTabsModule
   ],
   providers: [
     {provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher}

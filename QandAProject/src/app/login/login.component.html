@@ -1,27 +1,35 @@
-<form class="login-form" #myForm="ngForm" novalidate>
-  <h1>Login</h1>
-  <input
-    class="inputs"
-    [(ngModel)]="login"
-    type="text"
-    name="login"
-    placeholder="login"
-    autocomplete="username"
-    required
-    email
-    autofocus
-  >
-  <input
-    class="inputs"
-    [(ngModel)]="password"
-    type="password"
-    name="password"
-    placeholder="password"
-    autocomplete="current-password"
-    required
-  >
-  <button 
-    (click)="Login()"
-    [disabled]="myForm.invalid"
-  >login</button>
+<form class="login-form">
+    <h1>Login</h1>
+    <mat-form-field appearance="fill">
+        <mat-label>Enter your email</mat-label>
+        <input matInput
+               type="text"
+               name="login"
+               autocomplete="username"
+               required
+               email
+               [formControl]="loginFormControl"
+               autofocus>
+        <mat-error *ngIf="loginFormControl.invalid">{{getEmailErrorMessage()}}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Enter your password</mat-label>
+        <input matInput
+               [type]="hidePassword ? 'text' : 'password'"
+               name="password"
+               autocomplete="current-password"
+               [formControl]="passwordFormControl"
+               required>
+        <button mat-icon-button
+                matSuffix
+                (click)="hidePassword = !hidePassword"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordFormControl.invalid">{{getPasswordErrorMessage()}}</mat-error>
+    </mat-form-field>
+    <button (click)="login()"
+            mat-raised-button>login</button>
 </form>

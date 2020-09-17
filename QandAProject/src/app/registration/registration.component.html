@@ -1,38 +1,51 @@
-
-<form class="registration-form" #myForm="ngForm" novalidate>
-  <h1>Registration</h1>
-  <input
-    class="inputs"
-    [(ngModel)]="login"
-    type="text"
-    name="login"
-    placeholder="login"
-    autocomplete="username"
-    required email
-  >
-  <input
-    class="inputs"
-    [(ngModel)]="password"
-    type="password"
-    name="password"
-    placeholder="password"
-    autocomplete="new-password"
-    required
-    pattern="((.+){8,})"
-    (change)="pattern = password"
-  >
-  <input
-    class="inputs"
-    [(ngModel)]="secondPassword"
-    type="password"
-    name="secondPassword"
-    placeholder="repeat password"
-    autocomplete="new-password"
-    required
-    [pattern]="pattern"
-  >
-  <button 
-    (click)="Registration()"
-    [disabled]="myForm.invalid"
-  >Registration</button>
+<form class="registration-form">
+    <h1>Registration</h1>
+    <mat-form-field appearance="fill">
+        <mat-label>Enter Your email</mat-label>
+        <input matInput
+               type="text"
+               name="login"
+               autocomplete="username"
+               [formControl]="loginFormControl"
+               autofocus
+               required>
+        <mat-error *ngIf="loginFormControl.invalid">{{getEmailErrorMessage()}}</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Enter Your password</mat-label>
+        <input matInput
+               [type]="hidePassword ? 'text' : 'password'"
+               name="password"
+               autocomplete="new-password"
+               required
+               [formControl]="passwordFormControl"
+               (change)="updatePattern()">
+        <button mat-icon-button
+                matSuffix
+                (click)="hidePassword = !hidePassword"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordFormControl.invalid">{{getPasswordErrorMessage()}}</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Repeat Your password</mat-label>
+        <input matInput
+               [formControl]="secondPasswordFormControl"
+               [type]="hideSecondPassword ? 'text' : 'password'"
+               name="secondPassword"
+               autocomplete="new-password"
+               required>
+        <button mat-icon-button
+                matSuffix
+                (click)="hideSecondPassword = !hideSecondPassword"
+                [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hideSecondPassword">
+            <mat-icon>{{hideSecondPassword ? 'visibility' : 'visibility_off'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="secondPasswordFormControl.invalid">{{getSecondPasswordErrorMessage()}}</mat-error>
+    </mat-form-field>
+    <button (click)="registration()"
+            mat-raised-button>Registration</button>
 </form>

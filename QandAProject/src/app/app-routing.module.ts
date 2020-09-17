@@ -9,10 +9,16 @@ import { AllSurveyComponent } from './all-survey/all-survey.component';
 import { SurveyComponent } from './survey/survey.component';
 import { EditSurveyComponent } from './edit-survey/edit-survey.component';
 import { CreateSurveyComponent } from './create-survey/create-survey.component';
+import { LoginOrRegistrationComponent } from './login-or-registration/login-or-registration.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [NotAuthorized] },
   { path: 'registration', component: RegistrationComponent, canActivate: [NotAuthorized] },
+  {
+    path: 'login-or-registration',
+    component: LoginOrRegistrationComponent,
+    canActivate: [NotAuthorized]
+  },
   { path: 'home', component: HomeComponent },
   { path: 'all-surveys', component: AllSurveyComponent, canActivate: [Authorized] },
   { path: 'survey/:id', component: SurveyComponent, canActivate: [Authorized] },
