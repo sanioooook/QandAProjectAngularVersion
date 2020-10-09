@@ -11,13 +11,21 @@ import { Filter } from '../classes/filter';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import * as momentTimezone from 'moment-timezone';
+import { UserService } from './user-service.service';
+import { User } from '../classes/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SurveysService {
 
-  constructor(private interceptor: InterceptorService) { }
+  constructor(private interceptor: InterceptorService,
+              private userService: UserService) {
+    this.userService.getUserLogin()
+      .then((userLogin: string) => this.user.login = userLogin);
+  }
+
+  user = new User();
 
   CreateSurvey(survey: Survey): Promise<any> {
     return this.interceptor.post('survey/create', survey).toPromise();
@@ -35,15 +43,14 @@ export class SurveysService {
         .set('filter', filter.searchQuery)
     ).pipe(map((data: Pagination<Survey>) => {
       data.data.forEach(survey => {
-        survey.abilityVoteFrom = momentTimezone.utc(survey.abilityVoteFrom).local().toDate();
-        survey.abilityVoteTo = momentTimezone.utc(survey.abilityVoteTo).local().toDate();
+        this.processingSurvey(survey);
       });
       return data;
     }), catchError(err => throwError(err))).toPromise();
   }
 
-  Vote(vote: Vote): Promise<any> {
-    return this.interceptor.post('vote', vote).toPromise();
+  Vote(votes: Vote[]): Promise<any> {
+    return this.interceptor.post('vote', votes).toPromise();
   }
 
   AddNewAnswer(answer: Answer): Promise<any> {
@@ -61,8 +68,7 @@ export class SurveysService {
   GetSurveyById(id: number): Promise<Survey> {
     return this.interceptor.get(`survey/${id}`)
       .pipe(map((survey: Survey) => {
-        survey.abilityVoteFrom = new Date(survey.abilityVoteFrom + '');
-        survey.abilityVoteTo = survey.abilityVoteTo ? new Date(survey.abilityVoteTo + '') : null;
+        this.processingSurvey(survey);
         return survey;
       }), catchError(err => throwError(err))).toPromise();
   }
@@ -73,5 +79,22 @@ export class SurveysService {
 
   DeleteSurvey(id: number): Promise<any> {
     return this.interceptor.delete(`survey/${id}`).toPromise();
+  }
+
+  private processingSurvey(survey: Survey): void {
+    survey.answers.forEach(answer => {
+      answer.isUserVote = false;
+      if (answer.votes.length > 0) {
+        answer.votes.forEach(vote => {
+          if (!answer.isUserVote && vote.voter === this.user.login) {
+            answer.isUserVote = true;
+          }
+        });
+      }
+    });
+    survey.abilityVoteFrom = momentTimezone.utc(survey.abilityVoteFrom).local().toDate();
+    survey.abilityVoteTo = survey.abilityVoteTo
+      ? momentTimezone.utc(survey.abilityVoteTo).local().toDate()
+      : null;
   }
 }

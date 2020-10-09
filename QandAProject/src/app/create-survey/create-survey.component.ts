@@ -19,15 +19,13 @@ export class CreateSurveyComponent implements OnInit {
               private surveyService: SurveysService,
               private dialogService: TdDialogService,
               public dialog: MatDialog) {
-    this.survey = new Survey();
-    this.survey.answers = new Array<Answer>();
+    this.survey = new Survey('', new Array<Answer>(), false, new Date(), 1, 1, null);
     this.newAnswer = 'Yes';
     this.PushAnswer();
-    this.survey.id = 0;
   }
 
 
-  question = new FormControl([Validators.required]);
+  question = new FormControl('', [Validators.required]);
   survey: Survey;
   newAnswer = '';
 
@@ -42,7 +40,8 @@ export class CreateSurveyComponent implements OnInit {
   }
 
   CreateSurvey(): void {
-    if (this.survey.answers.length > 0 && this.survey.question) {
+    if (this.survey.answers.length > 0 && this.question.valid) {
+      this.survey.question = this.question.value;
       this.surveyService.CreateSurvey(this.survey)
         .then(_ => this.router.navigate(['home']))
         .catch((Error: HttpErrorResponse) => console.log(Error.error));
@@ -51,11 +50,7 @@ export class CreateSurveyComponent implements OnInit {
 
   PushAnswer(): void {
     if (this.newAnswer) {
-      const answer = new Answer();
-      answer.id = 0;
-      answer.idSurvey = 0;
-      answer.textAnswer = this.newAnswer;
-      this.survey.answers.push(answer);
+      this.survey.answers.push(new Answer(0, this.newAnswer));
       this.newAnswer = '';
     } // тоже отобразить ошибку что ответ не может быть пустой
   }
@@ -88,7 +83,22 @@ export class CreateSurveyComponent implements OnInit {
 })
 // tslint:disable-next-line: component-class-suffix
 export class SettingDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: Survey) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: Survey) {
+    this.minNumberVoteFormControl.registerOnChange(() => this.updateMinNumberVoteFormControl());
+    this.maxNumberVoteFormControl.registerOnChange(() => this.updateMaxNumberVoteFormControl());
+  }
+  minNumberVoteFormControl = new FormControl(this.data.minCountVotes || 1,
+    [
+      Validators.required,
+      Validators.min(1),
+      Validators.max(this.data.answers.length)
+    ]);
+
+  maxNumberVoteFormControl = new FormControl(this.data.maxCountVotes,
+    [
+      Validators.min(this.minNumberVoteFormControl.value),
+      Validators.max(this.data.answers.length)
+    ]);
 
   now(): Date {
     return new Date();
@@ -110,4 +120,38 @@ export class SettingDialog {
     return dateTime;
   }
 
+  updateMinNumberVoteFormControl(): void {
+    if (this.minNumberVoteFormControl.valid) {
+      this.data.minCountVotes = this.minNumberVoteFormControl.value;
+      this.maxNumberVoteFormControl
+        .setValidators(Validators.min(this.minNumberVoteFormControl.value));
+    }
+  }
+
+  updateMaxNumberVoteFormControl(): void {
+    if (this.maxNumberVoteFormControl.valid) {
+      this.data.maxCountVotes = this.maxNumberVoteFormControl.value;
+    }
+  }
+
+  getErrorMinNumberVote(): string{
+    if (this.minNumberVoteFormControl.hasError('required')){
+      return 'The minimum number of votes can\'t be empty';
+    }
+    if (this.minNumberVoteFormControl.hasError('min')){
+      return 'The minimum number of votes can\'t be less than 1';
+    }
+    if (this.minNumberVoteFormControl.hasError('max')){
+      return `The minimum number of votes can't be more than the number of answers (${this.data.answers.length})`;
+    }
+  }
+
+  getErrorMaxNumberVote(): string{
+    if (this.maxNumberVoteFormControl.hasError('min')){
+      return `The maximum number of votes cannot exceed the minimum number of votes(${this.minNumberVoteFormControl.value})`;
+    }
+    if (this.maxNumberVoteFormControl.hasError('max')){
+      return `The maximum number of votes can't be more than the number of answers (${this.data.answers.length})`;
+    }
+  }
 }

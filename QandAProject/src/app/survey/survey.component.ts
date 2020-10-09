@@ -9,6 +9,7 @@ import { Answer } from '../classes/answer';
 import { Vote } from '../classes/vote';
 import { UserForPublic } from '../classes/user-for-public';
 import { UserService } from '../services/user-service.service';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-survey',
@@ -23,7 +24,8 @@ export class SurveyComponent implements OnInit {
   user = new UserForPublic();
   newAnswer: string;
   survey: Survey;
-  voteCountInSurvey: number;
+  isUserVote = false;
+  votes = new Array<Vote>();
 
   ngOnInit(): void {
     this.userService.getUserLogin().then(login => this.user.login = login);
@@ -32,89 +34,76 @@ export class SurveyComponent implements OnInit {
       .subscribe(id => this.setSurvey(+id));
   }
 
-  isVote(): boolean {
+  private setIsUserVote(): void {
     for (const answer of this.survey.answers) {
       if (answer.isUserVote) {
-        return true;
+        this.isUserVote = true;
       }
     }
-    return false;
   }
 
-  addAnswer(surveyId: number): void {
-    const answer = new Answer();
-    answer.textAnswer = this.newAnswer;
-    answer.idSurvey = surveyId;
-    answer.id = 0;
-    this.surveyService.AddNewAnswer(answer)
-      .then((newAnswer: Answer) => {
-        this.survey.answers.push(newAnswer);
-        this.newAnswer = '';
-      })
-      .catch((Error: HttpErrorResponse) => console.log(Error.error));
+  public addAnswer(): void {
+    if (this.newAnswer && !this.isUserVote) {
+      this.surveyService.AddNewAnswer(new Answer(this.survey.id, this.newAnswer))
+        .then((newAnswer: Answer) => {
+          this.survey.answers.push(newAnswer);
+          this.newAnswer = '';
+        })
+        .catch((Error: HttpErrorResponse) => console.log(Error.error));
+    }
   }
 
-  vote(answerId: number): void {
-    const vote = new Vote();
-    vote.id = 0;
-    vote.idAnswer = answerId;
-    this.surveyService.Vote(vote)
-      .then()
-      .catch((Error: HttpErrorResponse) => console.log(Error.error))
-      .finally(() => this.ngOnInit());
-  }
-
-  processingSurvey(): void {
-    this.voteCountInSurvey = 0;
-    this.survey.answers.forEach(answer => {
-      answer.isUserVote = false;
-      this.voteCountInSurvey += answer.votes.length;
-      if (answer.votes.length > 0) {
-        answer.votes.forEach(voteInAnswer => {
-          if (!answer.isUserVote && voteInAnswer.voter === this.user.login) {
-            answer.isUserVote = true;
-          }
-        });
+  public vote(e: MatCheckboxChange, answerId: number): void {
+    const indexAnswer = this.survey.answers.findIndex(answer => answer.id === answerId);
+    if (this.getAbilityVote(this.survey.answers[indexAnswer])) {
+      const answer = this.survey.answers.find(answerLocal => answerLocal.id === answerId);
+      if (e.checked && !answer.isUserVote) {
+        answer.isUserVote = true;
+        this.votes.push(new Vote(answerId, this.survey.id));
       }
-    });
+      else if (!e.checked && answer.isUserVote) {
+        answer.isUserVote = false;
+        this.votes.splice(this.votes.findIndex(vote => vote.idAnswer === answerId), 1);
+      }
+    }
   }
 
-  setSurvey(id: number): void {
+  private setSurvey(id: number): void {
     this.surveyService.GetSurveyById(id)
       .then(survey => {
         this.survey = survey;
-        this.processingSurvey();
+        this.setIsUserVote();
       })
       .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
-  getNowDate(): Date {
-    return new Date();
+  public getAbilityVote(answer: Answer): boolean {
+    return !this.isUserVote
+      && (this.abilityCountVote()
+        && this.getAbilityDateTimeVote()
+        || answer.isUserVote);
   }
 
-  getAbilityVote(answer: Answer): boolean {
-    return this.abilityMultivote() && this.abilityDateTimeVote() && !answer.isUserVote;
-  }
-
-  abilityDateTimeVote(): boolean {
-    if (new Date() >= this.survey.abilityVoteFrom
+  public getAbilityDateTimeVote(): boolean {
+    if (new Date() >= moment(this.survey.abilityVoteFrom).local().toDate()
       && this.survey.abilityVoteTo
-      && new Date() <= this.survey.abilityVoteTo) {
+      && new Date() <= moment(this.survey.abilityVoteTo).local().toDate()) {
       return true;
     }
-    else if (new Date() >= this.survey.abilityVoteFrom) {
+    else if (new Date() >= moment(this.survey.abilityVoteFrom).local().toDate()
+      && !this.survey.abilityVoteTo) {
       return true;
     }
     return false;
   }
 
-  abilityMultivote(): boolean {
-    if (!this.survey.severalAnswer && this.isVote()) {
-      return false;
-    }
-    else if (this.survey.severalAnswer) {
+  abilityCountVote(): boolean {
+    const voteCount = this.voteCount();
+    const maxCountVotes = this.survey.maxCountVotes;
+    if (maxCountVotes && voteCount < maxCountVotes || !maxCountVotes) {
       return true;
     }
+    return false;
   }
 
   getDeadtimeTo(date: Date): string {
@@ -124,4 +113,25 @@ export class SurveyComponent implements OnInit {
   getDeadtimeFrom(date: Date): string {
     return moment(date).fromNow();
   }
+
+  sendVotes(): void {
+    const voteCount = this.voteCount();
+    const maxCountVotes = this.survey.maxCountVotes;
+    const minCountVotes = this.survey.minCountVotes;
+    if (minCountVotes <= voteCount
+      && maxCountVotes
+      && voteCount <= maxCountVotes
+      || !maxCountVotes
+      && minCountVotes <= voteCount) {
+      this.surveyService.Vote(this.votes)
+        .then()
+        .catch((Error: HttpErrorResponse) => console.log(Error.error))
+        .finally(() => this.ngOnInit());
+    }
+  }
+
+  private voteCount(): number {
+    return this.survey.answers.filter(answer => answer.isUserVote).length;
+  }
+
 }

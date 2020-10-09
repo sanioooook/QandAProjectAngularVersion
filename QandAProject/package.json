@@ -6,7 +6,7 @@
     "ng": "ng",
     "build": "ng build",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "ng lint --fix=true",
     "e2e": "ng e2e"
   },
   "private": true,
@@ -28,7 +28,7 @@
     "@covalent/highlight": "^3.0.1",
     "@covalent/http": "^3.0.1",
     "@covalent/markdown": "^3.0.1",
-    "moment": "^2.27.0",
+    "moment": "^2.29.0",
     "moment-timezone": "^0.5.31",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.3"

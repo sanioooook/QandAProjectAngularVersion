@@ -9,7 +9,6 @@
         <input type="text"
                required
                matInput
-               [(ngModel)]="survey.question"
                placeholder="Ex. Where do we go this weekend?"
                [formControl]="question">
         <mat-error *ngIf="question.invalid">{{getErrorMessage()}}</mat-error>

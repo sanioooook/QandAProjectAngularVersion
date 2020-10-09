@@ -13,8 +13,7 @@ import { UserForPublic } from '../classes/user-for-public';
 export class UserService {
   constructor(private http: HttpClient,
               public dialogService: TdDialogService) {
-    this.user = new User();
-    this.user.authorizeToken = localStorage.getItem('user') ?? '';
+    this.user = new User('' , localStorage.getItem('user'));
   }
 
   private user: User;

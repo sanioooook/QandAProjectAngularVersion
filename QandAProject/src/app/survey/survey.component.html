@@ -15,13 +15,14 @@
         transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)">
                 <mat-checkbox [(checked)]="answer.isUserVote"
                               [disabled]="!getAbilityVote(answer)"
-                              (change)="vote(answer.id)">
+                              (change)="vote($event,answer.id)">
                     {{answer.textAnswer}}
                 </mat-checkbox>
             </section>
         </mat-card-content>
         <mat-card-actions class="survey-add-response"
-                          *ngIf="survey.addResponse ||
+                          *ngIf="survey.addResponse &&
+                          !isUserVote ||
                           survey.user &&
                           survey.user.login === user.login">
             <mat-form-field appearance="outline">
@@ -29,10 +30,10 @@
                 <input type="text"
                        matInput
                        [(ngModel)]="newAnswer"
-                       (keyup.enter)="addAnswer(survey.id)">
+                       (keyup.enter)="addAnswer()">
                 <button matSuffix
                         mat-icon-button
-                        (click)="addAnswer(survey.id)">
+                        (click)="addAnswer()">
                     <mat-icon>add</mat-icon>
                 </button>
             </mat-form-field>
@@ -42,17 +43,22 @@
             careator: {{survey.user.login}}
         </div>
         <div class="time-permission">
-        <ng-container *ngIf="getNowDate()<survey.abilityVoteFrom; else elseTemplate">
-            You will be able to vote via {{getDeadtimeFrom(survey.abilityVoteFrom)}} (start from {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
-        </ng-container>
-        <ng-template #elseTemplate>
-            <ng-container *ngIf="survey.abilityVoteTo; else timeIsUnlimited">
-              Voting will end {{getDeadtimeFrom(survey.abilityVoteTo)}} (end {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
+            <ng-container *ngIf="!getAbilityDateTimeVote(); else elseTemplate;">
+                You will be able to vote via {{getDeadtimeFrom(survey.abilityVoteFrom)}} (start from {{survey.abilityVoteFrom |date:'dd.MM.yyyy HH:mm'}})
             </ng-container>
-            <ng-template #timeIsUnlimited>
-                Voting time is unlimited
+            <ng-template #elseTemplate>
+                <ng-container *ngIf="survey.abilityVoteTo; else timeIsUnlimited">
+                    Voting will end {{getDeadtimeFrom(survey.abilityVoteTo)}} (end {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
+                </ng-container>
+                <ng-template #timeIsUnlimited>
+                    Voting time is unlimited
+                </ng-template>
             </ng-template>
-        </ng-template>
-      </div>
+        </div>
     </ng-template>
+    <button mat-raised-button
+            (click)="sendVotes()"
+            [disabled]="isUserVote">
+        Vote
+    </button>
 </mat-card>

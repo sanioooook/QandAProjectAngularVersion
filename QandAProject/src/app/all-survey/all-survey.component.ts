@@ -26,10 +26,10 @@ export class AllSurveyComponent implements OnInit {
 
   public surveyPagination: Pagination<Survey>;
   public dataSource: MatTableDataSource<Survey>;
+  public filter = new Filter();
   private user: UserForPublic;
   private sortBy = SurveySortBy.Id;
   private sortDirection = SortDirection.Descending;
-  public filter = new Filter();
 
   ngOnInit(): void {
     this.user = new UserForPublic();

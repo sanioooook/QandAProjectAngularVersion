@@ -11,8 +11,6 @@ export class Survey {
 
   public question: string;
 
-  public severalAnswer: boolean;
-
   public user: UserForPublic;
 
   public timeCreate: Date;
@@ -20,4 +18,27 @@ export class Survey {
   public abilityVoteFrom: Date;
 
   public abilityVoteTo: Date = null;
+
+  public minCountVotes: number;
+
+  public maxCountVotes: number = null;
+
+  constructor(
+    question: string,
+    answers: Answer[],
+    addResponse: boolean,
+    abilityVoteFrom: Date,
+    minCountVotes: number,
+    maxCountVotes: number = null,
+    abilityVoteTo: Date = null
+    ) {
+      this.abilityVoteFrom = abilityVoteFrom;
+      this.minCountVotes = minCountVotes;
+      this.maxCountVotes = maxCountVotes;
+      this.abilityVoteTo = abilityVoteTo;
+      this.addResponse = addResponse;
+      this.question = question;
+      this.answers = answers;
+      this.id = 0;
+  }
 }
