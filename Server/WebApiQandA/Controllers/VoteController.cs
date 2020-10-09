@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using WebApiQandA.DTO;
@@ -70,7 +71,7 @@ namespace WebApiQandA.Controllers
         
         // POST: api/Vote
         [HttpPost]
-        public IActionResult Create([FromBody] VoteDto vote)
+        public IActionResult Create([FromBody] VoteDto[] votesDto)
         {
             try
             {
@@ -84,12 +85,24 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
                 }
-                if (vote.IdAnswer == null)
+
+                if(votesDto.Length <= 0)
                 {
-                    throw new ArgumentException("IdAnswer is null");
+                    throw new ArgumentException("Votes array can't be empty", nameof(votesDto));
                 }
-                vote.Voter = user.Login;
-                return Ok(_voteService.Create(vote));
+                votesDto.Aggregate((prev, next) =>
+                        next.IdSurvey == prev.IdSurvey ? next : throw new Exception("IdSurvey must be equals on all votes")
+                    );
+                foreach(var vote in votesDto)
+                {
+                    if(vote.IdAnswer == null)
+                    {
+                        throw new ArgumentException("Answer id can't be null", nameof(vote.IdAnswer));
+                    }
+                    vote.Voter = user.Login;
+                }
+                _voteService.Create(votesDto);
+                return Ok();
             }
             catch (Exception e)
             {

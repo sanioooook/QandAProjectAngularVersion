@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using Entities.Models;
 using WebApiQandA.DTO;
 
 namespace WebApiQandA.Interfaces
 {
     public interface IVoteService
     {
-        VoteDto Create(VoteDto vote);
+        void Create(VoteDto[] votesDto);
 
         VoteDto GetVoteByVoteId(int voteId);
 

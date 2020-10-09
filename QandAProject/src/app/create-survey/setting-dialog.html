@@ -1,36 +1,67 @@
 <h1 mat-dialog-title>Setting survey</h1>
 <div mat-dialog-content>
     <section class="checkboxs">
-        <mat-checkbox [(ngModel)]="data.severalAnswer">Several answer</mat-checkbox>
         <mat-checkbox [(ngModel)]="data.addResponse">Add response</mat-checkbox>
     </section>
-    <mat-form-field appearance="outline">
-        <mat-label>Choose a date from</mat-label>
-        <input matInput
-               [ngxMatDatetimePicker]="pickerFrom"
-               [min]="minDateFrom()"
-               matTooltip="Choose date and time from which users can vote"
-               matTooltipPosition="below"
-               [(ngModel)]="data.abilityVoteFrom">
-        <mat-datepicker-toggle matSuffix
-                               [for]="pickerFrom"></mat-datepicker-toggle>
-        <ngx-mat-datetime-picker #pickerFrom>
-        </ngx-mat-datetime-picker>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-        <mat-label>Choose a date to</mat-label>
-        <input matInput
-               [ngxMatDatetimePicker]="pickerTo"
-               [ngModel]="data.abilityVoteTo"
-               [min]="minDateTo()"
-               matTooltip="Choose date and time to which users can vote"
-               matTooltipPosition="below"
-               [(ngModel)]="data.abilityVoteTo">
-        <mat-datepicker-toggle matSuffix
-                               [for]="pickerTo"></mat-datepicker-toggle>
-        <ngx-mat-datetime-picker #pickerTo>
-        </ngx-mat-datetime-picker>
-    </mat-form-field>
+    <section>
+        <mat-form-field appearance="outline">
+            <mat-label>Minimum number vote</mat-label>
+            <input matInput
+                   [formControl]="minNumberVoteFormControl"
+                   type="number"
+                   required
+                   (change)="updateMinNumberVoteFormControl()">
+            <mat-error *ngIf="minNumberVoteFormControl.invalid">
+                {{getErrorMinNumberVote()}}
+            </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Maximum number vote</mat-label>
+            <input matInput
+                   [formControl]="maxNumberVoteFormControl"
+                   type="number"
+                   (change)="updateMaxNumberVoteFormControl()">
+            <button mat-button
+                    matSuffix
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="maxNumberVoteFormControl.reset()">
+                <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="maxNumberVoteFormControl.invalid">
+                {{getErrorMaxNumberVote()}}
+            </mat-error>
+        </mat-form-field>
+    </section>
+    <section>
+        <mat-form-field appearance="outline">
+            <mat-label>Choose a date from</mat-label>
+            <input matInput
+                   [ngxMatDatetimePicker]="pickerFrom"
+                   [min]="minDateFrom()"
+                   matTooltip="Choose date and time from which users can vote"
+                   matTooltipPosition="below"
+                   [(ngModel)]="data.abilityVoteFrom">
+            <mat-datepicker-toggle matSuffix
+                                   [for]="pickerFrom"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #pickerFrom>
+            </ngx-mat-datetime-picker>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Choose a date to</mat-label>
+            <input matInput
+                   [ngxMatDatetimePicker]="pickerTo"
+                   [ngModel]="data.abilityVoteTo"
+                   [min]="minDateTo()"
+                   matTooltip="Choose date and time to which users can vote"
+                   matTooltipPosition="below"
+                   [(ngModel)]="data.abilityVoteTo">
+            <mat-datepicker-toggle matSuffix
+                                   [for]="pickerTo"></mat-datepicker-toggle>
+            <ngx-mat-datetime-picker #pickerTo>
+            </ngx-mat-datetime-picker>
+        </mat-form-field>
+    </section>
 </div>
 <div mat-dialog-actions>
     <button mat-button

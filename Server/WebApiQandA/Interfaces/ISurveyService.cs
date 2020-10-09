@@ -20,5 +20,9 @@ namespace WebApiQandA.Interfaces
         void DeleteSurveyBySurveyId(int userId, int surveyId);
 
         int GetCountSurveys(string surveyQuestionFilter = null);
+
+        SurveyDto GetSurveyBySurveyIdAndUserId(int surveyDtoId, int userId);
+
+        bool IsUserVoteInSurvey(SurveyDto surveyDto, User user);
     }
 }

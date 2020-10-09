@@ -12,5 +12,7 @@ namespace Entities.Models
 
 		public DateTime DateVote { get; set; }//когда голосовал
 
+		public int IdSurvey { get; set; }
+
 	}
 }

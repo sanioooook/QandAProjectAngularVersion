@@ -10,6 +10,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { SettingDialog } from '../create-survey/create-survey.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserService } from '../services/user-service.service';
 
 @Component({
   selector: 'app-edit-survey',
@@ -22,11 +23,14 @@ export class EditSurveyComponent implements OnInit {
               private router: Router,
               private dialogService: TdDialogService,
               private dialog: MatDialog,
-              private snackBar: MatSnackBar) { }
+              private snackBar: MatSnackBar,
+              private userService: UserService) {
+    this.question.registerOnChange(() => this.survey.question = this.question.value);
+  }
 
   newAnswer = '';
   survey: Survey;
-  question = new FormControl([Validators.required]);
+  question = new FormControl('', [Validators.required]);
 
   ngOnInit(): void {
     this.route.paramMap.pipe(
@@ -43,18 +47,19 @@ export class EditSurveyComponent implements OnInit {
   setSurvey(id: number): void {
     this.surveyService.GetSurveyById(id)
       .then(survey => {
-        this.survey = survey;
+        this.userService.getUserLogin().then(login => {
+          if (survey.user.login === login) {
+            this.survey = survey;
+            this.question.setValue(survey.question);
+          }
+        });
       })
       .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   addAnswer(): void {
     if (this.newAnswer) {
-      const answer = new Answer();
-      answer.textAnswer = this.newAnswer;
-      answer.idSurvey = this.survey.id;
-      answer.id = 0;
-      this.surveyService.AddNewAnswer(answer)
+      this.surveyService.AddNewAnswer(new Answer(this.survey.id, this.newAnswer))
         .then((newAnswer: Answer) => {
           this.openSnackBar('Answer successfully added', 'OK');
           this.survey.answers.push(newAnswer);

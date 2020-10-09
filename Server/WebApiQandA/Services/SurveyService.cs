@@ -28,15 +28,25 @@ namespace WebApiQandA.Services
 
         public void Create(SurveyDto surveyDto)
         {
+            surveyDto.AbilityVoteFrom = surveyDto.AbilityVoteFrom.AddSeconds(surveyDto.AbilityVoteFrom.Second - 60);
             surveyDto.AbilityVoteFrom = surveyDto.AbilityVoteFrom == DateTime.MinValue
                 ? DateTime.Now.ToUniversalTime()
                 : surveyDto.AbilityVoteFrom.ToUniversalTime();
-
+            if(surveyDto.MaxCountVotes != null && surveyDto.MaxCountVotes > surveyDto.Answers.Count)
+            {
+                throw new ArgumentException("MaxCountVotes can't be more Answers");
+            }
             if(surveyDto.AbilityVoteTo == DateTime.MinValue)
             {
                 surveyDto.AbilityVoteTo = null;
             }
-            surveyDto.TimeCreate = DateTime.Now;
+            else
+            {
+                var time = (DateTime)surveyDto.AbilityVoteTo;
+                time = time.AddSeconds(time.Second - 60);
+                surveyDto.AbilityVoteTo = time;
+            }
+            surveyDto.TimeCreate = DateTime.Now.ToUniversalTime();
             var survey = _surveyRepository.CreateSurvey(_mapper.Map<Survey>(surveyDto));
             surveyDto.Answers.ForEach(answer =>
             {
@@ -70,7 +80,12 @@ namespace WebApiQandA.Services
 
             _surveyRepository
                 .GetAllSurveys()
-                .ForEach(survey => surveysDto.Add(_mapper.Map<SurveyDto>(survey)));
+                .ForEach(survey =>
+                {
+                    var surveyDto = _mapper.Map<SurveyDto>(survey);
+                    // ReSharper disable once AccessToModifiedClosure
+                    surveysDto.Add(surveyDto);
+                });
             switch(sort.SortBy)
             {
                 case SurveySortBy.NumberAnswers:
@@ -144,6 +159,12 @@ namespace WebApiQandA.Services
 
         public void EditSurvey(SurveyDto surveyDto)
         {
+            if(surveyDto.MaxCountVotes != null &&
+               // ReSharper disable once PossibleInvalidOperationException
+               surveyDto.MaxCountVotes > _answerService.GetAnswersBySurveyId((int)surveyDto.Id).Count)
+            {
+                throw new ArgumentException("MaxCountVotes can't be more Answers");
+            }
             _surveyRepository.EditSurvey(_mapper.Map<Survey>(surveyDto));
         }
 
@@ -163,9 +184,19 @@ namespace WebApiQandA.Services
             return surveyDto.Answers.Sum(answer => answer.Votes.Count);
         }
 
+        public bool IsUserVoteInSurvey(SurveyDto surveyDto, User user)
+        {
+            return surveyDto.Answers.SelectMany(answer => answer.Votes).Any(vote => vote.Voter == user.Login);
+        }
+
         private static bool IsUserSurvey(SurveyDto surveyDto, User user)
         {
             return surveyDto.User.Login == user.Login;
+        }
+
+        public SurveyDto GetSurveyBySurveyIdAndUserId(int surveyId, int userId)
+        {
+            return _mapper.Map<SurveyDto>(_surveyRepository.GetSurveyBySurveyIdAndUserId(surveyId, userId));
         }
     }
 }
