@@ -21,8 +21,9 @@ namespace Entities.Repositories
 
         public Vote Create(Vote vote)
         {
-            return _db.QuerySingle<Vote>("INSERT INTO Vote (IdAnswer, IdCustomer, DateVote) OUTPUT INSERTED.* VALUES(@IdAnswer, @IdCustomer, @date)",
-                new { vote.IdAnswer, vote.IdCustomer, date = DateTime.Now });
+            return _db.QuerySingle<Vote>("INSERT INTO Vote (IdAnswer, IdCustomer, DateVote, IdSurvey) " +
+                                         "OUTPUT INSERTED.* VALUES(@IdAnswer, @IdCustomer, @date, @IdSurvey)",
+                new { vote.IdAnswer, vote.IdCustomer, vote.IdSurvey, date = DateTime.Now });
         }
 
         public Vote GetVoteByVoteId(int voteId)

@@ -59,7 +59,9 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("Token is empty. Please, try again.");
                 }
-                if(_userService.GetUserByToken(token) == null)
+
+                var user = _userService.GetUserByToken(token);
+                if(user == null)
                 {
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
                 }
@@ -122,16 +124,16 @@ namespace WebApiQandA.Controllers
                 }
                 if (surveyDto.Id == null)
                 {
-                    throw new ArgumentException("SurveyId is null");
+                    throw new ArgumentException("Survey Id is null");
                 }
-                if(_surveyService.GetSurveyBySurveyId((int)surveyDto.Id).Equals(surveyDto))
+                var survey = _surveyService.GetSurveyBySurveyIdAndUserId((int)surveyDto.Id, user.Id);
+                if(survey == null)
+                {
+                    throw new Exception("Not found");
+                }
+                if(survey.Equals(surveyDto))
                 {
                     throw new ArgumentException("The passed object does not differ from the original one");
-                }
-
-                if(_surveyService.GetSurveyBySurveyId((int)surveyDto.Id).User.Login != user.Login)
-                {
-                    throw new ArgumentException("You don't have permissive to edit this survey");
                 }
 
                 _surveyService.EditSurvey(surveyDto);

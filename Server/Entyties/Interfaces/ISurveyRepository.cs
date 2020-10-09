@@ -16,5 +16,7 @@ namespace Entities.Interfaces
         void EditSurvey(Survey surveyDto);
 
         void DeleteSurveyBySurveyId(int userId, int surveyId);
+
+        Survey GetSurveyBySurveyIdAndUserId(in int surveyId, in int userId);
     }
 }

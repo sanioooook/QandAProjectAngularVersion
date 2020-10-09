@@ -34,9 +34,18 @@ namespace WebApiQandA.Controllers
                 {
                     throw new ArgumentException("Token is empty. Please, try again.");
                 }
-                if(_userService.GetUserByToken(token) == null)
+
+                var user = _userService.GetUserByToken(token);
+                if(user == null)
                 {
                     throw new ArgumentException("Token is incorrect. Please, logout, login and try again");
+                }
+
+                if(answer.IdSurvey != null && answer.IdSurvey != 0 &&
+                   _surveyService.IsUserVoteInSurvey(_surveyService.GetSurveyBySurveyId((int)answer.IdSurvey), user)
+                )
+                {
+                    throw new Exception("You can't add answer to a survey if you've already voted in the survey");
                 }
                 return Ok(_answerService.Create(answer));
             }

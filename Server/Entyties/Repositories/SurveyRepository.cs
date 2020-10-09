@@ -21,17 +21,20 @@ namespace Entities.Repositories
 
         public Survey CreateSurvey(Survey survey)
         {
-            //if(survey.AbilityVoteTo == DateTime.MinValue)
-            //{
-            //    survey.AbilityVoteTo = null;
-            //}
-            return _db.QuerySingle<Survey>("INSERT INTO Survey (Question, IdCreator, AddResponse, SeveralAnswer, TimeCreate, AbilityVoteFrom, AbilityVoteTo)" +
-                       "OUTPUT INSERTED.* VALUES(@Question, @IdCreator, @AddResponse, @SeveralAnswer, @TimeCreate, @AbilityVoteFrom, @AbilityVoteTo)", survey);
+            return _db.QuerySingle<Survey>("INSERT INTO Survey (Question, IdCreator, AddResponse, TimeCreate," +
+                                           " AbilityVoteFrom, AbilityVoteTo, MinCountVotes, MaxCountVotes)" +
+                       "OUTPUT INSERTED.* VALUES(@Question, @IdCreator, @AddResponse, @TimeCreate," +
+                                           " @AbilityVoteFrom, @AbilityVoteTo, @MinCountVotes, @MaxCountVotes)", survey);
         }
 
         public Survey GetSurveyBySurveyId(int surveyId)
         {
             return _db.Query<Survey>("SELECT * FROM Survey WHERE Id = @surveyId", new { surveyId }).FirstOrDefault();
+        }
+
+        public Survey GetSurveyBySurveyIdAndUserId(in int surveyId, in int userId)
+        {
+            return _db.Query<Survey>("SELECT * FROM Survey WHERE Id = @surveyId AND IdCreator = @userId", new { surveyId, userId }).FirstOrDefault();
         }
 
         public int GetCountSurveys(string surveyQuestionFilter = null)
@@ -53,8 +56,8 @@ namespace Entities.Repositories
         public void EditSurvey(Survey survey)
         {
             _db.Execute(
-                "UPDATE Survey SET Question = @Question, AddResponse = @AddResponse, SeveralAnswer = @SeveralAnswer, " +
-                "AbilityVoteFrom = @AbilityVoteFrom, AbilityVoteTo = @AbilityVoteTo WHERE Id = @Id",
+                "UPDATE Survey SET Question = @Question, AddResponse = @AddResponse, AbilityVoteFrom = @AbilityVoteFrom, " +
+                "AbilityVoteTo = @AbilityVoteTo, MinCountVotes = @MinCountVotes, MaxCountVotes = @MaxCountVotes WHERE Id = @Id",
                 survey);
         }
 

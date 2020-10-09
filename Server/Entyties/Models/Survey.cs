@@ -4,20 +4,22 @@ namespace Entities.Models
 {
     public class Survey
     {
-		public int Id { get; set; }
-		
-		public string Question { set; get; }
-		
-		public int IdCreator { get; set; }
-		
-		public bool SeveralAnswer { get; set; }
+        public int Id { get; set; }
 
-		public bool AddResponse { get; set; }
+        public string Question { set; get; }
+
+        public int IdCreator { get; set; }
+
+        public bool AddResponse { get; set; }
 
         public DateTime TimeCreate { get; set; }
 
-		public DateTime AbilityVoteFrom { get; set; }
+        public DateTime AbilityVoteFrom { get; set; }
 
-		public DateTime? AbilityVoteTo { get; set; }
-	}
+        public DateTime? AbilityVoteTo { get; set; }
+
+        public int MinCountVotes { get; set; }
+
+        public int? MaxCountVotes { get; set; }
+    }
 }

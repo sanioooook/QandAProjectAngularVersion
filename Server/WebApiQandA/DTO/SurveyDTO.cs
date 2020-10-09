@@ -19,9 +19,6 @@ namespace WebApiQandA.DTO
         public UserForPublic User { get; set; }
 
         [Required]
-        public bool SeveralAnswer { get; set; }
-
-        [Required]
         public bool AddResponse { get; set; }
 
         [DataType(DataType.DateTime)]
@@ -32,6 +29,12 @@ namespace WebApiQandA.DTO
 
         [DataType(DataType.DateTime)]
         public DateTime? AbilityVoteTo { get; set; }
+
+        [Required, Range(1, int.MaxValue, ErrorMessage = "MinCountVotes must be >=1")]
+        public int MinCountVotes { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "MaxCountVotes must be >= 1")]
+        public int? MaxCountVotes { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -44,15 +47,16 @@ namespace WebApiQandA.DTO
             return temp != null && (temp.TimeCreate == TimeCreate
                                     && temp.User.Equals(User)
                                     && temp.AddResponse == AddResponse
-                                    && temp.SeveralAnswer == SeveralAnswer
                                     && temp.Question == Question
                                     && temp.AbilityVoteFrom == AbilityVoteFrom
-                                    && temp.AbilityVoteTo == AbilityVoteTo);
+                                    && temp.AbilityVoteTo == AbilityVoteTo
+                                    && temp.MaxCountVotes == MaxCountVotes
+                                    && temp.MinCountVotes == MinCountVotes);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, Question, Answers, User, SeveralAnswer, AddResponse, TimeCreate);
+            return HashCode.Combine(Id, Question, Answers, User, AddResponse, TimeCreate, MaxCountVotes, MinCountVotes);
         }
     }
 }

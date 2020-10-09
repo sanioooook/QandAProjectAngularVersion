@@ -27,35 +27,37 @@ namespace WebApiQandA.Services
             _surveyRepository = surveyRepository;
         }
 
-        public VoteDto Create(VoteDto vote)
+        public void Create(VoteDto[] votesDto)
         {
             var answers = new List<AnswerDto>();
-            var answer = _answerRepository.GetAnswerByAnswerId((int)vote.IdAnswer);
-            if(answer != null)
+            _answerRepository.GetAnswersBySurveyId(_answerRepository.GetAnswerByAnswerId((int)votesDto[0].IdAnswer).IdSurvey)
+                .ForEach(source => answers.Add(_mapper.Map<AnswerDto>(source)));
+            var surveyDto = _mapper.Map<SurveyDto>(_surveyRepository.GetSurveyBySurveyId(votesDto[0].IdSurvey));
+            foreach(var vote in votesDto)
             {
-                _answerRepository.GetAnswersBySurveyId(answer.IdSurvey)
-                    .ForEach(source => answers.Add(_mapper.Map<AnswerDto>(source)));
-                var survey = _surveyRepository.GetSurveyBySurveyId((int)answers[0].IdSurvey);
-                if(answers.SelectMany(answerDto => answerDto.Votes).Any(voteDto =>
-                    voteDto.Voter == vote.Voter && voteDto.IdAnswer == vote.IdAnswer))
+                if(surveyDto.Answers.SelectMany(localAnswer => localAnswer.Votes).Any(dto => dto.Voter == vote.Voter))
+                {
+                    throw new Exception("You can't vote multiple times");
+                }
+
+                if(answers.SelectMany(answerDto => answerDto.Votes).Any(localVote =>
+                    localVote.Voter == vote.Voter && localVote.IdAnswer == vote.IdAnswer))
                 {
                     throw new Exception("You can't vote for the same option");
                 }
-                if(!survey.SeveralAnswer &&
-                   answers.Any(answerDto => answerDto.Votes.Find(voteDto => voteDto.Voter == vote.Voter) != null))
-                {
-                    throw new Exception("You don't have permissions for multi vote");
-                }
-
-                if(DateTime.Now.ToUniversalTime() < survey.AbilityVoteFrom && survey.AbilityVoteTo > DateTime.Now.ToUniversalTime())
-                {
-                    throw new Exception("You can't vote, because time is out");
-                }
-
-                return _mapper.Map<VoteDto>(_voteRepository.Create(_mapper.Map<Vote>(vote)));
             }
-
-            throw new Exception("Don't have this answer in database");
+            if(surveyDto.MaxCountVotes != null && votesDto.Length > surveyDto.MaxCountVotes || votesDto.Length < surveyDto.MinCountVotes)
+            {
+                throw new Exception("More votes than the maximum or minimum allowed");
+            }
+            if(DateTime.Now.ToUniversalTime() < surveyDto.AbilityVoteFrom && surveyDto.AbilityVoteTo > DateTime.Now.ToUniversalTime())
+            {
+                throw new Exception("You can't vote, because time is out");
+            }
+            foreach(var vote in votesDto)
+            {
+                _mapper.Map<VoteDto>(_voteRepository.Create(_mapper.Map<Vote>(vote)));
+            }
         }
 
         public VoteDto GetVoteByVoteId(int voteId)
