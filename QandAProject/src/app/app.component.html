@@ -7,6 +7,21 @@
         <span>{{title}}</span>
         <span class="spacer"></span>
         <button mat-icon-button
+                [matMenuTriggerFor]="menu"
+                aria-label="Example icon-button with a menu"
+                matTooltip="Change theme">
+            <mat-icon>format_paint</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu" class="menu">
+            <button mat-menu-item
+                    (click)="onSetTheme('dark-theme')">
+                <span>Dark</span>
+            </button>
+            <button mat-menu-item
+                    (click)="onSetTheme('light-theme')">
+                <span>Light</span></button>
+        </mat-menu>
+        <button mat-icon-button
                 (click)="logOut()"
                 *ngIf="userService.IsUserLogged(); else notLoggedUserTemplate">
             <mat-icon>exit_to_app</mat-icon>

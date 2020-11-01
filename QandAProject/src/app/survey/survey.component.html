@@ -10,9 +10,9 @@
                           *ngIf="survey.answers">
             <section class="answer mat-primary"
                      *ngFor="let answer of survey.answers"
-                     style.background="linear-gradient(to right,
+                      ><!--style.background="linear-gradient(to right,
              #7b1fa2 {{answer.votes.length/voteCountInSurvey*100}}%,
-        transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)">
+        transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)" -->
                 <mat-checkbox [(checked)]="answer.isUserVote"
                               [disabled]="!getAbilityVote(answer)"
                               (change)="vote($event,answer.id)">
@@ -44,11 +44,11 @@
         </div>
         <div class="time-permission">
             <ng-container *ngIf="!getAbilityDateTimeVote(); else elseTemplate;">
-                You will be able to vote via {{getDeadtimeFrom(survey.abilityVoteFrom)}} (start from {{survey.abilityVoteFrom |date:'dd.MM.yyyy HH:mm'}})
+                You will be able to vote via <br> {{getDeadtimeFrom(survey.abilityVoteFrom)}} (start from {{survey.abilityVoteFrom |date:'dd.MM.yyyy HH:mm'}})
             </ng-container>
             <ng-template #elseTemplate>
                 <ng-container *ngIf="survey.abilityVoteTo; else timeIsUnlimited">
-                    Voting will end {{getDeadtimeFrom(survey.abilityVoteTo)}} (end {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
+                    Voting will end {{getDeadtimeFrom(survey.abilityVoteTo)}} <br> (end {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
                 </ng-container>
                 <ng-template #timeIsUnlimited>
                     Voting time is unlimited
