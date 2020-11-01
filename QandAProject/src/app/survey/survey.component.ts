@@ -14,7 +14,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 @Component({
   selector: 'app-survey',
   templateUrl: './survey.component.html',
-  styleUrls: ['./survey.component.css']
+  styleUrls: ['./survey.component.scss']
 })
 export class SurveyComponent implements OnInit {
   constructor(private route: ActivatedRoute,

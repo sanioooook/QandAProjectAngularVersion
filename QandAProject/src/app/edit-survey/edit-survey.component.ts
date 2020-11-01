@@ -15,7 +15,7 @@ import { UserService } from '../services/user-service.service';
 @Component({
   selector: 'app-edit-survey',
   templateUrl: './edit-survey.component.html',
-  styleUrls: ['./edit-survey.component.css']
+  styleUrls: ['./edit-survey.component.scss']
 })
 export class EditSurveyComponent implements OnInit {
   constructor(private route: ActivatedRoute,

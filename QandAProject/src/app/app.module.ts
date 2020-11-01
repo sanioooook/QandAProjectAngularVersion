@@ -30,6 +30,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -83,7 +85,9 @@ import { LoginOrRegistrationComponent } from './login-or-registration/login-or-r
     MatDialogModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatTabsModule
+    MatTabsModule,
+    OverlayModule,
+    MatMenuModule
   ],
   providers: [
     {provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher}

@@ -11,7 +11,7 @@ import { Answer } from '../classes/answer';
 @Component({
   selector: 'app-create-survey',
   templateUrl: './create-survey.component.html',
-  styleUrls: ['./create-survey.component.css']
+  styleUrls: ['./create-survey.component.scss']
 })
 export class CreateSurveyComponent implements OnInit {
 
@@ -19,7 +19,7 @@ export class CreateSurveyComponent implements OnInit {
               private surveyService: SurveysService,
               private dialogService: TdDialogService,
               public dialog: MatDialog) {
-    this.survey = new Survey('', new Array<Answer>(), false, new Date(), 1, 1, null);
+    this.survey = new Survey('', new Array<Answer>(), false, null, 1, 1, null);
     this.newAnswer = 'Yes';
     this.PushAnswer();
   }
