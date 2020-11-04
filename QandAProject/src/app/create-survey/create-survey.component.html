@@ -5,13 +5,13 @@
         </button>
     </mat-card-actions>
     <mat-form-field appearance="outline">
-        <mat-label>Question for survey</mat-label>
+        <mat-label>{{'newSurveyComponent.question' | transloco}}</mat-label>
         <input type="text"
                required
                matInput
-               placeholder="Ex. Where do we go this weekend?"
+               placeholder="{{'newSurveyComponent.example' | transloco}}"
                [formControl]="question">
-        <mat-error *ngIf="question.invalid">{{getErrorMessage()}}</mat-error>
+        <mat-error *ngIf="question.invalid">{{getErrorMessage() | async}}</mat-error>
     </mat-form-field>
     <div class="answers"
          *ngFor="let answer of this.survey.answers; index as i">
@@ -19,20 +19,20 @@
             {{answer.textAnswer}}
             <mat-icon [ngStyle]="{'cursor':'pointer'}"
                       (click)="survey.answers.splice(i, 1)"
-                      matTooltip="Delete this answer"
+                      matTooltip="{{'newSurveyComponent.deleteThisAnswer' | transloco}}"
                       matTooltipPosition="below">
                 delete
             </mat-icon>
             <mat-icon [ngStyle]="{'cursor':'pointer'}"
                       (click)="showEditAnswerWindow(answer)"
-                      matTooltip="Edit this answer"
+                      matTooltip="{{'newSurveyComponent.editThisAnswer' | transloco}}"
                       matTooltipPosition="below">
                 edit
             </mat-icon>
         </div>
     </div>
     <mat-form-field appearance="outline">
-        <mat-label>New answer</mat-label>
+        <mat-label>{{'newSurveyComponent.newAnswer' | transloco}}</mat-label>
         <input type="text"
                matInput
                [(ngModel)]="newAnswer"
@@ -45,5 +45,5 @@
     </mat-form-field>
     <button mat-stroked-button
             color="primory"
-            (click)="CreateSurvey()">Create survey</button>
+            (click)="CreateSurvey()">{{'newSurveyComponent.createSurvey' | transloco}}</button>
 </mat-card>

@@ -1,22 +1,22 @@
-<h1 mat-dialog-title>Setting survey</h1>
+<h1 mat-dialog-title>{{'settingDialog.settingSurvey' | transloco}}</h1>
 <div mat-dialog-content>
     <section class="checkboxs">
-        <mat-checkbox [(ngModel)]="data.addResponse">Add response</mat-checkbox>
+        <mat-checkbox [(ngModel)]="data.addResponse">{{'settingDialog.addResponse' | transloco}}</mat-checkbox>
     </section>
     <section>
         <mat-form-field appearance="outline">
-            <mat-label>Minimum number vote</mat-label>
+            <mat-label>{{'settingDialog.minimumVote' | transloco}}</mat-label>
             <input matInput
                    [formControl]="minNumberVoteFormControl"
                    type="number"
                    required
                    (change)="updateMinNumberVoteFormControl()">
             <mat-error *ngIf="minNumberVoteFormControl.invalid">
-                {{getErrorMinNumberVote()}}
+                {{getErrorMinNumberVote() | async}}
             </mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
-            <mat-label>Maximum number vote</mat-label>
+            <mat-label>{{'settingDialog.maximumVote' | transloco}}</mat-label>
             <input matInput
                    [formControl]="maxNumberVoteFormControl"
                    type="number"
@@ -29,17 +29,17 @@
                 <mat-icon>close</mat-icon>
             </button>
             <mat-error *ngIf="maxNumberVoteFormControl.invalid">
-                {{getErrorMaxNumberVote()}}
+                {{getErrorMaxNumberVote() | async}}
             </mat-error>
         </mat-form-field>
     </section>
     <section>
         <mat-form-field appearance="outline">
-            <mat-label>Choose a date from</mat-label>
+            <mat-label>{{'settingDialog.chooseDateFrom' | transloco}}</mat-label>
             <input matInput
                    [ngxMatDatetimePicker]="pickerFrom"
                    [min]="minDateFrom()"
-                   matTooltip="Choose date and time from which users can vote"
+                   matTooltip="{{'settingDialog.chooseDateAndTimeFrom' | transloco}}"
                    matTooltipPosition="below"
                    [(ngModel)]="data.abilityVoteFrom">
             <mat-datepicker-toggle matSuffix
@@ -48,12 +48,12 @@
             </ngx-mat-datetime-picker>
         </mat-form-field>
         <mat-form-field appearance="outline">
-            <mat-label>Choose a date to</mat-label>
+            <mat-label>{{'settingDialog.chooseDateTo' | transloco}}</mat-label>
             <input matInput
                    [ngxMatDatetimePicker]="pickerTo"
                    [ngModel]="data.abilityVoteTo"
                    [min]="minDateTo()"
-                   matTooltip="Choose date and time to which users can vote"
+                   matTooltip="{{'settingDialog.chooseDateAndTimeTo' | transloco}}"
                    matTooltipPosition="below"
                    [(ngModel)]="data.abilityVoteTo">
             <mat-datepicker-toggle matSuffix
@@ -65,5 +65,5 @@
 </div>
 <div mat-dialog-actions>
     <button mat-button
-            mat-dialog-close>Close</button>
+            mat-dialog-close>{{'settingDialog.close' | transloco}}</button>
 </div>

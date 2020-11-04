@@ -134,4 +134,8 @@ export class SurveyComponent implements OnInit {
     return this.survey.answers.filter(answer => answer.isUserVote).length;
   }
 
+  public getTimeNow(): Date {
+    return new Date();
+  }
+
 }

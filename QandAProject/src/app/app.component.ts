@@ -3,6 +3,8 @@ import { UserService } from './services/user-service.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { OverlayContainer} from '@angular/cdk/overlay';
+import { TranslocoService } from '@ngneat/transloco';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-root',
@@ -12,18 +14,23 @@ import { OverlayContainer} from '@angular/cdk/overlay';
 export class AppComponent implements OnInit {
   constructor(public userService: UserService,
               public overlayContainer: OverlayContainer,
+              private translocoService: TranslocoService,
               private router: Router) {
   }
   title = 'QandA';
-  previusTheme = '';
   @HostBinding('class') componentCssClass: string;
 
   ngOnInit(): void {
     let theme = localStorage.getItem('theme');
+    let storageLang = localStorage.getItem('lang');
     if (!theme) {
       theme = 'dark-theme';
     }
+    if (!storageLang) {
+      storageLang = this.getLangs()[0];
+    }
     this.onSetTheme(theme);
+    this.onSetLang(storageLang);
   }
 
   logOut(): void {
@@ -43,5 +50,15 @@ export class AppComponent implements OnInit {
       this.componentCssClass = theme;
       localStorage.setItem('theme', theme);
     }
+  }
+
+  getLangs(): Array<any>{
+    return ['en', 'ru'];
+  }
+
+  onSetLang(lang: string): void {
+    this.translocoService.setActiveLang(lang);
+    moment.locale(lang);
+    localStorage.setItem('lang', lang);
   }
 }

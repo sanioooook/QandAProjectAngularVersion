@@ -1,0 +1,113 @@
+{
+  "en": "English",
+  "ru": "Russian",
+  "darkTheme": "Dark theme",
+  "lightTheme": "Light theme",
+  "changeLang": "Change lang",
+  "changeTheme": "Change theme",
+  "logOut": "Log out of your account",
+  "loginOrRegistration": "Log in or register",
+  "homeComponent": {
+    "login": "Login",
+    "registration": "Registration",
+    "createSurvey": "Create survey",
+    "allSurveys": "All surveys"
+  },
+  "surveyComponent": {
+    "newAnswer": "New answer",
+    "creatorSurvey": "Creator: {{creator}}",
+    "youWillBeAbleToVoteVia": "You will be able to vote via",
+    "startFrom": "Start from {{date}}",
+    "votingWillEnd": "Voting will end {{date}}",
+    "endVote": "End {{date}}",
+    "voteEnd": "Voting is end {{date}}",
+    "votingTimeIsUnlimited": "Voting time is unlimited",
+    "vote": "Vote",
+    "isUserVote": "You have already voted"
+  },
+  "registrationComponent": {
+    "registration": "Registration",
+    "enterYourEmail": "Enter Your email",
+    "enterYourPassword": "Enter Your password",
+    "repeatYourPassword": "Repeat Your password",
+    "enterValue": "You must enter a value",
+    "notValidEmail": "Not a valid email",
+    "minimalLengthPassword": "Minimal length password is {{minlength}}",
+    "passwordsMustEqual": "Passwords must be the equal"
+  },
+  "loginComponent": {
+    "login": "Login",
+    "enterYourEmail": "Enter Your email",
+    "enterYourPassword": "Enter Your password",
+    "enterValue": "You must enter a value",
+    "notValidEmail": "Not a valid email"
+  },
+  "loginAndRegistration": {
+    "login": "Login",
+    "registration": "Registration" 
+  },
+  "allSurveyComponent": {
+    "search": "Search",
+    "example": "Ex. Where are we going",
+    "question": "Question survey",
+    "numberAnswers": "Number answers",
+    "timeCreate": "Time create survey",
+    "numberVotes": "Number votes",
+    "permissionEdit": "Permission on edit",
+    "noDataMatching":"No data matching the filter \"{{searchQuery}}\""
+  },
+  "matPaginator": {
+    "itemsPerPageLabel": "Items per page:",
+    "nextPageLabel": "Next page",
+    "previousPageLabel": "Previous page",
+    "firstPageLabel": "First page",
+    "lastPageLabel": "Last page",
+    "nullOf": "0 of {{length}}",
+    "indexOf": "{{startIndex}} - {{endIndex}} of {{length}}"
+  },
+  "editSurveyComponent": {
+    "question": "Question for survey",
+    "newAnswer": "New answer",
+    "save": "Save survey",
+    "enterValue": "You must enter a value",
+    "answerSuccessfullyAdded": "Answer successfully added",
+    "answerSuccessfullyEdited": "Answer successfully edited",
+    "answerSuccessfullyDeleted": "Answer successfully deleted",
+    "surveySuccessfullySaved": "Survey successfully saved",
+    "surveySuccessfullyDeleted": "Survey successfully deleted",
+    "editAnswer": "Edit answer",
+    "editTextAnswer": "Edit text answer",
+    "cancel": "Cancel",
+    "example": "Ex. Where do we go this weekend?",
+    "deleteThisAnswer": "Delete this answer",
+    "editThisAnswer": "Edit this answer"
+  },
+  "newSurveyComponent": {
+    "question": "Question for survey",
+    "example": "Ex. Where do we go this weekend?",
+    "deleteThisAnswer": "Delete this answer",
+    "enterValue": "You must enter a value",
+    "editThisAnswer": "Edit this answer",
+    "newAnswer": "New answer",
+    "createSurvey": "Create survey",
+    "editAnswer": "Edit answer",
+    "editTextAnswer": "Edit text answer",
+    "cancel": "Cancel"
+  },
+  "settingDialog": {
+    "minimumNumberVotesCantBeEmpty": "The minimum number of votes can't be empty",
+    "minimumNumberVotesCantBeLessOne": "The minimum number of votes can't be less than 1",
+    "minimumNumberVotesCantBeMore": "The minimum number of votes can't be more than the number of answers ({{length}})",
+    "maximumNumberVotesCantExceed": "The maximum number of votes can't exceed the minimum number of votes({{value}})",
+    "maximumNumberVotesCantBeMore": "The maximum number of votes can't be more than the number of answers ({{length}})",
+    "settingSurvey": "Setting survey",
+    "minimumVote": "Minimum number vote",
+    "addResponse": "Add response",
+    "maximumVote": "Maximum number vote",
+    "chooseDateFrom": "Choose a date from",
+    "chooseDateAndTimeFrom": "Choose date and time from which users can vote",
+    "chooseDateTo": "Choose a date to",
+    "chooseDateAndTimeTo": "Choose date and time to which users can vote",
+    "close": "Close"
+  }
+}

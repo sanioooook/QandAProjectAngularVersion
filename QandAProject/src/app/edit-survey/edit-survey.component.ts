@@ -11,6 +11,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { SettingDialog } from '../create-survey/create-survey.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserService } from '../services/user-service.service';
+import { TranslocoService } from '@ngneat/transloco';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-edit-survey',
@@ -24,7 +26,8 @@ export class EditSurveyComponent implements OnInit {
               private dialogService: TdDialogService,
               private dialog: MatDialog,
               private snackBar: MatSnackBar,
-              private userService: UserService) {
+              private userService: UserService,
+              private translocoService: TranslocoService) {
     this.question.registerOnChange(() => this.survey.question = this.question.value);
   }
 
@@ -38,10 +41,11 @@ export class EditSurveyComponent implements OnInit {
       .subscribe(id => this.setSurvey(+id));
   }
 
-  getErrorMessage(): string {
+  getErrorMessage(): Observable<string> {
     if (this.question.hasError('required')) {
-      return 'You must enter a value';
+      return this.translocoService.selectTranslate('editSurveyComponent.enterValue');
     }
+    return new Observable<string>(observer => observer.next(''));
   }
 
   setSurvey(id: number): void {
@@ -61,7 +65,7 @@ export class EditSurveyComponent implements OnInit {
     if (this.newAnswer) {
       this.surveyService.AddNewAnswer(new Answer(this.survey.id, this.newAnswer))
         .then((newAnswer: Answer) => {
-          this.openSnackBar('Answer successfully added', 'OK');
+          this.openSnackBar(this.translocoService.translate('editSurveyComponent.answerSuccessfullyAdded'), 'OK');
           this.survey.answers.push(newAnswer);
           this.newAnswer = '';
         })
@@ -71,16 +75,16 @@ export class EditSurveyComponent implements OnInit {
 
   private editAnswer(answer: Answer): void {
     this.surveyService.EditAnswer(answer)
-    .then(_ => this.openSnackBar('Answer successfully edited', 'OK'))
+      .then(_ => this.openSnackBar(this.translocoService.translate('editSurveyComponent.answerSuccessfullyEdited'), 'OK'))
       .catch((Error: HttpErrorResponse) => console.log(Error.error));
   }
 
   showEditAnswerWindow(answer: Answer): void {
     this.dialogService.openPrompt({
-      title: 'Edit answer',
-      message: 'Edit text answer',
+      title: this.translocoService.translate('editSurveyComponent.editAnswer'),
+      message: this.translocoService.translate('editSurveyComponent.editTextAnswer'),
       value: answer.textAnswer,
-      cancelButton: 'Cancel',
+      cancelButton: this.translocoService.translate('editSurveyComponent.cancel'),
       acceptButton: 'Ok',
     })
       .afterClosed()
@@ -95,20 +99,20 @@ export class EditSurveyComponent implements OnInit {
 
   deleteAnswer(answer: Answer): Promise<any> {
     return this.surveyService.DeleteAnswer(answer.id)
-      .then(_ => this.openSnackBar('Answer successfully deleted', 'OK'))
+      .then(_ => this.openSnackBar(this.translocoService.translate('editSurveyComponent.answerSuccessfullyDeleted'), 'OK'))
       .catch(_ => this.ngOnInit());
   }
 
   saveSurvey(): void {
     this.surveyService.EditSurvey(this.survey)
-    .then(_ => this.openSnackBar('Survey successfully saved', 'OK'))
+      .then(_ => this.openSnackBar(this.translocoService.translate('editSurveyComponent.surveySuccessfullySaved'), 'OK'))
       .catch(_ => this.ngOnInit());
   }
 
   deleteSurvey(): void {
     this.surveyService.DeleteSurvey(this.survey.id)
       .then(_ => {
-        this.openSnackBar('Survey successfully deleted', 'OK');
+        this.openSnackBar(this.translocoService.translate('editSurveyComponent.surveySuccessfullyDeleted'), 'OK');
         this.router.navigate(['home']);
       })
       .catch((Error: HttpErrorResponse) => console.log(Error.error));

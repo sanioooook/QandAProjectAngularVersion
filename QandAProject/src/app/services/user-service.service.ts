@@ -69,7 +69,7 @@ export class UserService {
   }
 
   public IsUserLogged(): boolean {
-    return this.user.authorizeToken !== '';
+    return !!this.user.authorizeToken;
   }
 
   private setAuthorizationToken(authorizeToken: string): void {

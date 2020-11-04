@@ -3,6 +3,8 @@ import { UserService } from '../services/user-service.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, Validators } from '@angular/forms';
+import { TranslocoService } from '@ngneat/transloco';
+import { Observable } from 'rxjs';
 
 @Component({
 
@@ -16,17 +18,26 @@ export class LoginComponent {
   passwordFormControl = new FormControl('', [Validators.required]);
   hidePassword = false;
 
-  constructor(private router: Router, private userService: UserService) { }
+  constructor(private router: Router,
+              private translocoService: TranslocoService,
+              private userService: UserService) { }
 
-  getEmailErrorMessage(): string {
+  getEmailErrorMessage(): Observable<string> {
     if (this.loginFormControl.hasError('required')) {
-      return 'You must enter a value';
+      return this.translocoService.selectTranslate('loginComponent.enterValue');
     }
-    return this.loginFormControl.hasError('email') ? 'Not a valid email' : '';
+    if (this.loginFormControl.hasError('email')) {
+      return this.translocoService.selectTranslate('loginComponent.notValidEmail');
+    }
+    return new Observable<string>(observer => observer.next(''));
   }
 
-  getPasswordErrorMessage(): string {
-    return this.passwordFormControl.hasError('required') ? 'You must enter a value' : '';
+  getPasswordErrorMessage(): Observable<string> {
+    if (this.passwordFormControl.hasError('required'))
+    {
+      return this.translocoService.selectTranslate('loginComponent.enterValue');
+    }
+    return new Observable<string>(observer => observer.next(''));
   }
 
   login(): void {

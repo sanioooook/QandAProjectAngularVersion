@@ -3,6 +3,9 @@ import { Router } from '@angular/router';
 import { UserService } from '../services/user-service.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, Validators } from '@angular/forms';
+import { TranslocoService } from '@ngneat/transloco';
+import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-registration',
@@ -24,39 +27,43 @@ export class RegistrationComponent {
   hidePassword = false;
   hideSecondPassword = false;
 
-  constructor(private router: Router, private userService: UserService) { }
+  constructor(private router: Router,
+              private translocoService: TranslocoService,
+              private userService: UserService) { }
 
-  getEmailErrorMessage(): string {
+  getEmailErrorMessage(): Observable<string> {
     if (this.loginFormControl.hasError('required')) {
-      return 'You must enter a value';
+      return this.translocoService.selectTranslate('registrationComponent.enterValue');
     }
     if (this.loginFormControl.hasError('email')) {
-      return 'Not a valid email';
+      return this.translocoService.selectTranslate('registrationComponent.notValidEmail');
     }
-    return '';
+    return new Observable<string>(observer => observer.next(''));
   }
 
-  getPasswordErrorMessage(): string {
+  getPasswordErrorMessage(): Observable<string> {
     if (this.passwordFormControl.hasError('required')) {
-      return 'You must enter a value';
+      return this.translocoService.selectTranslate('registrationComponent.enterValue');
     }
     if (this.passwordFormControl.hasError('minlength')) {
-      return `Minimal length password is ${this.passwordFormControl.errors.minlength.requiredLength}`;
+      return this.translocoService.selectTranslate('registrationComponent.minimalLengthPassword',
+        { minlength: this.passwordFormControl.errors.minlength.requiredLength });
     }
-    return '';
+    return new Observable<string>(observer => observer.next(''));
   }
 
-  getSecondPasswordErrorMessage(): string {
+  getSecondPasswordErrorMessage(): Observable<string> {
     if (this.secondPasswordFormControl.hasError('required')) {
-      return 'You must enter a value';
+      return this.translocoService.selectTranslate('registrationComponent.enterValue');
     }
     if (this.secondPasswordFormControl.hasError('minlength')) {
-      return `Minimal length password is ${this.secondPasswordFormControl.errors.minlength.requiredLength}`;
+      return this.translocoService.selectTranslate('registrationComponent.minimalLengthPassword',
+        { minlength: this.secondPasswordFormControl.errors.minlength.requiredLength });
     }
     if (this.secondPasswordFormControl.hasError('pattern')){
-      return 'Passwords must be the equal';
+      return this.translocoService.selectTranslate('registrationComponent.passwordsMustEqual');
     }
-    return '';
+    return new Observable<string>(observer => observer.next(''));
   }
 
   registration(): void {

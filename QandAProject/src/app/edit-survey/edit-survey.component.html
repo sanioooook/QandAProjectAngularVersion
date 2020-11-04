@@ -10,12 +10,12 @@
             </button>
         </mat-card-actions>
         <mat-form-field appearance="outline">
-            <mat-label>Question for survey</mat-label>
+            <mat-label>{{'editSurveyComponent.question' | transloco}}</mat-label>
             <input required
                    matInput
-                   placeholder="Ex. Where do we go this weekend?"
+                   placeholder="{{'editSurveyComponent.example' | transloco}}"
                    [formControl]="question">
-            <mat-error *ngIf="question.invalid">{{getErrorMessage()}}</mat-error>
+            <mat-error *ngIf="question.invalid">{{getErrorMessage() | async}}</mat-error>
         </mat-form-field>
         <div class="answers"
              *ngFor="let answer of this.survey.answers; index as i">
@@ -23,20 +23,20 @@
                 {{answer.textAnswer}}
                 <mat-icon [ngStyle]="{'cursor':'pointer'}"
                           (click)="deleteAnswer(answer).then(survey.answers.splice(i, 1))"
-                          matTooltip="Delete this answer"
+                          matTooltip="{{'editSurveyComponent.deleteThisAnswer' | transloco}}"
                           matTooltipPosition="below">
                     delete
                 </mat-icon>
                 <mat-icon [ngStyle]="{'cursor':'pointer'}"
                           (click)="showEditAnswerWindow(answer)"
-                          matTooltip="Edit this answer"
+                          matTooltip="{{'editSurveyComponent.editThisAnswer' | transloco}}"
                           matTooltipPosition="below">
                     edit
                 </mat-icon>
             </div>
         </div>
         <mat-form-field appearance="outline">
-            <mat-label>New answer</mat-label>
+            <mat-label>{{'editSurveyComponent.newAnswer' | transloco}}</mat-label>
             <input matInput
                    [(ngModel)]="newAnswer"
                    (keyup.enter)="addAnswer()">
@@ -47,7 +47,6 @@
             </button>
         </mat-form-field>
         <button mat-stroked-button
-                color="primory"
-                (click)="saveSurvey()">Save survey</button>
+                (click)="saveSurvey()">{{'editSurveyComponent.save' | transloco}}</button>
     </ng-template>
 </mat-card>

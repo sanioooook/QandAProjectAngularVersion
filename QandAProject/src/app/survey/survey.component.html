@@ -9,8 +9,8 @@
         <mat-card-content class="survey-answers"
                           *ngIf="survey.answers">
             <section class="answer mat-primary"
-                     *ngFor="let answer of survey.answers"
-                      ><!--style.background="linear-gradient(to right,
+                     *ngFor="let answer of survey.answers">
+                <!--style.background="linear-gradient(to right,
              #7b1fa2 {{answer.votes.length/voteCountInSurvey*100}}%,
         transparent {{answer.votes.length/voteCountInSurvey*100-100}}%)" -->
                 <mat-checkbox [(checked)]="answer.isUserVote"
@@ -26,7 +26,7 @@
                           survey.user &&
                           survey.user.login === user.login">
             <mat-form-field appearance="outline">
-                <mat-label>New answer</mat-label>
+                <mat-label>{{'surveyComponent.newAnswer' | transloco}}</mat-label>
                 <input type="text"
                        matInput
                        [(ngModel)]="newAnswer"
@@ -40,25 +40,37 @@
         </mat-card-actions>
         <div class="survey-creator"
              *ngIf="survey.user">
-            careator: {{survey.user.login}}
+            {{'surveyComponent.creatorSurvey' | transloco: {creator: survey.user.login} }}
         </div>
         <div class="time-permission">
-            <ng-container *ngIf="!getAbilityDateTimeVote(); else elseTemplate;">
-                You will be able to vote via <br> {{getDeadtimeFrom(survey.abilityVoteFrom)}} (start from {{survey.abilityVoteFrom |date:'dd.MM.yyyy HH:mm'}})
+            <ng-container *ngIf="isUserVote">
+                {{'surveyComponent.isUserVote' | transloco}}
+                <br>
+            </ng-container>
+            
+            <ng-container *ngIf="survey.abilityVoteFrom > getTimeNow(); else elseTemplate;">
+                {{'surveyComponent.youWillBeAbleToVoteVia' | transloco}}
+                {{getDeadtimeFrom(survey.abilityVoteFrom)}}<br>
+                {{'surveyComponent.startFrom' | transloco: { date: survey.abilityVoteFrom | date:'dd.MM.yyyy HH:mm'} }}
             </ng-container>
             <ng-template #elseTemplate>
-                <ng-container *ngIf="survey.abilityVoteTo; else timeIsUnlimited">
-                    Voting will end {{getDeadtimeFrom(survey.abilityVoteTo)}} <br> (end {{survey.abilityVoteTo |date:'dd.MM.yyyy HH:mm'}})
+                <ng-container *ngIf="survey.abilityVoteTo && survey.abilityVoteTo > getTimeNow()">
+                    {{'surveyComponent.votingWillEnd' | transloco: {date: getDeadtimeFrom(survey.abilityVoteTo)} }}
+                    <br> {{'surveyComponent.endVote'| transloco: {date: survey.abilityVoteTo | date:'dd.MM.yyyy HH:mm'} }}
                 </ng-container>
-                <ng-template #timeIsUnlimited>
-                    Voting time is unlimited
-                </ng-template>
+                <ng-container *ngIf="survey.abilityVoteTo && survey.abilityVoteTo < getTimeNow()">
+                    {{ 'surveyComponent.voteEnd' | transloco: {date: getDeadtimeFrom(survey.abilityVoteTo)} }}
+                    <br> {{ survey.abilityVoteTo | date:'dd.MM.yyyy HH:mm' }}
+                </ng-container>
+                <ng-container *ngIf="!survey.abilityVoteTo">
+                    {{'surveyComponent.votingTimeIsUnlimited' | transloco}}
+                </ng-container>
             </ng-template>
         </div>
     </ng-template>
     <button mat-raised-button
             (click)="sendVotes()"
             [disabled]="isUserVote">
-        Vote
+        {{'surveyComponent.vote' | transloco}}
     </button>
 </mat-card>

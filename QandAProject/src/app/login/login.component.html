@@ -1,7 +1,7 @@
 <form class="login-form">
-    <h1>Login</h1>
+    <h1>{{'loginComponent.login' | transloco}}</h1>
     <mat-form-field appearance="fill">
-        <mat-label>Enter your email</mat-label>
+        <mat-label>{{'loginComponent.enterYourEmail' | transloco}}</mat-label>
         <input matInput
                type="text"
                name="login"
@@ -10,11 +10,11 @@
                email
                [formControl]="loginFormControl"
                autofocus>
-        <mat-error *ngIf="loginFormControl.invalid">{{getEmailErrorMessage()}}</mat-error>
+        <mat-error *ngIf="loginFormControl.invalid">{{getEmailErrorMessage() | async}}</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
-        <mat-label>Enter your password</mat-label>
+        <mat-label>{{'loginComponent.enterYourPassword' | transloco}}</mat-label>
         <input matInput
                [type]="hidePassword ? 'text' : 'password'"
                name="password"
@@ -28,8 +28,8 @@
                 [attr.aria-pressed]="hidePassword">
             <mat-icon>{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
         </button>
-        <mat-error *ngIf="passwordFormControl.invalid">{{getPasswordErrorMessage()}}</mat-error>
+        <mat-error *ngIf="passwordFormControl.invalid">{{getPasswordErrorMessage() | async}}</mat-error>
     </mat-form-field>
     <button (click)="login()"
-            mat-raised-button>login</button>
+            mat-raised-button>{{'loginComponent.login' | transloco}}</button>
 </form>

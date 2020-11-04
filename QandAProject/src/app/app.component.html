@@ -6,28 +6,44 @@
         </a>
         <span>{{title}}</span>
         <span class="spacer"></span>
+
         <button mat-icon-button
-                [matMenuTriggerFor]="menu"
-                aria-label="Example icon-button with a menu"
-                matTooltip="Change theme">
+                [matMenuTriggerFor]="menuLang"
+                matTooltip="{{'changeLang'|transloco}}">
+            <mat-icon>translate</mat-icon>
+        </button>
+        <mat-menu #menuLang="matMenu">
+            <button mat-menu-item
+                    *ngFor="let lang of getLangs()"
+                    (click)="onSetLang(lang)">
+                {{lang | transloco}}
+            </button>
+        </mat-menu>
+
+        <button mat-icon-button
+                [matMenuTriggerFor]="menuTheme"
+                matTooltip="{{'changeTheme' | transloco}}">
             <mat-icon>format_paint</mat-icon>
         </button>
-        <mat-menu #menu="matMenu" class="menu">
+        <mat-menu #menuTheme="matMenu">
             <button mat-menu-item
                     (click)="onSetTheme('dark-theme')">
-                <span>Dark</span>
+                <span>{{'darkTheme'| transloco}}</span>
             </button>
             <button mat-menu-item
                     (click)="onSetTheme('light-theme')">
-                <span>Light</span></button>
+                <span>{{'lightTheme' | transloco}}</span></button>
         </mat-menu>
+        
         <button mat-icon-button
                 (click)="logOut()"
+                matTooltip="{{'logOut' | transloco}}"
                 *ngIf="userService.IsUserLogged(); else notLoggedUserTemplate">
             <mat-icon>exit_to_app</mat-icon>
         </button>
         <ng-template #notLoggedUserTemplate>
             <a routerLink="/login-or-registration"
+               matTooltip="{{'loginOrRegistration'|transloco}}"
                mat-icon-button>
                 <mat-icon>login</mat-icon>
             </a></ng-template>
