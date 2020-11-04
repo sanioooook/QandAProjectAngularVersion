@@ -28,6 +28,7 @@
     "@covalent/highlight": "^3.1.0",
     "@covalent/http": "^3.1.0",
     "@covalent/markdown": "^3.1.0",
+    "@ngneat/transloco": "^2.19.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
     "tslib": "^2.0.3",

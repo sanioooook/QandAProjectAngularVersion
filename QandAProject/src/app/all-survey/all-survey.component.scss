@@ -1,8 +1,20 @@
-table {
-  width: 100%;
+.all-survey-table {
+    overflow: auto;
+
+    table {
+        width: 100%;
+
+        // .mat-cell {
+        //     text-align: center;
+        // }
+
+        .mat-header-cell {
+            font-size: 14px;
+            font-weight: 600;
+        }
+    }
 }
 
-.mat-header-cell {
-  font-size: 14px;
-  font-weight: 600;
+mat-spinner {
+    margin: auto;
 }

@@ -1,11 +1,11 @@
-<ng-template tdLoading
-             [tdLoadingUntil]="surveyPagination">
+<div class="all-survey-table"
+     *ngIf="!!surveyPagination else downloadSurveys">
     <mat-form-field>
-        <mat-label>Search</mat-label>
+        <mat-label>{{'allSurveyComponent.search' | transloco}}</mat-label>
         <input matInput
                (input)="getSurveys()"
                [(ngModel)]="filter.searchQuery"
-               placeholder="Ex. Where are we going"
+               placeholder="{{'allSurveyComponent.example' | transloco}}"
                #input>
     </mat-form-field>
     <table mat-table
@@ -17,7 +17,7 @@
         <ng-container matColumnDef="question">
             <th mat-header-cell
                 *matHeaderCellDef
-                mat-sort-header="Question">Question survey</th>
+                mat-sort-header="Question">{{'allSurveyComponent.question' | transloco}}</th>
             <td mat-cell
                 *matCellDef="let row"><a mat-button
                    [routerLink]="['/survey', row.id]">{{row.question}}</a> </td>
@@ -26,7 +26,7 @@
         <ng-container matColumnDef="numAnswers">
             <th mat-header-cell
                 *matHeaderCellDef
-                mat-sort-header="NumberAnswers">Number answers</th>
+                mat-sort-header="NumberAnswers">{{'allSurveyComponent.numberAnswers' | transloco}}</th>
             <td mat-cell
                 *matCellDef="let row"> {{row.answers.length}} </td>
         </ng-container>
@@ -34,7 +34,7 @@
         <ng-container matColumnDef="timeCreateSurvey">
             <th mat-header-cell
                 *matHeaderCellDef
-                mat-sort-header="TimeCreate">Time create survey</th>
+                mat-sort-header="TimeCreate">{{'allSurveyComponent.timeCreate' | transloco}}</th>
             <td mat-cell
                 *matCellDef="let row"> {{row.timeCreate|date:'dd.MM.yyyy HH:mm'}} </td>
         </ng-container>
@@ -42,14 +42,14 @@
         <ng-container matColumnDef="numberVotes">
             <th mat-header-cell
                 *matHeaderCellDef
-                mat-sort-header="NumberVotes">Number votes</th>
+                mat-sort-header="NumberVotes">{{'allSurveyComponent.numberVotes' | transloco}}</th>
             <td mat-cell
                 *matCellDef="let row"> {{getNumberVotes(row)}} </td>
         </ng-container>
         <ng-container matColumnDef="canEditSurvey">
             <th mat-header-cell
                 *matHeaderCellDef
-                mat-sort-header="PermissionEdit">Permission on edit</th>
+                mat-sort-header="PermissionEdit">{{'allSurveyComponent.permissionEdit' | transloco}}</th>
             <td mat-cell
                 *matCellDef="let row">
                 <a mat-icon-button
@@ -67,12 +67,16 @@
         <tr class="mat-row"
             *matNoDataRow>
             <td class="mat-cell"
-                colspan="4">No data matching the filter "{{filter.searchQuery}}"</td>
+                colspan="4">{{'allSurveyComponent.noDataMatching' | transloco: {searchQuery: filter.searchQuery} }}</td>
         </tr>
     </table>
     <mat-paginator (page)="requestNewPage($event)"
                    *ngIf="surveyPagination"
                    [pageSizeOptions]="[5, 10, 25, 100]"
                    [pageSize]="surveyPagination.pageSize"
-                   [length]="surveyPagination.totalCount"></mat-paginator>
+                   [length]="surveyPagination.totalCount">
+    </mat-paginator>
+</div>
+<ng-template #downloadSurveys>
+    <mat-spinner></mat-spinner>
 </ng-template>

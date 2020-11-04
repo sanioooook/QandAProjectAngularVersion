@@ -1,0 +1,113 @@
+{
+  "en": "Английский",
+  "ru": "Русский",
+  "darkTheme": "Темная тема",
+  "lightTheme": "Светлая тема",
+  "changeLang": "Изменить язык",
+  "changeTheme": "Изменить тему",
+  "logOut": "Выйти из аккаунта",
+  "loginOrRegistration": "Войти или зарегестрироваться",
+  "homeComponent": {
+    "login": "Вход",
+    "registration": "Регистрация",
+    "createSurvey": "Создать опрос",
+    "allSurveys": "Все опросы"
+  },
+  "surveyComponent": {
+    "newAnswer": "Новый ответ",
+    "creatorSurvey": "Создатель: {{creator}}",
+    "youWillBeAbleToVoteVia": "Вы сможете проголосовать через",
+    "startFrom": "Начало {{date}}",
+    "votingWillEnd": "Голосование заканчивается {{date}}",
+    "endVote": "Окончание голосования {{date}}",
+    "voteEnd": "Голосование закончилось {{date}}",
+    "votingTimeIsUnlimited": "Голосование не ограничено по времени",
+    "vote": "Проголосовать",
+    "isUserVote": "Вы уже проголосовали"
+  },
+  "registrationComponent": {
+    "registration": "Регистрация",
+    "enterYourEmail": "Введите email",
+    "enterYourPassword": "Введите пароль",
+    "repeatYourPassword": "Повторите пароль",
+    "enterValue": "Поле не может быть пустым",
+    "notValidEmail": "Не действительный email",
+    "minimalLengthPassword": "Минимальная длина пароля равна {{minlength}}",
+    "passwordsMustEqual": "Пароли должны совпадать"
+  },
+  "loginComponent": {
+    "login": "Вход",
+    "enterYourEmail": "Введите email",
+    "enterYourPassword": "Введите пароль",
+    "enterValue": "Поле не может быть пустым",
+    "notValidEmail": "Не действительный email"
+  },
+  "loginAndRegistration": {
+    "login": "Вход",
+    "registration": "Регистрация"
+  },
+  "allSurveyComponent": {
+    "search": "Поиск",
+    "example": "Например: Куда мы идем",
+    "question": "Заголовок опроса",
+    "numberAnswers": "Количество ответов",
+    "timeCreate": "Время создания опроса",
+    "numberVotes": "количество голосов",
+    "permissionEdit": "Возможность редактирования",
+    "noDataMatching": "Ничего не найдено по запросу \"{{searchQuery}}\""
+  },
+  "matPaginator": {
+    "itemsPerPageLabel": "Елементов на странице:",
+    "nextPageLabel": "Следующая страница",
+    "previousPageLabel": "Предыдущая страница",
+    "firstPageLabel": "Первая страница",
+    "lastPageLabel": "Последняя страница",
+    "nullOf": "0 из {{length}}",
+    "indexOf": "{{startIndex}} - {{endIndex}} из {{length}}"
+  },
+  "editSurveyComponent": {
+    "question": "Вопрос к опросу",
+    "newAnswer": "Новый вариант ответа",
+    "save": "Сохранить изменения",
+    "enterValue": "Поле не может быть пустым",
+    "answerSuccessfullyAdded": "Вариант ответа успешно добавлен",
+    "answerSuccessfullyEdited": "Вариант ответа успешно изменен",
+    "answerSuccessfullyDeleted": "Вариант ответа успешно удален",
+    "surveySuccessfullySaved": "Опрос успешно сохранен",
+    "surveySuccessfullyDeleted": "Опрос успешно удален",
+    "editAnswer": "Отредактировать вариант ответа",
+    "editTextAnswer": "Отредактировать текст варианта ответа",
+    "cancel": "Отмена",
+    "example": "Например куда сходить на выходные?",
+    "deleteThisAnswer": "Удалить этот вариант ответа",
+    "editThisAnswer": "Отредактировать этот вариант ответа"
+  },
+  "newSurveyComponent": {
+    "question": "Вопрос к опросу",
+    "example": "Например куда сходить на выходные",
+    "deleteThisAnswer": "Удалить этот вариант ответа",
+    "enterValue": "Поле не может быть пустым",
+    "editThisAnswer": "Отредактировать этот вариант ответа",
+    "newAnswer": "Новый вариант ответа",
+    "createSurvey": "Создать опрос",
+    "editAnswer": "Отредактировать вариант ответа",
+    "editTextAnswer": "Отредактировать текст варианта ответа",
+    "cancel": "Отмена"
+  },
+  "settingDialog": {
+    "minimumNumberVotesCantBeEmpty": "Минимальное количество голосов не может быть пустым",
+    "minimumNumberVotesCantBeLessOne": "Минимальное количество голосов не может быть меньше 1",
+    "minimumNumberVotesCantBeMore": "Минимальное количество голосов не может быть больше количества ответов ({{length}})",
+    "maximumNumberVotesCantExceed": "Максимальное количество голосов не может превышать минимальное количество голосов ({{value}})",
+    "maximumNumberVotesCantBeMore": "Максимальное количество голосов не может быть больше количества ответов ({{length}})",
+    "settingSurvey": "Настройки опроса",
+    "minimumVote": "Минимальное количество голосов",
+    "addResponse": "Возможность голосовать несколько раз",
+    "maximumVote": "Максимальное количество голосов",
+    "chooseDateFrom": "Выберите дату от",
+    "chooseDateAndTimeFrom": "Выберите дату и время, с которых пользователи могут голосовать",
+    "chooseDateTo": "Выберите дату до",
+    "chooseDateAndTimeTo": "Выберите дату и время, до которого пользователи могут голосовать",
+    "close": "Закрыть"
+  }
+}

@@ -11,12 +11,12 @@ export class HomeComponent implements OnInit {
   constructor(public userService: UserService) { }
 
   private linksNotAuthorizedUser = [
-    { title: 'Login', link: '/login' },
-    { title: 'Registration', link: '/registration' }
+    { title: 'homeComponent.login', link: '/login' },
+    { title: 'homeComponent.registration', link: '/registration' }
   ];
   private linksAuthorizedUser = [
-    { title: 'Create survey', link: '/create-survey' },
-    { title: 'All surveys', link: '/all-surveys' }
+    { title: 'homeComponent.createSurvey', link: '/create-survey' },
+    { title: 'homeComponent.allSurveys', link: '/all-surveys' }
   ];
 
   ngOnInit(): void {
@@ -26,9 +26,7 @@ export class HomeComponent implements OnInit {
     if (this.userService.IsUserLogged()) {
       return this.linksAuthorizedUser;
     }
-    else {
-      return this.linksNotAuthorizedUser;
-    }
+    return this.linksNotAuthorizedUser;
   }
 
 }

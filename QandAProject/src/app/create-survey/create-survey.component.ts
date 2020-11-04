@@ -7,6 +7,8 @@ import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SurveysService } from '../services/surveys.service';
 import { Survey } from '../classes/survey';
 import { Answer } from '../classes/answer';
+import { Observable } from 'rxjs';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-create-survey',
@@ -18,6 +20,7 @@ export class CreateSurveyComponent implements OnInit {
   constructor(private router: Router,
               private surveyService: SurveysService,
               private dialogService: TdDialogService,
+              private translocoService: TranslocoService,
               public dialog: MatDialog) {
     this.survey = new Survey('', new Array<Answer>(), false, null, 1, 1, null);
     this.newAnswer = 'Yes';
@@ -33,9 +36,9 @@ export class CreateSurveyComponent implements OnInit {
 
   }
 
-  getErrorMessage(): string {
+  getErrorMessage(): Observable<string> {
     if (this.question.hasError('required')) {
-      return 'You must enter a value';
+      return this.translocoService.selectTranslate('newSurveyComponent.enterValue');
     }
   }
 
@@ -57,10 +60,10 @@ export class CreateSurveyComponent implements OnInit {
 
   showEditAnswerWindow(answer: Answer): void {
     this.dialogService.openPrompt({
-      title: 'Edit answer',
-      message: 'Edit text answer',
+      title: this.translocoService.translate('newSurveyComponent.editAnswer'),
+      message: this.translocoService.translate('newSurveyComponent.editTextAnswer'),
       value: answer.textAnswer,
-      cancelButton: 'Cancel',
+      cancelButton: this.translocoService.translate('newSurveyComponent.cancel'),
       acceptButton: 'Ok',
     })
       .afterClosed()
@@ -83,7 +86,8 @@ export class CreateSurveyComponent implements OnInit {
 })
 // tslint:disable-next-line: component-class-suffix
 export class SettingDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: Survey) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: Survey,
+              private translocoService: TranslocoService) {
     this.minNumberVoteFormControl.registerOnChange(() => this.updateMinNumberVoteFormControl());
     this.maxNumberVoteFormControl.registerOnChange(() => this.updateMaxNumberVoteFormControl());
   }
@@ -134,24 +138,27 @@ export class SettingDialog {
     }
   }
 
-  getErrorMinNumberVote(): string{
+  getErrorMinNumberVote(): Observable<string>{
     if (this.minNumberVoteFormControl.hasError('required')){
-      return 'The minimum number of votes can\'t be empty';
+      return this.translocoService.selectTranslate('settingDialog.minimumNumberVotesCantBeEmpty');
     }
     if (this.minNumberVoteFormControl.hasError('min')){
-      return 'The minimum number of votes can\'t be less than 1';
+      return this.translocoService.selectTranslate('settingDialog.minimumNumberVotesCantBeLessOne');
     }
     if (this.minNumberVoteFormControl.hasError('max')){
-      return `The minimum number of votes can't be more than the number of answers (${this.data.answers.length})`;
+      return this.translocoService.selectTranslate('settingDialog.minimumNumberVotesCantBeMore',
+        { length: this.data.answers.length });
     }
   }
 
-  getErrorMaxNumberVote(): string{
+  getErrorMaxNumberVote(): Observable<string>{
     if (this.maxNumberVoteFormControl.hasError('min')){
-      return `The maximum number of votes cannot exceed the minimum number of votes(${this.minNumberVoteFormControl.value})`;
+      return this.translocoService.selectTranslate('settingDialog.maximumNumberVotesCantExceed',
+        { value: this.minNumberVoteFormControl.value });
     }
     if (this.maxNumberVoteFormControl.hasError('max')){
-      return `The maximum number of votes can't be more than the number of answers (${this.data.answers.length})`;
+      return this.translocoService.selectTranslate('settingDialog.maximumNumberVotesCantBeMore',
+        { length: this.data.answers.length });
     }
   }
 }

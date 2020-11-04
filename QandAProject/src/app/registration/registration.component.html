@@ -1,7 +1,7 @@
 <form class="registration-form">
-    <h1>Registration</h1>
+    <h1>{{'registrationComponent.registration' | transloco}}</h1>
     <mat-form-field appearance="fill">
-        <mat-label>Enter Your email</mat-label>
+        <mat-label>{{'registrationComponent.enterYourEmail' | transloco}}</mat-label>
         <input matInput
                type="text"
                name="login"
@@ -9,10 +9,10 @@
                [formControl]="loginFormControl"
                autofocus
                required>
-        <mat-error *ngIf="loginFormControl.invalid">{{getEmailErrorMessage()}}</mat-error>
+        <mat-error *ngIf="loginFormControl.invalid">{{getEmailErrorMessage() | async}}</mat-error>
     </mat-form-field>
     <mat-form-field appearance="fill">
-        <mat-label>Enter Your password</mat-label>
+        <mat-label>{{'registrationComponent.enterYourPassword' | transloco}}</mat-label>
         <input matInput
                [type]="hidePassword ? 'text' : 'password'"
                name="password"
@@ -27,10 +27,10 @@
                 [attr.aria-pressed]="hidePassword">
             <mat-icon>{{hidePassword ? 'visibility' : 'visibility_off'}}</mat-icon>
         </button>
-        <mat-error *ngIf="passwordFormControl.invalid">{{getPasswordErrorMessage()}}</mat-error>
+        <mat-error *ngIf="passwordFormControl.invalid">{{getPasswordErrorMessage() | async}}</mat-error>
     </mat-form-field>
     <mat-form-field appearance="fill">
-        <mat-label>Repeat Your password</mat-label>
+        <mat-label>{{'registrationComponent.repeatYourPassword' | transloco}}</mat-label>
         <input matInput
                [formControl]="secondPasswordFormControl"
                [type]="hideSecondPassword ? 'text' : 'password'"
@@ -44,8 +44,8 @@
                 [attr.aria-pressed]="hideSecondPassword">
             <mat-icon>{{hideSecondPassword ? 'visibility' : 'visibility_off'}}</mat-icon>
         </button>
-        <mat-error *ngIf="secondPasswordFormControl.invalid">{{getSecondPasswordErrorMessage()}}</mat-error>
+        <mat-error *ngIf="secondPasswordFormControl.invalid">{{getSecondPasswordErrorMessage() | async}}</mat-error>
     </mat-form-field>
     <button (click)="registration()"
-            mat-raised-button>Registration</button>
+            mat-raised-button>{{'registrationComponent.registration' | transloco}}</button>
 </form>

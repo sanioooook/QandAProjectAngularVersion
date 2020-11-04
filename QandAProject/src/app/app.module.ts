@@ -26,12 +26,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { MatMenuModule } from '@angular/material/menu';
+import { TranslocoRootModule } from './transloco/transloco-root.module';
+import { MatPaginatorIntlCro } from './services/mat-paginator-intl-cro.service';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -87,10 +89,12 @@ import { LoginOrRegistrationComponent } from './login-or-registration/login-or-r
     MatSnackBarModule,
     MatTabsModule,
     OverlayModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslocoRootModule
   ],
   providers: [
-    {provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher}
+    { provide: MatPaginatorIntl, useClass: MatPaginatorIntlCro },
+    { provide: ErrorStateMatcher, useClass: ShowOnDirtyErrorStateMatcher }
   ],
   bootstrap: [AppComponent]
 })
