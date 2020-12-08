@@ -80,7 +80,8 @@
     "cancel": "Cancel",
     "example": "Ex. Where do we go this weekend?",
     "deleteThisAnswer": "Delete this answer",
-    "editThisAnswer": "Edit this answer"
+    "editThisAnswer": "Edit this answer",
+    "deleteThisSurvey": "Delete this survey"
   },
   "newSurveyComponent": {
     "question": "Question for survey",

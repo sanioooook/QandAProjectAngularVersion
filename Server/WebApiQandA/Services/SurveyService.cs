@@ -27,16 +27,16 @@ namespace WebApiQandA.Services
         private readonly IMapper _mapper;
 
         public void Create(SurveyDto surveyDto)
-        {
-            surveyDto.AbilityVoteFrom = surveyDto.AbilityVoteFrom.AddSeconds(surveyDto.AbilityVoteFrom.Second - 60);
-            surveyDto.AbilityVoteFrom = surveyDto.AbilityVoteFrom == DateTime.MinValue
+        { 
+          surveyDto.AbilityVoteFrom = surveyDto.AbilityVoteFrom == DateTime.MinValue
                 ? DateTime.Now.ToUniversalTime()
                 : surveyDto.AbilityVoteFrom.ToUniversalTime();
+            surveyDto.AbilityVoteFrom = surveyDto.AbilityVoteFrom.AddSeconds(surveyDto.AbilityVoteFrom.Second - 60);
             if(surveyDto.MaxCountVotes != null && surveyDto.MaxCountVotes > surveyDto.Answers.Count)
             {
                 throw new ArgumentException("MaxCountVotes can't be more Answers");
             }
-            if(surveyDto.AbilityVoteTo == DateTime.MinValue)
+            if(surveyDto.AbilityVoteTo == DateTime.MinValue || surveyDto.AbilityVoteTo == null)
             {
                 surveyDto.AbilityVoteTo = null;
             }
