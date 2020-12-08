@@ -80,7 +80,8 @@
     "cancel": "Отмена",
     "example": "Например куда сходить на выходные?",
     "deleteThisAnswer": "Удалить этот вариант ответа",
-    "editThisAnswer": "Отредактировать этот вариант ответа"
+    "editThisAnswer": "Отредактировать этот вариант ответа",
+    "deleteThisSurvey": "Удалить этот опрос"
   },
   "newSurveyComponent": {
     "question": "Вопрос к опросу",

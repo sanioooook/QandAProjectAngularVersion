@@ -8,6 +8,14 @@
                     (click)="openSettings()">
                 <mat-icon>settings</mat-icon>
             </button>
+            <button mat-icon-button
+                    (click)="deleteSurvey()"
+                    matTooltip="{{'editSurveyComponent.deleteThisSurvey' | transloco}}"
+                    matTooltipPosition="below">
+                <mat-icon [ngStyle]="{'cursor':'pointer'}">
+                    delete
+                </mat-icon>
+            </button>
         </mat-card-actions>
         <mat-form-field appearance="outline">
             <mat-label>{{'editSurveyComponent.question' | transloco}}</mat-label>
