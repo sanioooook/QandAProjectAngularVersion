@@ -1,0 +1,64 @@
+# Runs a released version from the prebuilt images; nothing is built locally.
+# Each GitHub release attaches this file (as docker-compose.yml) with the version filled in.
+#   docker compose up -d        -> http://localhost:8090
+name: qanda-ng
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-qanda}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qanda}
+      POSTGRES_DB: ${POSTGRES_DB:-qanda}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  api:
+    image: ghcr.io/${QANDA_OWNER:-sanioooook}/qanda-ng-api:${QANDA_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__Default: Host=db;Database=${POSTGRES_DB:-qanda};Username=${POSTGRES_USER:-qanda};Password=${POSTGRES_PASSWORD:-qanda}
+      App__PublicUrl: ${PUBLIC_URL:-http://localhost:8090}
+      Email__Smtp__Host: ${EMAIL_SMTP_HOST:-}
+      Email__Smtp__Port: ${EMAIL_SMTP_PORT:-587}
+      Email__Smtp__Username: ${EMAIL_SMTP_USERNAME:-}
+      Email__Smtp__Password: ${EMAIL_SMTP_PASSWORD:-}
+      Email__Smtp__Security: ${EMAIL_SMTP_SECURITY:-Auto}
+      Email__From: ${EMAIL_FROM:-QandA <noreply@qanda.local>}
+      Email__RequireConfirmation: ${EMAIL_REQUIRE_CONFIRMATION:-true}
+    volumes:
+      - api-keys:/keys
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /health HTTP/1.0\\r\\n\\r\\n\" >&3 && grep -q Healthy <&3'"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  web:
+    image: ghcr.io/${QANDA_OWNER:-sanioooook}/qanda-ng-web:${QANDA_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8090}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  mailpit:
+    profiles: [mail]
+    image: axllent/mailpit:v1.27
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_PORT:-8026}:8025"
+
+volumes:
+  db-data:
+  api-keys:
