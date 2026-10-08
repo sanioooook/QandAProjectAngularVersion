@@ -1,0 +1,104 @@
+name: qanda-ng
+
+x-db-credentials: &db-credentials
+  POSTGRES_USER: ${POSTGRES_USER:-qanda}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qanda}
+  POSTGRES_DB: ${POSTGRES_DB:-qanda}
+
+services:
+  db:
+    image: postgres:16
+    environment: *db-credentials
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: ./Backend
+      target: final
+    environment:
+      ConnectionStrings__Default: Host=db;Database=${POSTGRES_DB:-qanda};Username=${POSTGRES_USER:-qanda};Password=${POSTGRES_PASSWORD:-qanda}
+      App__PublicUrl: ${PUBLIC_URL:-http://localhost:8090}
+      # Email is optional: with an empty host nothing is sent and no confirmation is required.
+      Email__Smtp__Host: ${EMAIL_SMTP_HOST:-}
+      Email__Smtp__Port: ${EMAIL_SMTP_PORT:-587}
+      Email__Smtp__Username: ${EMAIL_SMTP_USERNAME:-}
+      Email__Smtp__Password: ${EMAIL_SMTP_PASSWORD:-}
+      Email__Smtp__Security: ${EMAIL_SMTP_SECURITY:-Auto}
+      Email__From: ${EMAIL_FROM:-QandA <noreply@qanda.local>}
+      Email__RequireConfirmation: ${EMAIL_REQUIRE_CONFIRMATION:-true}
+    volumes:
+      - api-keys:/keys
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /health HTTP/1.0\r\n\r\n\" >&3 && grep -q Healthy <&3'"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  # Production build of the SPA served by nginx, which also proxies /api to the API.
+  web:
+    build:
+      context: ./Frontend
+      target: final
+    ports:
+      - "${WEB_PORT:-8090}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Angular dev server with hot reload: `docker compose --profile dev up web-dev`.
+  # node_modules lives in a named volume, not on the host disk.
+  web-dev:
+    profiles: [dev]
+    image: node:22-alpine
+    working_dir: /app
+    # --poll: file change events do not cross the Windows/macOS bind mount.
+    command: sh -c "npm ci --no-audit --no-fund && npx ng serve --host 0.0.0.0 --port 4200 --poll 1000"
+    environment:
+      API_URL: http://api:8080
+    volumes:
+      - ./Frontend:/app
+      - web-node-modules:/app/node_modules
+    ports:
+      - "${WEB_DEV_PORT:-4200}:4200"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Local mail catcher: every email the API sends shows up at http://localhost:8026.
+  # Enable with the settings from .env.example.
+  mailpit:
+    profiles: [mail]
+    image: axllent/mailpit:v1.27
+    ports:
+      - "${MAILPIT_PORT:-8026}:8025"
+
+  api-tests:
+    profiles: [test]
+    build:
+      context: ./Backend
+      target: test
+    environment:
+      TEST_DB_CONNECTION: Host=db;Username=${POSTGRES_USER:-qanda};Password=${POSTGRES_PASSWORD:-qanda}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web-tests:
+    profiles: [test]
+    build:
+      context: ./Frontend
+      target: test
+
+volumes:
+  db-data:
+  api-keys:
+  web-node-modules:
