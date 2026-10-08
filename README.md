@@ -1,54 +1,132 @@
-# QandAProjectAngularVersion
-Questions and Answers - this is a survey creation application written in angularjs and the .net core web api
-Цель: все, что вы учили по кусочкам - собрать в одно целое. Понять как строить весь стек приложения и как его разные слои взаимодействуют. Немного пощупать VueJS. Ваше приложение не будет соответсвовать всем современным стандартам и это не страшно. Позже вы можете вернуться к нему и имея больший опыт, отрефакторить.
+# QandA (Angular)
 
-Технические требования Используем:
-- MS SQL Server 2019 -Dapper 
-- .Net Core 3 
-- Angular 
-- html & css
+Quick polls for friends and teams. Ask a question, give a few answer options, share the link, watch the votes come in.
 
-Не используем: 
-- CSS Frameworks (Bootstrap etc) 
-- UI Components Libraries (element-ui, vuetify, vue-bootstrap etc) 
-- NgRx 
-- ORM (Entity Framework etc) 
-- less, saas etc
-- линтеры 
-- тесты
+This is the Angular version of the app. The same product with a Vue frontend lives in [QandA-Project](https://github.com/sanioooook/QandA-Project); both share the .NET API.
 
-В материалах есть про WebAPI и REST. Естественно, что раз есть материалы по каким-то темам, то это значит, что они пригодятся вам в работе. Они могут по ходу дела обновляться и пополняться.
+The interface is available in Ukrainian, English and Russian, with light, dark and system themes.
 
-Немного о том, как будет проходить процесс работы над личным проектом. В рамках работы над проектом будет 2 созвона. Каждый продолжительностью 20-30 минут. Первый созвон - через неделю после получения задания. На нем вы должны показать прототип вашего приложения. Что это значит. Значит, что у вас уже есть база, бекенд, связь с базой хотя бы по одному сценарию и минимальный фронтенд. Т.е. оно хромает, имеет кучу багов, работает только позитивный сценарий - но уже в целом видно какую-то структуру проекта и можно как-то поклацать. Вы показываете что у вас работает и как, показываете ваш код, рассказываете где, что и как работает у вас. Мы задаем какие-то вопросы, возможно вы успеваете задавать свои вопросы. Цель этого созвона - успеть исправить серьезные косяки и не дать вам пойти не туда. Второй созвон - еще через неделю, т.е. через две недели после получения задания. На нем вы показываете финальное демо своего продукта. мы задаем вам вопросы. Цель - финальный результат ваших стараний. Созвоны будут проходить в вс в дневное и вечернее время, точные слоты будут определяться по пт
+![Active surveys](docs/screenshots/surveys.png)
 
-приложение которое нужно реализовать - это продвинутая голосовалка. В которой можно
+## Screenshots
 
-зарегистрироваться и залогинится в последующем (проверка почты при регистрации не нужна)
-создать новый опрос. например "куда пойдем на выходных"
-задать сразу несколько вариантов ответа. например "в кино", "в парк", "в туалет"
-задать параметры опроса, например "могут ли участники добавлять свои варианты ответов", "сколько максимум можно добавить вариантов ответов", "за сколько вариантов может одновременно проголосовать отвечающий", "дедлайн после которого новые ответы не принимаются"
-сделать опрос доступным(опубликовать) или сохранить приватным для последующего редактирования.
-при "публикации" опроса он добавляется в список активных опросов и у него появляется отдельная ссылка которую можно кидат друзьям
-удалить опрос
-просмотреть список своих опросов , активные, неактивные, опубликованные, скрытые (можно без фильтров на сейчас)
-увидеть список текущих активных опросов с указанием названия, автора, времени создания(или времени публикации)
-зайти по чьей-то ссылке, и если не залогинен или не зарегистрирован - залогинится или зарегистрироваться и вернутся на опрос из ссылки
-проголосовать в чьем-то опросе за какие-то из вариантов
-добавить свой вариант в опросе и проголосовать (или нет) за него
-каждый голос сохраняется и автор опроса может посмотреть кто голосовал за какой вариант. Не автор опроса видит только общее количество голосов без указания голосовавших Можно голосовать за несколько вариантах в пределах, установленных создателем опроса (например вариантов 10, но макс голосов 2, тогда можно проголосовать за 2 варианта максимум)
+| | |
+|---|---|
+| ![The author's view of a survey: countdown, results and who voted](docs/screenshots/survey-author.png)<br>**The author's view:** countdown, results, who voted for what | ![What a guest sees after following a shared link](docs/screenshots/guest.png)<br>**Shared link, as a guest:** results are public, voting needs an account |
+| ![Creating a survey](docs/screenshots/new-survey.png)<br>**New survey:** options, vote limit, deadline, participant options | ![Voting in dark mode](docs/screenshots/survey-dark.png)<br>**Dark theme:** a participant who already voted |
+| ![My surveys with status filters](docs/screenshots/my-surveys.png)<br>**My surveys:** drafts, active and closed | ![Share dialog](docs/screenshots/share.png)<br>**Sharing:** the link with a copy button |
+| ![Account settings](docs/screenshots/account.png)<br>**Settings:** photo, name, password, language, time zone, theme | <p align="center"><img src="docs/screenshots/mobile.png" width="300" alt="Voting on a phone"><br><b>On a phone</b></p> |
 
-На счет авторизации, она не должна быть сильно заморочливой. Самая простая, без изысков, без токенов, на основе куков. никаких двухфакторных, никаких восстановлений, никаких пока что даже подтверждений. нормальная авторизация это отдельная задача на очень много часов. не тратьте на это слишком много времени в рамкахличного проекта.
+## Features
 
-шаги
+- **Surveys.** A question with an optional description and 2–30 answer options. Save it as a private draft and edit it, or publish it right away. Published surveys can no longer be edited, so nobody's vote changes meaning.
+- **Sharing.** Every published survey has a link. Anyone who opens it sees the question and the current results. Voting needs an account; after signing in or signing up, the visitor lands back on the same survey.
+- **Voting rules set by the author:**
+  - how many options a participant may pick (one by default);
+  - whether participants may add their own options, and how many each;
+  - an optional deadline: a date, or a date and time. A date alone means the end of that day. A live countdown shows the time left, and voting closes the moment it runs out. Deadlines are shown with their UTC offset ("Oct 22, 11:59 PM GMT+3") in each viewer's own time zone.
+- **Changing your mind.** Until the deadline, a participant can change or withdraw their vote. A new option can be added and voted for in one step.
+- **Results.** Everyone sees the counts and percentages. Only the author sees who voted for what, and when.
+- **Lists.** Active surveys, your own surveys (filter: drafts, active, closed) and the surveys you voted in.
+- **Accounts.** Sign up with an email, a display name and a password. The display name and an optional profile photo are what other people see; the email stays private. In the settings you can change the name, photo, password, language, time zone (the device's by default) and theme.
+- **Email (optional).** With an SMTP server configured, new accounts confirm their address before voting, forgotten passwords can be reset by email, and password changes are notified. Without one, everything else works the same: no confirmation is needed and password reset is hidden.
 
-простое бекенд приложение MVC с одним контроллером и одним (или несколькими) методами. можно шаблонными. которое при вызове из броузера отдает в броузер какой-то захардкоженный json
-приложение подключается к базе и запрашивает из нее данные
-приложение отдает данные из базы наружу через метод контроллера в ответ на запрос броузера 4а. VueJS. просто SPA приложение с одной страницей где вы напишите что-то свое и как-то стилизируете 4b. VueJS приложение. где есть одна кнопка и одно поле ввода. по нажатию на кнопку меняется содержимое поля ввода отображается в каком-нибудь div'е. (например квадрат числа можно отображать. или его само) 5а. VueJS приложение которое умеет запрашивать бекенд и получать ответ.
-метод fetch или библиотека axios
-промисы (callback'и или async-await'ы если промисы не зашли)
-отображение полученных от бекенда данных 5b передавать данные с фронтенда на сервер и сохранять в базу. например содержимое поля ввода отправляется на сервер POST запросом при помощи fetch и там обрабатывается соответствующим методом контроллера и сохраняется в базу
---- после этого у вас есть все что б сделать простую --- --- голосовалку и показать ее в конце недели ---
+## Run a released version
 
-6 компоненты. что это и как работает 7 роутинг - сделать еще две страницы, для логина и регистрации, на которые можно переходить с основной страницы с голосовалкой 8 простая авторизация. я б делал через глобальную переменную в которой хранить уникальную рандомно-сгенеренную строку с бекенда и передавать ее в каждом запросе. но можете усложнить жизнь сессиями и кукисами. или упростить храня и передавая не уникальную рандомную строку, а ID юзера
+Releases publish ready-made Docker images for `linux/amd64` and `linux/arm64` (Raspberry Pi 4/5 included). You only need Docker with Compose.
 
---- после этого у вас по идее уже готов проект ---
+1. Download `docker-compose.yml` from the assets of the [latest release](https://github.com/sanioooook/QandAProjectAngularVersion/releases/latest) into an empty folder. It is pinned to that release's images; the release notes link the images themselves.
+2. Optionally save [`.env.example`](.env.example) next to it as `.env` and set what you need: at least `POSTGRES_PASSWORD` if the machine is reachable by others, and `PUBLIC_URL` if users open the app at an address other than `http://localhost:8090`.
+3. Start it:
+
+   ```bash
+   docker compose up -d
+   ```
+
+4. Open http://localhost:8090 (or `WEB_PORT`). The database schema is created on the first start.
+
+Update to a newer release by replacing `docker-compose.yml` with the new one and running `docker compose up -d` again; data lives in Docker volumes and is kept. Stop with `docker compose down` (add `-v` only if you want to delete all data).
+
+## Configuration
+
+All settings are environment variables, read from `.env` next to the compose file. Everything is optional.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `WEB_PORT` | `8090` | Port the app is served on |
+| `PUBLIC_URL` | `http://localhost:8090` | Address users open; used for links in emails |
+| `POSTGRES_PASSWORD` | `qanda` | Database password (the database is not exposed outside Docker) |
+| `EMAIL_SMTP_HOST` | empty | SMTP server. Empty turns email off |
+| `EMAIL_SMTP_PORT` | `587` | SMTP port |
+| `EMAIL_SMTP_USERNAME`, `EMAIL_SMTP_PASSWORD` | empty | SMTP credentials, if the server needs them |
+| `EMAIL_SMTP_SECURITY` | `Auto` | `None`, `StartTls`, `SslOnConnect` or `Auto` |
+| `EMAIL_FROM` | `QandA <noreply@qanda.local>` | Sender of the emails |
+| `EMAIL_REQUIRE_CONFIRMATION` | `true` | With email on, require a confirmed address to vote and create surveys |
+
+The ports differ from the Vue version (8080), so both can run on one machine.
+
+To try email without a real mail server, start [Mailpit](https://mailpit.axllent.org), which catches every email and shows it at http://localhost:8026. Put this into `.env`:
+
+```
+COMPOSE_PROFILES=mail
+EMAIL_SMTP_HOST=mailpit
+EMAIL_SMTP_PORT=1025
+EMAIL_SMTP_SECURITY=None
+```
+
+## Development
+
+Everything runs in containers; neither Node nor the .NET SDK is needed on the host. `node_modules` lives in a Docker volume.
+
+Build and run the whole stack from the sources (same address, http://localhost:8090):
+
+```bash
+docker compose up -d --build
+```
+
+Frontend with live reload on http://localhost:4200 (`ng serve`), against the API from the stack above:
+
+```bash
+docker compose --profile dev up web-dev
+```
+
+### Tests
+
+Backend: unit tests of the pure rules plus integration tests that drive the real API over HTTP against a throw-away PostgreSQL database per test class.
+
+```bash
+docker compose --profile test run --rm --build api-tests
+```
+
+Frontend: type check, unit tests (stores, interceptor, guard, i18n, utilities), component tests, and app-level integration tests that render the whole app against an in-memory API and use it the way a person does, by roles and labels.
+
+```bash
+docker compose --profile test run --rm --build web-tests
+```
+
+CI runs both suites in parallel on every push.
+
+### Releasing
+
+Push a version tag. CI runs the tests, then the images are built for amd64 and arm64, pushed to `ghcr.io/sanioooook/qanda-ng-api` and `qanda-ng-web`, and a GitHub release is created with a `docker-compose.yml` pinned to that version and the images listed in its notes.
+
+```bash
+git tag v2.0.0
+```
+
+```bash
+git push origin v2.0.0
+```
+
+New container packages on GitHub may start out private; if the images cannot be pulled without logging in, make both packages public in the package settings on GitHub.
+
+## Tech stack
+
+- **API** (`Backend/`): .NET 10, ASP.NET Core, EF Core 10 with PostgreSQL 16, cookie authentication with PBKDF2 password hashes, MailKit for SMTP.
+- **Web** (`Frontend/`): Angular 22 (standalone components, signals, zoneless), Angular Material 3, NgRx Signals for state, Transloco with ICU plural rules.
+- **Tests**: xUnit v3; Vitest with Angular Testing Library.
+- **Delivery**: Docker Compose; nginx serves the app and proxies `/api`, so the auth cookie stays first-party.
+
+## History
+
+QandA started in 2020 as a learning project for Angular: Angular 10 with Angular Material, ASP.NET Core 3.1 with Dapper and SQL Server. In 2026 it was rebuilt on the current stack with proper authentication, the full feature set above, tests and container-based delivery.

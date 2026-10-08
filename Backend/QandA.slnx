@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QandA.Api/QandA.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QandA.Api.Tests/QandA.Api.Tests.csproj" />
+    <Project Path="tests/QandA.Api.UnitTests/QandA.Api.UnitTests.csproj" />
+  </Folder>
+</Solution>

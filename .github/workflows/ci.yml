@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  # The release workflow runs the same checks before publishing anything.
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  # The two suites run in parallel, in the same containers as `docker compose --profile test` locally.
+  api:
+    name: API tests (unit + integration on PostgreSQL)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker compose --profile test run --rm --build api-tests
+      - if: always()
+        run: docker compose --profile test down -v
+
+  web:
+    name: Web typecheck + tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker compose --profile test run --rm --build web-tests
