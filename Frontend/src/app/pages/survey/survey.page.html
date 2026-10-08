@@ -1,0 +1,203 @@
+<ng-container *transloco="let t">
+  @if (notFound()) {
+    <app-not-found-page />
+  } @else if (loadError()) {
+    <p class="alert error" role="alert">{{ loadError() }}</p>
+  } @else if (survey(); as s) {
+    <div class="layout" [class.with-side]="s.isAuthor">
+      <article class="main">
+        <header class="head">
+          <div class="badges">
+            <app-status-badge [status]="status()" />
+            @if (s.deadline) {
+              <span class="deadline muted" [title]="format.title(s.deadline)">
+                <mat-icon svgIcon="clock" class="sm" />
+                {{ status() === 'closed' ? t('survey.closedAt', { date: format.dateWithZone(s.deadline) }) : format.dateWithZone(s.deadline) }}
+              </span>
+            }
+            @if (s.status !== 'draft') {
+              <app-share-button class="share" [url]="shareUrl()" [title]="s.title" />
+            }
+          </div>
+          <h1 class="title" [class.long]="s.title.length > longTitle">{{ s.title }}</h1>
+          @if (s.description) {
+            <div class="description-block">
+              <p class="description" [class.clamped]="descriptionLong() && !descriptionOpen()">{{ s.description }}</p>
+              @if (descriptionLong()) {
+                <button type="button" class="link-btn" [attr.aria-expanded]="descriptionOpen()" (click)="descriptionOpen.set(!descriptionOpen())">
+                  {{ descriptionOpen() ? t('survey.showLess') : t('survey.showMore') }}
+                </button>
+              }
+            </div>
+          }
+          <p class="meta muted">
+            <app-user-avatar [name]="s.author.name" [url]="s.author.avatarUrl" [size]="22" />
+            <span [title]="format.title(s.publishedAt ?? s.createdAt)">
+              {{ t('survey.by', { author: s.author.name }) }} ·
+              {{ s.publishedAt ? t('survey.published', { date: format.date(s.publishedAt) }) : t('survey.created', { date: format.date(s.createdAt) }) }}
+            </span>
+          </p>
+        </header>
+
+        @if (left(); as l) {
+          <div class="countdown" [class.soon]="l.totalMs < 3600000" role="timer" aria-live="off">
+            <span class="countdown-label">{{ t('survey.timeLeft') }}</span>
+            <span class="countdown-value">{{ countdown() }}</span>
+          </div>
+        }
+
+        @if (status() === 'draft') {
+          <p class="alert warning">{{ t('survey.draftNotice') }}</p>
+        } @else if (status() === 'closed') {
+          <p class="alert">{{ t('survey.closedNotice') }}</p>
+        }
+
+        <div class="vote">
+          @if (canVote()) {
+            <div class="vote-head">
+              <span class="label">{{ single() ? t('survey.chooseOne') : t('survey.chooseUpTo', { n: s.maxVotesPerUser }) }}</span>
+              @if (!single()) {
+                <span class="muted small">{{ t('survey.selected', { n: selection().length, max: s.maxVotesPerUser }) }}</span>
+              }
+            </div>
+          }
+
+          <ul class="options" [attr.role]="single() ? 'radiogroup' : 'group'" [attr.aria-label]="s.title">
+            @for (option of s.options; track option.id) {
+              @let pct = percent(s, option);
+              <li>
+                <div
+                  class="option"
+                  [class.selected]="isSelected(option)"
+                  [class.mine]="s.myVotes.includes(option.id)"
+                  [class.disabled]="optionDisabled(option)"
+                >
+                  <span class="bar" [style.width.%]="pct" aria-hidden="true"></span>
+                  @if (single()) {
+                    <mat-radio-button
+                      class="choice"
+                      disableRipple
+                      [name]="'survey-' + s.id"
+                      [value]="option.id"
+                      [checked]="isSelected(option)"
+                      [disabled]="optionDisabled(option)"
+                      (change)="toggle(option)"
+                    >
+                      <span class="text">{{ option.text }}</span>
+                      @if (option.addedBy) {
+                        <small class="muted added">{{ t('survey.addedBy', { name: option.addedBy }) }}</small>
+                      }
+                    </mat-radio-button>
+                  } @else {
+                    <mat-checkbox class="choice" disableRipple [checked]="isSelected(option)" [disabled]="optionDisabled(option)" (change)="toggle(option)">
+                      <span class="text">{{ option.text }}</span>
+                      @if (option.addedBy) {
+                        <small class="muted added">{{ t('survey.addedBy', { name: option.addedBy }) }}</small>
+                      }
+                    </mat-checkbox>
+                  }
+                  <span class="result">
+                    <strong>{{ pct }}%</strong>
+                    <small class="muted">{{ t('survey.votes', { n: option.votes }) }}</small>
+                  </span>
+                </div>
+
+                @if (s.isAuthor && option.voters?.length) {
+                  <details class="voters">
+                    <summary>{{ t('survey.votersTitle') }} ({{ option.voters!.length }})</summary>
+                    <ul>
+                      @for (voter of option.voters; track voter.userId) {
+                        <li>
+                          <span class="voter"><app-user-avatar [name]="voter.name" [url]="voter.avatarUrl" [size]="22" />{{ voter.name }}</span>
+                          <time class="muted" [attr.datetime]="voter.votedAt" [title]="format.title(voter.votedAt)">{{ format.date(voter.votedAt) }}</time>
+                        </li>
+                      }
+                    </ul>
+                  </details>
+                }
+              </li>
+            }
+          </ul>
+
+          <div class="totals muted">
+            <span><mat-icon svgIcon="users" class="sm" />{{ t('survey.voters', { n: s.voterCount }) }}</span>
+            <span>{{ t('survey.totalVotes') }}: {{ t('survey.votes', { n: s.totalVotes }) }}</span>
+            @if (s.isAuthor && s.status !== 'draft') {
+              <span>{{ t('survey.authorOnly') }}</span>
+            }
+          </div>
+
+          @if (status() === 'active' && !auth.isLoggedIn()) {
+            <div class="cta">
+              <span>{{ t('survey.signInToVote') }}</span>
+              <a mat-flat-button routerLink="/login" [queryParams]="{ redirect: '/surveys/' + s.id }">{{ t('nav.login') }}</a>
+              <a mat-stroked-button routerLink="/register" [queryParams]="{ redirect: '/surveys/' + s.id }">{{ t('nav.register') }}</a>
+            </div>
+          } @else if (status() === 'active' && auth.needsConfirmation()) {
+            <p class="alert warning">{{ t('survey.confirmToVote') }}</p>
+          }
+
+          @if (canVote()) {
+            <div class="vote-actions">
+              <button mat-flat-button [disabled]="busy() || !dirty() || selection().length === 0" (click)="submitVote()">
+                <mat-icon svgIcon="check" />{{ hasVoted() ? t('survey.updateVote') : t('survey.submitVote') }}
+              </button>
+              @if (hasVoted()) {
+                <button mat-button [disabled]="busy()" (click)="withdraw()">{{ t('survey.withdraw') }}</button>
+              }
+            </div>
+          }
+        </div>
+
+        @if (canAddOption()) {
+          <form class="add-option" (ngSubmit)="addOption()">
+            <div class="add-row">
+              <mat-form-field class="full" subscriptSizing="dynamic">
+                <mat-label>{{ t('survey.addOption') }}</mat-label>
+                <input
+                  matInput
+                  name="newOption"
+                  [ngModel]="newOption()"
+                  (ngModelChange)="newOption.set($event); newOptionError.set('')"
+                  [placeholder]="t('survey.addOptionPlaceholder')"
+                  [maxlength]="limits.optionTextMax"
+                />
+                <button mat-button matSuffix type="submit" class="add-btn" [disabled]="busy() || !newOption().trim()">
+                  <mat-icon svgIcon="plus" />{{ t('survey.add') }}
+                </button>
+              </mat-form-field>
+            </div>
+            @if (newOptionError()) {
+              <p class="error-text" role="alert">{{ newOptionError() }}</p>
+            }
+            <div class="add-meta">
+              @if (canVoteForNew()) {
+                <mat-checkbox name="newOptionVote" [ngModel]="newOptionVote()" (ngModelChange)="newOptionVote.set($event)">
+                  {{ t('survey.addAndVote') }}
+                </mat-checkbox>
+              }
+              @if (!s.isAuthor) {
+                <span class="muted small">{{ t('survey.optionsLeft', { n: optionsLeft() }) }}</span>
+              }
+            </div>
+          </form>
+        }
+      </article>
+
+      @if (s.isAuthor) {
+        <aside class="side">
+          @if (s.status === 'draft') {
+            <button mat-flat-button [disabled]="busy()" (click)="publish()"><mat-icon svgIcon="send" />{{ t('survey.publish') }}</button>
+            <a mat-stroked-button [routerLink]="['/surveys', s.id, 'edit']"><mat-icon svgIcon="edit" />{{ t('survey.edit') }}</a>
+          }
+          <button mat-stroked-button class="danger" [disabled]="busy()" (click)="remove()"><mat-icon svgIcon="trash" />{{ t('survey.delete') }}</button>
+        </aside>
+      }
+    </div>
+  } @else {
+    <div aria-busy="true">
+      <span class="sr-only">{{ t('common.loading') }}</span>
+      <app-survey-skeleton />
+    </div>
+  }
+</ng-container>

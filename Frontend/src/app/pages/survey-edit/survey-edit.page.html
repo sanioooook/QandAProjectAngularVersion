@@ -1,0 +1,182 @@
+<ng-container *transloco="let t">
+  @if (notFound()) {
+    <app-not-found-page />
+  } @else {
+    <section class="edit">
+      <div class="page-head">
+        <h1>{{ id() ? t('form.editTitle') : t('form.createTitle') }}</h1>
+      </div>
+
+      @if (loaded()) {
+        <form class="card" [formGroup]="form" novalidate (ngSubmit)="save(true)">
+          @if (formError()) {
+            <p id="form-error" class="alert error" role="alert" tabindex="-1">{{ formError() }}</p>
+          }
+          @if (restored()) {
+            <div class="alert restored">
+              <span>{{ t('form.restored') }}</span>
+              <button type="button" class="link-btn" (click)="startOver()">{{ t('form.startOver') }}</button>
+            </div>
+          }
+
+          <mat-form-field class="full">
+            <mat-label>{{ t('form.title') }}</mat-label>
+            <input matInput id="title" formControlName="title" [placeholder]="t('form.titlePlaceholder')" [maxlength]="limits.titleMax" />
+            <mat-hint align="end"><app-char-count [value]="value().title" [max]="limits.titleMax" /></mat-hint>
+            <mat-error>{{ error('title') }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="full">
+            <mat-label>{{ t('form.description') }}</mat-label>
+            <textarea
+              matInput
+              id="description"
+              formControlName="description"
+              rows="3"
+              [placeholder]="t('form.descriptionPlaceholder')"
+              [maxlength]="limits.descriptionMax"
+            ></textarea>
+            <mat-hint align="end"><app-char-count [value]="value().description" [max]="limits.descriptionMax" /></mat-hint>
+            <mat-error>{{ error('description') }}</mat-error>
+          </mat-form-field>
+
+          <fieldset class="options" formArrayName="options">
+            <legend class="label">{{ t('form.options') }}</legend>
+            @for (control of options.controls; track $index; let i = $index) {
+              <div class="option-row">
+                <span class="num muted">{{ i + 1 }}</span>
+                <mat-form-field class="full" subscriptSizing="dynamic">
+                  <input
+                    matInput
+                    [id]="'option-' + i"
+                    [formControlName]="i"
+                    [placeholder]="t('form.optionPlaceholder', { n: i + 1 })"
+                    [attr.aria-label]="t('form.optionPlaceholder', { n: i + 1 })"
+                    [maxlength]="limits.optionTextMax"
+                    (keydown.enter)="onOptionEnter($event, i)"
+                  />
+                  <app-char-count matSuffix class="inside" [value]="value().options[i] ?? ''" [max]="limits.optionTextMax" />
+                </mat-form-field>
+                <button
+                  mat-icon-button
+                  type="button"
+                  [disabled]="options.length <= limits.optionsMin"
+                  [attr.aria-label]="t('form.removeOption', { n: i + 1 })"
+                  [matTooltip]="t('form.removeOption', { n: i + 1 })"
+                  (click)="removeOption(i)"
+                >
+                  <mat-icon svgIcon="x" />
+                </button>
+              </div>
+            }
+            @if (optionsError()) {
+              <p class="error-text" role="alert">{{ optionsError() }}</p>
+            }
+            <button mat-stroked-button type="button" class="add" [disabled]="options.length >= limits.optionsMax" (click)="addOption()">
+              <mat-icon svgIcon="plus" />{{ t('form.addOption') }}
+            </button>
+          </fieldset>
+
+          <fieldset class="settings">
+            <legend class="label">{{ t('form.settings') }}</legend>
+
+            <div class="grid">
+              <!-- Left: who may do what. Right: until when. -->
+              <div class="column">
+                <mat-form-field class="count-field">
+                  <mat-label>{{ t('form.maxVotes') }}</mat-label>
+                  <input matInput id="max-votes" type="number" formControlName="maxVotesPerUser" min="1" [max]="maxVotesLimit()" />
+                  <mat-error>{{ error('maxVotesPerUser') }}</mat-error>
+                </mat-form-field>
+
+                <mat-checkbox formControlName="allowParticipantOptions">{{ t('form.allowOptions') }}</mat-checkbox>
+
+                <!-- A refinement of the checkbox, so it reads as one line under it rather than a new setting. -->
+                @if (value().allowParticipantOptions) {
+                  <div class="nested">
+                    <label for="max-options" class="muted">{{ t('form.maxOptions') }}</label>
+                    <mat-form-field class="tiny" subscriptSizing="dynamic">
+                      <input
+                        matInput
+                        id="max-options"
+                        type="number"
+                        formControlName="maxOptionsPerParticipant"
+                        min="1"
+                        [max]="limits.maxOptionsPerParticipantCap"
+                      />
+                    </mat-form-field>
+                  </div>
+                  @if (error('maxOptionsPerParticipant')) {
+                    <p class="error-text nested-error">{{ error('maxOptionsPerParticipant') }}</p>
+                  }
+                }
+              </div>
+
+              <div class="column">
+                <div class="deadline-row">
+                  <mat-form-field class="date">
+                    <mat-label>{{ t('form.deadline') }}</mat-label>
+                    <input matInput id="deadline" formControlName="deadlineDate" [matDatepicker]="datePicker" [min]="minDate()" />
+                    <mat-datepicker-toggle matIconSuffix [for]="datePicker" />
+                    <mat-datepicker #datePicker />
+                    <mat-error>{{ error('deadlineDate') }}</mat-error>
+                  </mat-form-field>
+                  <mat-form-field class="time">
+                    <mat-label>{{ t('form.deadlineTime') }}</mat-label>
+                    <input
+                      matInput
+                      id="deadline-time"
+                      formControlName="deadlineTime"
+                      [matTimepicker]="timePicker"
+                    />
+                    <mat-timepicker-toggle matIconSuffix [for]="timePicker" />
+                    <mat-timepicker #timePicker interval="30min" />
+                  </mat-form-field>
+                  @if (value().deadlineDate || value().deadlineTime) {
+                    <button
+                      mat-icon-button
+                      type="button"
+                      class="clear"
+                      [attr.aria-label]="t('form.clearDeadline')"
+                      [matTooltip]="t('form.clearDeadline')"
+                      (click)="clearDeadline()"
+                    >
+                      <mat-icon svgIcon="x" />
+                    </button>
+                  }
+                </div>
+                @if (deadline(); as d) {
+                  <p class="hint">{{ t('form.deadlineSummary', { date: format.dateWithZone(d.toISOString()) }) }}</p>
+                } @else {
+                  <p class="hint">{{ t('form.deadlineHint') }}</p>
+                }
+                <p class="hint">
+                  {{ t('form.deadlineZone', { zone: zoneLabel() }) }}
+                  <a routerLink="/account">{{ t('form.changeZone') }}</a>
+                </p>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="footer">
+            <p class="hint">{{ t('form.publishHint') }}</p>
+            <div class="buttons">
+              <button mat-button type="button" (click)="cancel()">{{ t('form.cancel') }}</button>
+              <button mat-stroked-button type="button" [disabled]="saving()" (click)="save(false)">
+                {{ id() ? t('form.saveChanges') : t('form.saveDraft') }}
+              </button>
+              <button mat-flat-button type="submit" [disabled]="saving()"><mat-icon svgIcon="send" />{{ t('form.publish') }}</button>
+            </div>
+          </div>
+        </form>
+      } @else if (formError()) {
+        <p class="alert error" role="alert">{{ formError() }}</p>
+      } @else {
+        <div aria-busy="true">
+          <span class="sr-only">{{ t('common.loading') }}</span>
+          <app-form-skeleton />
+        </div>
+      }
+    </section>
+  }
+</ng-container>

@@ -1,0 +1,264 @@
+@use '@angular/material' as mat;
+
+// Material 3 theme. Colors are emitted with light-dark(), so the active scheme follows `color-scheme`:
+// the OS setting by default, or the one picked in the app (<html data-theme="light|dark">).
+html {
+  color-scheme: light dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: (
+        plain-family: (Inter, 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif),
+        brand-family: (Inter, 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif),
+      ),
+      density: 0,
+    )
+  );
+
+  // App tokens on top of Material's system tokens (--mat-sys-*).
+  --app-bg: light-dark(#f6f7fb, #0e1016);
+  --app-border: var(--mat-sys-outline-variant);
+  --app-muted: var(--mat-sys-on-surface-variant);
+  --app-bar: light-dark(#d9d5fd, #3d3990);
+  --app-success: light-dark(#15803d, #4ade80);
+  --app-success-soft: light-dark(#dcfce7, #14301f);
+  --app-warning: light-dark(#a16207, #fbbf24);
+  --app-warning-soft: light-dark(#fef3c7, #352a10);
+  --app-danger: var(--mat-sys-error);
+  --app-danger-soft: var(--mat-sys-error-container);
+  --app-info-soft: var(--mat-sys-primary-container);
+  --app-radius: 14px;
+  --app-shadow: light-dark(0 1px 2px rgb(16 24 40 / 0.06), 0 1px 2px rgb(0 0 0 / 0.3)),
+    light-dark(0 4px 16px rgb(16 24 40 / 0.06), 0 4px 16px rgb(0 0 0 / 0.25));
+
+  // Rounder, softer Material defaults.
+  @include mat.card-overrides(
+    (
+      outlined-container-shape: var(--app-radius),
+      outlined-container-color: var(--mat-sys-surface-container-lowest),
+      outlined-outline-color: var(--app-border),
+    )
+  );
+  @include mat.snack-bar-overrides((container-shape: 12px));
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--app-bg);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-large);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(1.45rem, 1.2rem + 1vw, 1.9rem);
+  font-weight: 650;
+}
+
+h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+.container {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 20px;
+
+  p {
+    margin-top: 4px;
+  }
+}
+
+.muted {
+  color: var(--app-muted);
+}
+
+.small {
+  font-size: 0.86rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 100;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+
+  &:focus {
+    top: 12px;
+  }
+}
+
+// Messages inside forms and pages.
+.alert {
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 0.93rem;
+  background: var(--app-info-soft);
+  color: var(--mat-sys-on-primary-container);
+
+  &.error {
+    background: var(--app-danger-soft);
+    color: var(--mat-sys-on-error-container);
+  }
+
+  &.warning {
+    background: var(--app-warning-soft);
+    color: light-dark(#713f12, #fde68a);
+  }
+}
+
+.hint {
+  font-size: 0.86rem;
+  color: var(--app-muted);
+}
+
+.error-text {
+  font-size: 0.86rem;
+  color: var(--app-danger);
+}
+
+// Outlined fields are drawn by Material as three pieces (start, the notch for the label, end). Where
+// the pieces meet at fractional pixels the line shows light seams. While the label sits inside the
+// field there is no notch to cut, so one continuous border is drawn instead; the pieces take over
+// again once the label floats.
+.mat-mdc-form-field {
+  --app-outline: var(--mat-sys-outline);
+
+  &:hover {
+    --app-outline: var(--mat-sys-on-surface);
+  }
+
+  &.mat-form-field-invalid {
+    --app-outline: var(--mat-sys-error);
+  }
+
+  &.mat-form-field-disabled {
+    --app-outline: color-mix(in srgb, var(--mat-sys-on-surface) 12%, transparent);
+  }
+}
+
+.mdc-notched-outline:not(.mdc-notched-outline--notched) {
+  > * {
+    border-color: transparent !important;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--app-outline);
+    border-radius: var(--mat-form-field-outlined-container-shape, 4px);
+    pointer-events: none;
+  }
+}
+
+// Full-width form fields by default; the subscript area only takes space when it shows something.
+.mat-mdc-form-field.full {
+  width: 100%;
+}
+
+// Inline SVG icons: an inline <svg> sits on the text baseline and the body's line-height makes the
+// icon taller than its box, which pushes it above the label in buttons.
+.mat-icon svg {
+  display: block;
+}
+
+.mat-icon.sm {
+  width: 15px;
+  height: 15px;
+}
+
+// Loading placeholders.
+.skeleton {
+  display: block;
+  border-radius: 7px;
+  background: var(--mat-sys-surface-container-high);
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: skeleton-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.toast-success {
+  --mat-snack-bar-container-color: light-dark(#14532d, #bbf7d0);
+  --mat-snack-bar-supporting-text-color: light-dark(#ffffff, #052e16);
+}
+
+.toast-error {
+  --mat-snack-bar-container-color: var(--mat-sys-error);
+  --mat-snack-bar-supporting-text-color: var(--mat-sys-on-error);
+  --mat-snack-bar-button-color: var(--mat-sys-on-error);
+}

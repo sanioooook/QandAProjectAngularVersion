@@ -1,0 +1,109 @@
+@if (auth.user(); as user) {
+  <section class="account" *transloco="let t">
+    <div class="page-head">
+      <h1>{{ t('account.title') }}</h1>
+    </div>
+
+    <div class="section">
+      <h2>{{ t('account.profile') }}</h2>
+      <div class="avatar-row">
+        <app-user-avatar [name]="user.displayName" [url]="user.avatarUrl" [size]="88" />
+        <div class="avatar-actions">
+          <input #file type="file" accept="image/png,image/jpeg,image/webp" hidden (change)="onFile($event)" />
+          <div class="buttons">
+            <button mat-stroked-button [disabled]="avatarBusy()" (click)="file.click()">
+              <mat-icon svgIcon="camera" />{{ user.avatarUrl ? t('account.changeAvatar') : t('account.uploadAvatar') }}
+            </button>
+            @if (user.avatarUrl) {
+              <button mat-button class="danger" [disabled]="avatarBusy()" (click)="removeAvatar()">
+                <mat-icon svgIcon="trash" />{{ t('account.removeAvatar') }}
+              </button>
+            }
+          </div>
+          <p class="hint">{{ t('account.avatarHint') }}</p>
+          @if (avatarError()) {
+            <p class="error-text" role="alert">{{ avatarError() }}</p>
+          }
+        </div>
+      </div>
+
+      <form class="name" novalidate (ngSubmit)="saveName()">
+        <mat-form-field class="full" subscriptSizing="dynamic">
+          <mat-label>{{ t('auth.displayName') }}</mat-label>
+          <input matInput id="display-name" [formControl]="name" [maxlength]="limits.displayNameMax" />
+          <mat-hint>{{ t('auth.displayNameHint') }}</mat-hint>
+          <mat-error>{{ nameError() }}</mat-error>
+        </mat-form-field>
+        <button mat-flat-button type="submit" [disabled]="nameBusy() || nameUnchanged()">{{ t('account.save') }}</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h2>{{ t('account.security') }}</h2>
+      <div class="line">
+        <div>
+          <div class="label">{{ t('auth.email') }}</div>
+          <div class="email">
+            {{ user.email }}
+            @if (auth.config().emailEnabled) {
+              <span class="badge" [class.ok]="user.emailConfirmed">
+                {{ user.emailConfirmed ? t('account.confirmed') : t('account.notConfirmed') }}
+              </span>
+            }
+          </div>
+        </div>
+        @if (auth.config().emailEnabled && !user.emailConfirmed) {
+          <button mat-stroked-button [disabled]="resendBusy()" (click)="resend()">{{ t('auth.resend') }}</button>
+        }
+      </div>
+      <div class="line">
+        <div>
+          <div class="label">{{ t('auth.password') }}</div>
+          <div class="muted">••••••••</div>
+        </div>
+        <a mat-stroked-button routerLink="/account/password"><mat-icon svgIcon="key" />{{ t('menu.changePassword') }}</a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>{{ t('account.interface') }}</h2>
+
+      <div class="field">
+        <span class="label" id="language-label">{{ t('prefs.language') }}</span>
+        <mat-button-toggle-group
+          aria-labelledby="language-label"
+          hideSingleSelectionIndicator
+          [value]="prefs.locale()"
+          (change)="prefs.setLocale($event.value)"
+        >
+          @for (code of locales; track code) {
+            <mat-button-toggle [value]="code" [attr.lang]="code">{{ localeNames[code] }}</mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+        <p class="hint">{{ t('account.languageHint') }}</p>
+      </div>
+
+      <div class="field">
+        <mat-form-field class="zone" subscriptSizing="dynamic">
+          <mat-label>{{ t('prefs.timeZone') }}</mat-label>
+          <mat-select [value]="prefs.timeZone()" (valueChange)="prefs.setTimeZone($event)">
+            <mat-option value="auto">{{ t('prefs.timeZoneAuto', { zone: autoZoneLabel }) }}</mat-option>
+            @for (option of zoneOptions; track option.zone) {
+              <mat-option [value]="option.zone">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <p class="hint">{{ t('account.timeZoneHint') }}</p>
+      </div>
+
+      <div class="field">
+        <span class="label" id="theme-label">{{ t('prefs.theme') }}</span>
+        <mat-button-toggle-group aria-labelledby="theme-label" hideSingleSelectionIndicator [value]="prefs.theme()" (change)="prefs.setTheme($event.value)">
+          @for (item of themes; track item.value) {
+            <mat-button-toggle [value]="item.value"><mat-icon [svgIcon]="item.icon" class="sm" />{{ t('prefs.' + item.value) }}</mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+      </div>
+    </div>
+  </section>
+}
