@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <base href="/" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <title>QandA</title>
+    <script>
+      // Apply the saved theme before the first paint to avoid a light flash in dark mode.
+      try {
+        var theme = localStorage.getItem('qanda.theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    </script>
+    <style>
+      /* Boot shell: shown as soon as the HTML arrives, replaced when the app starts.
+         Self-contained on purpose (the app's CSS may still be downloading on a slow connection). */
+      .boot { --b-bg: #f6f7fb; --b-bar: #ffffff; --b-line: #e3e6ef; --b-card: #ffffff; min-height: 100vh; background: var(--b-bg); }
+      :root[data-theme='dark'] .boot { --b-bg: #0e1016; --b-bar: #161922; --b-line: #2a2f3c; --b-card: #161922; }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) .boot { --b-bg: #0e1016; --b-bar: #161922; --b-line: #2a2f3c; --b-card: #161922; }
+      }
+      body { margin: 0; }
+      .boot-bar { display: flex; align-items: center; gap: 10px; height: 61px; padding: 0 max(16px, calc(50vw - 504px)); background: var(--b-bar); border-bottom: 1px solid var(--b-line); box-sizing: border-box; }
+      /* Same box as the app's .container, so nothing moves when the app takes over. */
+      .boot-body { max-width: 1040px; margin: 0 auto; padding: 24px 16px; box-sizing: border-box; }
+      .boot-line { display: block; height: 14px; margin-bottom: 12px; border-radius: 7px; background: var(--b-line); }
+      .boot-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; margin-top: 24px; }
+      .boot-cards span { height: 172px; border-radius: 14px; background: var(--b-card); border: 1px solid var(--b-line); }
+      @media (prefers-reduced-motion: no-preference) {
+        .boot-line, .boot-cards span { animation: boot-pulse 1.4s ease-in-out infinite; }
+      }
+      @keyframes boot-pulse { 50% { opacity: 0.55; } }
+    </style>
+  </head>
+  <body>
+    <app-root>
+      <div class="boot" aria-busy="true">
+        <div class="boot-bar">
+          <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#4f46e5"/><rect x="7" y="17" width="4" height="8" rx="1.5" fill="#fff"/><rect x="14" y="11" width="4" height="14" rx="1.5" fill="#fff"/><rect x="21" y="7" width="4" height="18" rx="1.5" fill="#fff"/></svg>
+        </div>
+        <div class="boot-body">
+          <span class="boot-line" style="width: 240px; height: 26px"></span>
+          <span class="boot-line" style="width: 360px; max-width: 80%"></span>
+          <div class="boot-cards"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </app-root>
+  </body>
+</html>

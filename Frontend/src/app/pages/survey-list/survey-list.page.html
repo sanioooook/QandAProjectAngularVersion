@@ -1,0 +1,72 @@
+<section *transloco="let t">
+  <div class="page-head">
+    <div>
+      <h1>{{ t('list.' + scope() + 'Title') }}</h1>
+      <p class="muted">{{ t('list.' + scope() + 'Subtitle') }}</p>
+    </div>
+    <div class="head-actions">
+      <button mat-stroked-button [disabled]="loading()" (click)="load(undefined, true)">
+        <mat-icon svgIcon="refresh" [class.spin]="loading()" />{{ t('list.refresh') }}
+      </button>
+      @if (scope() !== 'voted') {
+        <a mat-flat-button routerLink="/surveys/new"><mat-icon svgIcon="plus" />{{ t('nav.newSurvey') }}</a>
+      }
+    </div>
+  </div>
+
+  @if (scope() === 'mine') {
+    <nav class="filters" [attr.aria-label]="t('list.filterAll')">
+      <a class="chip" routerLink="." [class.active]="!status()" [attr.aria-current]="!status() ? 'true' : null">{{ t('list.filterAll') }}</a>
+      @for (value of statuses; track value) {
+        <a
+          class="chip"
+          routerLink="."
+          [queryParams]="{ status: value }"
+          [class.active]="status() === value"
+          [attr.aria-current]="status() === value ? 'true' : null"
+        >
+          {{ t('survey.status.' + value) }}
+        </a>
+      }
+    </nav>
+  }
+
+  @if (error()) {
+    <p class="alert error" role="alert">{{ error() }}</p>
+  }
+
+  @let list = data();
+  @if (!list && loading()) {
+    <div class="grid" aria-busy="true">
+      <span class="sr-only">{{ t('common.loading') }}</span>
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <app-survey-card-skeleton />
+      }
+    </div>
+  } @else if (list && list.items.length === 0) {
+    <app-empty-state [text]="t(emptyKey())">
+      @if (scope() !== 'voted') {
+        <a mat-flat-button routerLink="/surveys/new">{{ t('nav.newSurvey') }}</a>
+      } @else {
+        <a mat-stroked-button routerLink="/surveys">{{ t('nav.active') }}</a>
+      }
+    </app-empty-state>
+  } @else if (list) {
+    <div class="grid">
+      @for (survey of list.items; track survey.id) {
+        <app-survey-card [survey]="survey" />
+      }
+    </div>
+    @if (pages() > 1) {
+      <nav class="pager">
+        @if (page() > 1) {
+          <a mat-stroked-button routerLink="." [queryParams]="pageParams(page() - 1)"><mat-icon svgIcon="left" />{{ t('list.prev') }}</a>
+        }
+        <span class="muted">{{ t('list.page', { page: page(), pages: pages() }) }}</span>
+        @if (page() < pages()) {
+          <a mat-stroked-button routerLink="." [queryParams]="pageParams(page() + 1)">{{ t('list.next') }}<mat-icon svgIcon="right" iconPositionEnd /></a>
+        }
+      </nav>
+    }
+  }
+</section>

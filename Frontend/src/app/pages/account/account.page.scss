@@ -1,0 +1,124 @@
+.account {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.page-head {
+  margin-bottom: 4px;
+}
+
+.section {
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 3vw, 26px);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--mat-sys-surface-container-lowest);
+  box-shadow: var(--app-shadow);
+}
+
+.avatar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+}
+
+.avatar-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.danger {
+  --mat-button-text-label-text-color: var(--app-danger);
+}
+
+.name {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  button {
+    margin-top: 8px;
+  }
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--app-border);
+
+  &:first-of-type {
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+.label {
+  font-weight: 600;
+  font-size: 0.93rem;
+}
+
+.email {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.badge {
+  padding: 1px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--app-warning-soft);
+  color: var(--app-warning);
+
+  &.ok {
+    background: var(--app-success-soft);
+    color: var(--app-success);
+  }
+}
+
+.field {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.zone {
+  width: min(100%, 420px);
+}
+
+mat-button-toggle-group {
+  flex-wrap: wrap;
+}
+
+mat-button-toggle .mat-icon {
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+
+@media (max-width: 520px) {
+  .name {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      margin-top: 0;
+    }
+  }
+}

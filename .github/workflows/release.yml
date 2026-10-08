@@ -1,0 +1,90 @@
+name: Release
+
+# Push a version tag to release:  git tag v2.0.0 && git push origin v2.0.0
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    uses: ./.github/workflows/ci.yml
+
+  images:
+    name: Image ${{ matrix.image }}
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - image: api
+            context: ./Backend
+          - image: web
+            context: ./Frontend
+    steps:
+      - uses: actions/checkout@v7
+      # Only the tiny runtime stages run under emulation; .NET and Node build natively (see the Dockerfiles).
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/qanda-ng-${{ matrix.image }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+      - uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.context }}
+          target: final
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+
+  release:
+    name: GitHub release
+    needs: images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Pin the compose file to this version and write the notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          owner="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          repo_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+          mkdir dist
+          sed -e "s|\${QANDA_OWNER:-sanioooook}|${owner}|g" -e "s|\${QANDA_VERSION:-latest}|${version}|g" \
+            docker-compose.release.yml > dist/docker-compose.yml
+          # Images cannot be release assets, so the notes link them; the generated changelog follows.
+          cat > dist/notes.md <<EOF
+          ## Docker images (linux/amd64, linux/arm64)
+
+          | Image | Pull |
+          |---|---|
+          | [qanda-ng-api](${repo_url}/pkgs/container/qanda-ng-api) | \`docker pull ghcr.io/${owner}/qanda-ng-api:${version}\` |
+          | [qanda-ng-web](${repo_url}/pkgs/container/qanda-ng-web) | \`docker pull ghcr.io/${owner}/qanda-ng-web:${version}\` |
+
+          ## Run
+
+          Download \`docker-compose.yml\` below (it is pinned to these images) into an empty folder and run \`docker compose up -d\`, then open http://localhost:8090. Settings: [\`.env.example\`](${repo_url}/blob/${GITHUB_REF_NAME}/.env.example), see the [README](${repo_url}/blob/${GITHUB_REF_NAME}/README.md#run-a-released-version).
+          EOF
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/docker-compose.yml --notes-file dist/notes.md --generate-notes --title "QandA (Angular) $GITHUB_REF_NAME"
