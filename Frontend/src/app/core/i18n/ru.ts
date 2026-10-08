@@ -157,7 +157,7 @@ export const ru: Translation = {
     maxVotes: 'Сколько вариантов может выбрать участник',
     deadline: 'Дедлайн',
     deadlineHint: 'Необязательно. Дата без времени означает конец этого дня.',
-    deadlineTime: 'Время (необязательно)',
+    time: 'Время',
     deadlineSummary: 'Голосование завершится {date}',
     clearDeadline: 'Очистить',
     allowOptions: 'Участники могут добавлять свои варианты',

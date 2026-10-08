@@ -157,7 +157,7 @@ export const uk: Translation = {
     maxVotes: 'Скільки варіантів може обрати учасник',
     deadline: 'Дедлайн',
     deadlineHint: 'Необовʼязково. Дата без часу означає кінець цього дня.',
-    deadlineTime: 'Час (необовʼязково)',
+    time: 'Час',
     deadlineSummary: 'Голосування завершиться {date}',
     clearDeadline: 'Очистити',
     allowOptions: 'Учасники можуть додавати свої варіанти',

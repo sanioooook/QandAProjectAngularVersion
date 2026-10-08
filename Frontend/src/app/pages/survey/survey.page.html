@@ -8,6 +8,7 @@
       <article class="main">
         <header class="head">
           <div class="badges">
+            <div class="badge-row">
             <app-status-badge [status]="status()" />
             @if (s.deadline) {
               <span class="deadline muted" [title]="format.title(s.deadline)">
@@ -15,6 +16,7 @@
                 {{ status() === 'closed' ? t('survey.closedAt', { date: format.dateWithZone(s.deadline) }) : format.dateWithZone(s.deadline) }}
               </span>
             }
+            </div>
             @if (s.status !== 'draft') {
               <app-share-button class="share" [url]="shareUrl()" [title]="s.title" />
             }
@@ -73,7 +75,15 @@
                   [class.disabled]="optionDisabled(option)"
                 >
                   <span class="bar" [style.width.%]="pct" aria-hidden="true"></span>
-                  @if (single()) {
+                  @if (!canVote()) {
+                    <!-- Results only (guest, closed survey): no inputs that cannot be used. -->
+                    <span class="choice plain">
+                      <span class="text">{{ option.text }}</span>
+                      @if (option.addedBy) {
+                        <small class="muted added">{{ t('survey.addedBy', { name: option.addedBy }) }}</small>
+                      }
+                    </span>
+                  } @else if (single()) {
                     <mat-radio-button
                       class="choice"
                       disableRipple

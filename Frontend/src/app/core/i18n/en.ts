@@ -158,7 +158,7 @@ export const en = {
     maxVotes: 'Options a participant can pick',
     deadline: 'Deadline',
     deadlineHint: 'Optional. A date without a time means the end of that day.',
-    deadlineTime: 'Time (optional)',
+    time: 'Time',
     deadlineSummary: 'Voting ends {date}',
     clearDeadline: 'Clear',
     allowOptions: 'Participants can add their own options',

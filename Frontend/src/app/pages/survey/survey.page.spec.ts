@@ -89,7 +89,8 @@ describe('SurveyPage', () => {
 
     expect(screen.getByText('Sign in to vote')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Vote' })).toBeNull();
-    expect(screen.getAllByRole('radio').every((input) => (input as HTMLInputElement).disabled)).toBe(true);
+    expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    expect(screen.getByText('Park')).toBeTruthy();
   });
 
   it('a missing survey shows the not-found page', async () => {

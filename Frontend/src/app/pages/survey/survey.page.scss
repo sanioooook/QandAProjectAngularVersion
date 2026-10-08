@@ -27,16 +27,22 @@
 }
 
 .badges {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  // The icon button is 48px tall; let it overhang so the row keeps the badge's height.
+  margin: -8px 0 -2px;
+}
+
+.badge-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 14px;
-  // The icon button is 48px tall; let it overhang so the row keeps the badge's height.
-  margin-block: -8px;
 }
 
 .share {
-  margin-left: auto;
   margin-right: -10px;
 }
 
@@ -178,6 +184,10 @@
   position: relative;
   flex: 1;
   min-width: 0;
+
+  &.plain {
+    padding: 8px 10px;
+  }
 }
 
 .text {
